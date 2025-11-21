@@ -1,6 +1,6 @@
 {
   "name": "@raypx/logger",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lightweight, configurable logger based on consola",
   "keywords": [
     "logger",
