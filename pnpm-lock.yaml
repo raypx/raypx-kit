@@ -110,6 +110,28 @@ importers:
         specifier: 'catalog:'
         version: 4.0.12(@types/node@24.10.1)
 
+  packages/logger:
+    dependencies:
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.10.1
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.2
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.16.6(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.12(@types/node@24.10.1)
+
 packages:
 
   '@ark/schema@0.55.0':
@@ -791,6 +813,10 @@ packages:
   ci-info@3.9.0:
     resolution: {integrity: sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==}
     engines: {node: '>=8'}
+
+  consola@3.4.2:
+    resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
+    engines: {node: ^14.18.0 || >=16.10.0}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -2028,6 +2054,8 @@ snapshots:
       readdirp: 4.1.2
 
   ci-info@3.9.0: {}
+
+  consola@3.4.2: {}
 
   cross-spawn@7.0.6:
     dependencies:

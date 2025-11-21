@@ -62,6 +62,40 @@ console.log(env.NEXT_PUBLIC_API_URL); // string
 
 ---
 
+### [@raypx/logger](./packages/logger)
+
+Lightweight, configurable logger based on consola.
+
+```bash
+npm install @raypx/logger
+```
+
+**Features:**
+- ✅ Based on consola with rich formatting
+- ✅ Environment-aware log levels
+- ✅ Silent mode support
+- ✅ Replaceable logger instance for testing
+- ✅ Tagged logger support
+- ✅ TypeScript support
+
+**Example:**
+
+```typescript
+import { logger } from '@raypx/logger';
+
+logger.log('Hello, world!');
+logger.info('Information message');
+logger.warn('Warning message');
+logger.error('Error message');
+
+// Create module-specific logger
+import { createConsola } from '@raypx/logger';
+const moduleLogger = createConsola({ level: 4 }).withTag('MyModule');
+moduleLogger.info('Module-specific log');
+```
+
+---
+
 ### [@raypx/i18n](./packages/i18n)
 
 Vite plugin for internationalization with compile-time optimization.
@@ -118,6 +152,9 @@ Install the package you need:
 # Environment validation
 npm install @raypx/env zod
 
+# Logger
+npm install @raypx/logger
+
 # Internationalization
 npm install @raypx/i18n
 ```
@@ -173,6 +210,7 @@ pnpm release          # Publish to npm
 raypx-kit/
 ├── packages/
 │   ├── env/              # @raypx/env
+│   ├── logger/           # @raypx/logger
 │   └── i18n/             # @raypx/i18n
 ├── .github/
 │   └── workflows/        # CI/CD pipelines
@@ -185,6 +223,7 @@ raypx-kit/
 ## 📖 Documentation
 
 - **[@raypx/env Documentation](./packages/env/README.md)**
+- **[@raypx/logger Documentation](./packages/logger/README.md)**
 - **[@raypx/i18n Documentation](./packages/i18n/README.md)**
 - **[Contributing Guide](./CONTRIBUTING.md)**
 - **[Security Policy](./SECURITY.md)**

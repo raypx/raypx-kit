@@ -1,0 +1,59 @@
+{
+  "name": "@raypx/logger",
+  "version": "0.0.0",
+  "description": "Lightweight, configurable logger based on consola",
+  "keywords": [
+    "logger",
+    "logging",
+    "consola",
+    "typescript"
+  ],
+  "homepage": "https://github.com/raypx/raypx-kit/tree/main/packages/logger#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raypx/raypx-kit.git",
+    "directory": "packages/logger"
+  },
+  "license": "Apache-2.0",
+  "author": "Raypx Team",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rimraf dist",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "consola": "^3.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "rimraf": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
