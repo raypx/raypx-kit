@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Welcome to i18n Plugin",
+    "description": "This is a demo of the Vite i18n plugin."
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}

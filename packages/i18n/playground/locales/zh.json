@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "欢迎使用 i18n 插件",
+    "description": "这是 Vite i18n 插件的演示。"
+  },
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消"
+  }
+}

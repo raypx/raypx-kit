@@ -1,0 +1,56 @@
+{
+  "name": "@raypx/env",
+  "version": "0.0.3",
+  "description": "Environment validation with extends support and configurable client prefix",
+  "keywords": [
+    "env",
+    "environment-variables",
+    "validation",
+    "typescript",
+    "zod"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raypx/raypx-kit.git",
+    "directory": "packages/env"
+  },
+  "license": "Apache-2.0",
+  "author": "Raypx Team",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "catalog:",
+    "envin": "^1.1.10",
+    "lodash-es": "^4.17.21",
+    "rimraf": "catalog:",
+    "tsdown": "catalog:",
+    "type-fest": "^5.2.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
