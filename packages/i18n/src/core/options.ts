@@ -1,12 +1,12 @@
-import type { I18nPluginOptions, ResolvedI18nPluginOptions } from '../types';
+import type { I18nPluginOptions, ResolvedI18nPluginOptions } from "../types";
 
 const DEFAULT_OPTIONS: ResolvedI18nPluginOptions = {
-  localesDir: 'locales',
-  defaultLocale: 'en',
+  localesDir: "locales",
+  defaultLocale: "en",
   locales: [],
-  functionName: 't',
-  include: ['**/*.{js,ts,jsx,tsx,vue}'],
-  exclude: ['node_modules/**'],
+  functionName: "t",
+  include: ["**/*.{js,ts,jsx,tsx,vue}"],
+  exclude: ["node_modules/**"],
   strictMode: false,
   generateTypes: true,
 };

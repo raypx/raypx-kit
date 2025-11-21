@@ -1,10 +1,10 @@
-import type { LocaleMessages } from '../types';
+import type { LocaleMessages } from "../types";
 
 export function mergeMessages(target: LocaleMessages, source: LocaleMessages): LocaleMessages {
   const result = { ...target };
 
   for (const [key, value] of Object.entries(source)) {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       result[key] = mergeMessages((result[key] as LocaleMessages) || {}, value as LocaleMessages);
     } else {
       result[key] = value;
@@ -14,13 +14,13 @@ export function mergeMessages(target: LocaleMessages, source: LocaleMessages): L
   return result;
 }
 
-export function extractKeys(messages: LocaleMessages, prefix = ''): string[] {
+export function extractKeys(messages: LocaleMessages, prefix = ""): string[] {
   const keys: string[] = [];
 
   for (const [key, value] of Object.entries(messages)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       keys.push(fullKey);
     } else {
       keys.push(...extractKeys(value as LocaleMessages, fullKey));
@@ -31,7 +31,7 @@ export function extractKeys(messages: LocaleMessages, prefix = ''): string[] {
 }
 
 export function detectBrowserLocale(supportedLocales: string[]): string | undefined {
-  if (typeof window === 'undefined' || !window.navigator) {
+  if (typeof window === "undefined" || !window.navigator) {
     return undefined;
   }
 
@@ -45,7 +45,7 @@ export function detectBrowserLocale(supportedLocales: string[]): string | undefi
       return exactMatch;
     }
 
-    const langCode = browserLocale.split('-')[0];
+    const langCode = browserLocale.split("-")[0];
     const partialMatch = supportedLocales.find((locale) =>
       locale.toLowerCase().startsWith(langCode.toLowerCase())
     );

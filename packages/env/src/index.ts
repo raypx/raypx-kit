@@ -1,4 +1,4 @@
-import { defineEnv as defineEnvCore } from 'envin';
+import { defineEnv as defineEnvCore } from "envin";
 import type {
   ClientFormat,
   DefineEnv,
@@ -8,24 +8,24 @@ import type {
   Schema,
   ServerFormat,
   SharedFormat,
-} from 'envin/types';
-import { pick } from 'lodash-es';
+} from "envin/types";
+import { pick } from "lodash-es";
 
-export { z } from 'zod';
+export { z } from "zod";
 
 /**
  * Default client prefix for Vite projects
  */
-export const DEFAULT_CLIENT_PREFIX = 'VITE_';
+export const DEFAULT_CLIENT_PREFIX = "VITE_";
 
 /**
  * Common client prefixes for different frameworks
  */
 export const CLIENT_PREFIXES = {
-  VITE: 'VITE_',
-  NEXT: 'NEXT_PUBLIC_',
-  NUXT: 'NUXT_PUBLIC_',
-  EXPO: 'EXPO_PUBLIC_',
+  VITE: "VITE_",
+  NEXT: "NEXT_PUBLIC_",
+  NUXT: "NUXT_PUBLIC_",
+  EXPO: "EXPO_PUBLIC_",
 } as const;
 
 /**
@@ -37,7 +37,7 @@ export type CreateEnvOptions<
   TServer extends ServerFormat,
   TClient extends ClientFormat,
   TExtends extends ExtendsFormat,
-> = Omit<EnvOptions<TPrefix, TShared, TServer, TClient, TExtends>, 'envStrict' | 'env'> & {
+> = Omit<EnvOptions<TPrefix, TShared, TServer, TClient, TExtends>, "envStrict" | "env"> & {
   /**
    * Client prefix for environment variables (default: "VITE_")
    * Use CLIENT_PREFIXES.NEXT for Next.js, CLIENT_PREFIXES.NUXT for Nuxt, etc.
@@ -51,7 +51,7 @@ export type CreateEnvOptions<
 function getImportMetaEnv(): Record<string, string | undefined> {
   try {
     // @ts-expect-error - import.meta.env may not exist in all environments
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
+    if (typeof import.meta !== "undefined" && import.meta.env) {
       // @ts-expect-error - import.meta.env may not exist in all environments
       return import.meta.env as Record<string, string | undefined>;
     }
@@ -66,12 +66,12 @@ function getImportMetaEnv(): Record<string, string | undefined> {
  */
 function detectIsServer(): boolean {
   // Check window availability
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return true;
   }
 
   // Check Deno
-  if ('Deno' in window) {
+  if ("Deno" in window) {
     return true;
   }
 
@@ -111,8 +111,8 @@ export function createEnv<
   const TExtends extends ExtendsFormat = [],
   TFinalSchema extends Schema = FinalSchema<TShared, TServer, TClient, TExtends>,
 >(opts: CreateEnvOptions<TPrefix, TShared, TServer, TClient, TExtends>): DefineEnv<TFinalSchema> {
-  const client = typeof opts.client === 'object' ? opts.client : {};
-  const server = typeof opts.server === 'object' ? opts.server : {};
+  const client = typeof opts.client === "object" ? opts.client : {};
+  const server = typeof opts.server === "object" ? opts.server : {};
   const shared = opts.shared;
   const clientPrefix = (opts.clientPrefix ?? DEFAULT_CLIENT_PREFIX) as TPrefix;
   const isServer = opts.isServer ?? detectIsServer();

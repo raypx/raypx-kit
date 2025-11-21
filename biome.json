@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,45 +7,67 @@
     "defaultBranch": "main"
   },
   "files": {
-    "ignoreUnknown": false,
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/.turbo",
-      "**/.changeset",
-      "**/CHANGELOG.md"
+    "ignoreUnknown": true,
+    "maxSize": 1048576,
+    "includes": [
+      "**/*.{tsx,ts,js,jsx,json,jsonc,yaml,yml,md}",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/.git",
+      "!**/.turbo",
+      "!**/.changeset",
+      "!**/coverage",
+      "!**/*.tsbuildinfo"
     ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 100
-  },
-  "organizeImports": {
-    "enabled": true
+    "lineWidth": 100,
+    "lineEnding": "lf"
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["warn", "error", "debug"]
+          }
+        }
       },
       "style": {
         "useConst": "error",
-        "useTemplate": "warn"
+        "useTemplate": "warn",
+        "useImportType": "error"
       }
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
     }
   },
   "javascript": {
     "formatter": {
+      "enabled": true,
+      "semicolons": "always",
       "quoteStyle": "double",
       "jsxQuoteStyle": "double",
       "trailingCommas": "es5",
-      "semicolons": "always",
       "arrowParentheses": "always"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
     }
   }
 }

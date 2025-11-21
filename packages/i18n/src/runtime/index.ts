@@ -1,4 +1,4 @@
-import type { LocaleMessages } from '../types';
+import type { LocaleMessages } from "../types";
 
 interface I18nInstance {
   locale: string;
@@ -9,7 +9,7 @@ interface I18nInstance {
   availableLocales: () => string[];
 }
 
-let currentLocale = 'en';
+let currentLocale = "en";
 let messages: Record<string, LocaleMessages> = {};
 let listeners: Array<(locale: string) => void> = [];
 
@@ -17,7 +17,7 @@ export function createI18n(options: {
   locale?: string;
   messages: Record<string, LocaleMessages>;
 }): I18nInstance {
-  currentLocale = options.locale ?? 'en';
+  currentLocale = options.locale ?? "en";
   messages = options.messages;
 
   return {
@@ -73,17 +73,17 @@ export function onLocaleChange(callback: (locale: string) => void): () => void {
 }
 
 function getNestedValue(obj: LocaleMessages, path: string): string | undefined {
-  const keys = path.split('.');
+  const keys = path.split(".");
   let current: LocaleMessages | string = obj;
 
   for (const key of keys) {
-    if (typeof current !== 'object' || current === null) {
+    if (typeof current !== "object" || current === null) {
       return undefined;
     }
     current = current[key];
   }
 
-  return typeof current === 'string' ? current : undefined;
+  return typeof current === "string" ? current : undefined;
 }
 
 function interpolate(template: string, params: Record<string, string | number>): string {

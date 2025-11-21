@@ -1,12 +1,12 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import type { Plugin, ResolvedConfig } from 'vite';
-import { createTransform } from '../transform';
-import type { I18nContext, I18nPluginOptions, LocaleMessages } from '../types';
-import { createContext } from './context';
-import { resolveOptions } from './options';
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import type { Plugin, ResolvedConfig } from "vite";
+import { createTransform } from "../transform";
+import type { I18nContext, I18nPluginOptions, LocaleMessages } from "../types";
+import { createContext } from "./context";
+import { resolveOptions } from "./options";
 
-const VIRTUAL_MODULE_ID = 'virtual:i18n';
+const VIRTUAL_MODULE_ID = "virtual:i18n";
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
 export function i18nPlugin(userOptions: I18nPluginOptions = {}): Plugin {
@@ -15,7 +15,7 @@ export function i18nPlugin(userOptions: I18nPluginOptions = {}): Plugin {
   let ctx = createContext(options, process.cwd());
 
   return {
-    name: 'vite-plugin-i18n',
+    name: "vite-plugin-i18n",
 
     configResolved(resolvedConfig) {
       config = resolvedConfig;
@@ -66,12 +66,12 @@ function loadLocales(ctx: I18nContext): void {
     return;
   }
 
-  const files = readdirSync(localesPath).filter((f) => f.endsWith('.json'));
+  const files = readdirSync(localesPath).filter((f) => f.endsWith(".json"));
 
   for (const file of files) {
-    const locale = file.replace('.json', '');
+    const locale = file.replace(".json", "");
     const filePath = resolve(localesPath, file);
-    const content = readFileSync(filePath, 'utf-8');
+    const content = readFileSync(filePath, "utf-8");
     const messages = JSON.parse(content) as LocaleMessages;
     ctx.localeData.set(locale, messages);
 
@@ -81,10 +81,10 @@ function loadLocales(ctx: I18nContext): void {
   }
 }
 
-function collectKeys(messages: LocaleMessages, keys: Set<string>, prefix = ''): void {
+function collectKeys(messages: LocaleMessages, keys: Set<string>, prefix = ""): void {
   for (const [key, value] of Object.entries(messages)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       keys.add(fullKey);
     } else {
       collectKeys(value, keys, fullKey);
@@ -106,7 +106,7 @@ export const availableLocales = ${JSON.stringify([...ctx.localeData.keys()])};
 }
 
 function shouldTransform(id: string, options: ReturnType<typeof resolveOptions>): boolean {
-  if (id.includes('node_modules')) {
+  if (id.includes("node_modules")) {
     return false;
   }
 
@@ -128,9 +128,9 @@ function shouldTransform(id: string, options: ReturnType<typeof resolveOptions>)
 
 function globToRegex(glob: string): RegExp {
   const escaped = glob
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*/g, '.*')
-    .replace(/\*/g, '[^/]*')
-    .replace(/\?/g, '.');
+    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+    .replace(/\*\*/g, ".*")
+    .replace(/\*/g, "[^/]*")
+    .replace(/\?/g, ".");
   return new RegExp(`${escaped}$`);
 }

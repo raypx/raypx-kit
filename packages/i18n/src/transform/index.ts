@@ -1,9 +1,9 @@
-import MagicString from 'magic-string';
-import type { I18nContext } from '../types';
+import MagicString from "magic-string";
+import type { I18nContext } from "../types";
 
 interface TransformResult {
   code: string;
-  map: ReturnType<MagicString['generateMap']>;
+  map: ReturnType<MagicString["generateMap"]>;
 }
 
 export function createTransform(
@@ -12,7 +12,7 @@ export function createTransform(
   ctx: I18nContext
 ): TransformResult | null {
   const { functionName } = ctx.options;
-  const pattern = new RegExp(`\\b${functionName}\\s*\\(\\s*['"\`]([^'"\`]+)['"\`]`, 'g');
+  const pattern = new RegExp(`\\b${functionName}\\s*\\(\\s*['"\`]([^'"\`]+)['"\`]`, "g");
 
   if (!pattern.test(code)) {
     return null;
@@ -56,11 +56,11 @@ function hasTranslationKey(ctx: I18nContext, key: string): boolean {
 }
 
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-  const keys = path.split('.');
+  const keys = path.split(".");
   let current: unknown = obj;
 
   for (const key of keys) {
-    if (typeof current !== 'object' || current === null) {
+    if (typeof current !== "object" || current === null) {
       return undefined;
     }
     current = (current as Record<string, unknown>)[key];

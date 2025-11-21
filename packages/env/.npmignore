@@ -1,0 +1,28 @@
+# Source files
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+tsdown.config.ts
+vitest.config.ts
+biome.json
+
+# Build cache
+.turbo/
+.cache/
+
+# Development files
+*.log
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Documentation (keep only README)
+CONTRIBUTING.md

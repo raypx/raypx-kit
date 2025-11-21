@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createEnv, z, DEFAULT_CLIENT_PREFIX, CLIENT_PREFIXES } from '../src/index';
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { CLIENT_PREFIXES, createEnv, DEFAULT_CLIENT_PREFIX, z } from "../src/index";
 
-describe('createEnv', () => {
+describe("createEnv", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -12,10 +12,10 @@ describe('createEnv', () => {
     process.env = originalEnv;
   });
 
-  describe('basic functionality', () => {
-    it('should validate server environment variables', () => {
-      process.env.DATABASE_URL = 'postgresql://localhost:5432/db';
-      process.env.API_KEY = 'secret-key';
+  describe("basic functionality", () => {
+    it("should validate server environment variables", () => {
+      process.env.DATABASE_URL = "postgresql://localhost:5432/db";
+      process.env.API_KEY = "secret-key";
 
       const env = createEnv({
         server: {
@@ -25,25 +25,25 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.DATABASE_URL).toBe('postgresql://localhost:5432/db');
-      expect(env.API_KEY).toBe('secret-key');
+      expect(env.DATABASE_URL).toBe("postgresql://localhost:5432/db");
+      expect(env.API_KEY).toBe("secret-key");
     });
 
-    it('should validate shared environment variables', () => {
-      process.env.NODE_ENV = 'production';
+    it("should validate shared environment variables", () => {
+      process.env.NODE_ENV = "production";
 
       const env = createEnv({
         shared: {
-          NODE_ENV: z.enum(['development', 'production', 'test']),
+          NODE_ENV: z.enum(["development", "production", "test"]),
         },
         isServer: true,
       });
 
-      expect(env.NODE_ENV).toBe('production');
+      expect(env.NODE_ENV).toBe("production");
     });
 
-    it('should throw on invalid environment variables', () => {
-      process.env.DATABASE_URL = 'not-a-url';
+    it("should throw on invalid environment variables", () => {
+      process.env.DATABASE_URL = "not-a-url";
 
       expect(() =>
         createEnv({
@@ -55,7 +55,7 @@ describe('createEnv', () => {
       ).toThrow();
     });
 
-    it('should throw on missing required environment variables', () => {
+    it("should throw on missing required environment variables", () => {
       delete process.env.REQUIRED_VAR;
 
       expect(() =>
@@ -69,9 +69,9 @@ describe('createEnv', () => {
     });
   });
 
-  describe('client prefix configuration', () => {
-    it('should use default VITE_ prefix', () => {
-      process.env.VITE_APP_URL = 'https://example.com';
+  describe("client prefix configuration", () => {
+    it("should use default VITE_ prefix", () => {
+      process.env.VITE_APP_URL = "https://example.com";
 
       const env = createEnv({
         client: {
@@ -80,11 +80,11 @@ describe('createEnv', () => {
         isServer: false,
       });
 
-      expect(env.VITE_APP_URL).toBe('https://example.com');
+      expect(env.VITE_APP_URL).toBe("https://example.com");
     });
 
-    it('should support custom NEXT_PUBLIC_ prefix', () => {
-      process.env.NEXT_PUBLIC_APP_URL = 'https://example.com';
+    it("should support custom NEXT_PUBLIC_ prefix", () => {
+      process.env.NEXT_PUBLIC_APP_URL = "https://example.com";
 
       const env = createEnv({
         clientPrefix: CLIENT_PREFIXES.NEXT,
@@ -94,26 +94,26 @@ describe('createEnv', () => {
         isServer: false,
       });
 
-      expect(env.NEXT_PUBLIC_APP_URL).toBe('https://example.com');
+      expect(env.NEXT_PUBLIC_APP_URL).toBe("https://example.com");
     });
 
-    it('should support custom prefix string', () => {
-      process.env.CUSTOM_APP_URL = 'https://example.com';
+    it("should support custom prefix string", () => {
+      process.env.CUSTOM_APP_URL = "https://example.com";
 
       const env = createEnv({
-        clientPrefix: 'CUSTOM_',
+        clientPrefix: "CUSTOM_",
         client: {
           CUSTOM_APP_URL: z.string().url(),
         },
         isServer: false,
       });
 
-      expect(env.CUSTOM_APP_URL).toBe('https://example.com');
+      expect(env.CUSTOM_APP_URL).toBe("https://example.com");
     });
   });
 
-  describe('skip validation', () => {
-    it('should skip validation when skip is true', () => {
+  describe("skip validation", () => {
+    it("should skip validation when skip is true", () => {
       delete process.env.DATABASE_URL;
 
       const env = createEnv({
@@ -129,11 +129,11 @@ describe('createEnv', () => {
     });
   });
 
-  describe('extends functionality', () => {
-    it('should merge extended configurations', () => {
-      process.env.DATABASE_URL = 'postgresql://localhost:5432/db';
-      process.env.REDIS_URL = 'redis://localhost:6379';
-      process.env.API_KEY = 'secret';
+  describe("extends functionality", () => {
+    it("should merge extended configurations", () => {
+      process.env.DATABASE_URL = "postgresql://localhost:5432/db";
+      process.env.REDIS_URL = "redis://localhost:6379";
+      process.env.API_KEY = "secret";
 
       // Note: extends requires Preset type from envin
       // This test verifies basic merging functionality
@@ -146,15 +146,15 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.DATABASE_URL).toBe('postgresql://localhost:5432/db');
-      expect(env.REDIS_URL).toBe('redis://localhost:6379');
-      expect(env.API_KEY).toBe('secret');
+      expect(env.DATABASE_URL).toBe("postgresql://localhost:5432/db");
+      expect(env.REDIS_URL).toBe("redis://localhost:6379");
+      expect(env.API_KEY).toBe("secret");
     });
   });
 
-  describe('type transforms', () => {
-    it('should transform string to number', () => {
-      process.env.PORT = '3000';
+  describe("type transforms", () => {
+    it("should transform string to number", () => {
+      process.env.PORT = "3000";
 
       const env = createEnv({
         server: {
@@ -164,42 +164,42 @@ describe('createEnv', () => {
       });
 
       expect(env.PORT).toBe(3000);
-      expect(typeof env.PORT).toBe('number');
+      expect(typeof env.PORT).toBe("number");
     });
 
-    it('should transform string to boolean', () => {
-      process.env.ENABLE_FEATURE = 'true';
+    it("should transform string to boolean", () => {
+      process.env.ENABLE_FEATURE = "true";
 
       const env = createEnv({
         server: {
-          ENABLE_FEATURE: z.string().transform((val) => val === 'true'),
+          ENABLE_FEATURE: z.string().transform((val) => val === "true"),
         },
         isServer: true,
       });
 
       expect(env.ENABLE_FEATURE).toBe(true);
-      expect(typeof env.ENABLE_FEATURE).toBe('boolean');
+      expect(typeof env.ENABLE_FEATURE).toBe("boolean");
     });
   });
 
-  describe('default values', () => {
-    it('should use default values for optional variables', () => {
+  describe("default values", () => {
+    it("should use default values for optional variables", () => {
       delete process.env.OPTIONAL_VAR;
 
       const env = createEnv({
         server: {
-          OPTIONAL_VAR: z.string().default('default-value'),
+          OPTIONAL_VAR: z.string().default("default-value"),
         },
         isServer: true,
       });
 
-      expect(env.OPTIONAL_VAR).toBe('default-value');
+      expect(env.OPTIONAL_VAR).toBe("default-value");
     });
   });
 
-  describe('edge cases', () => {
-    it('should handle empty string values', () => {
-      process.env.EMPTY_VAR = '';
+  describe("edge cases", () => {
+    it("should handle empty string values", () => {
+      process.env.EMPTY_VAR = "";
 
       expect(() =>
         createEnv({
@@ -211,8 +211,8 @@ describe('createEnv', () => {
       ).toThrow();
     });
 
-    it('should handle whitespace-only values', () => {
-      process.env.WHITESPACE_VAR = '   ';
+    it("should handle whitespace-only values", () => {
+      process.env.WHITESPACE_VAR = "   ";
 
       const env = createEnv({
         server: {
@@ -223,11 +223,11 @@ describe('createEnv', () => {
       });
 
       // With skip, validation is bypassed
-      expect(env.WHITESPACE_VAR).toBe('   ');
+      expect(env.WHITESPACE_VAR).toBe("   ");
     });
 
-    it('should handle special characters in values', () => {
-      process.env.SPECIAL_VAR = 'value with spaces & special chars!@#$%';
+    it("should handle special characters in values", () => {
+      process.env.SPECIAL_VAR = "value with spaces & special chars!@#$%";
 
       const env = createEnv({
         server: {
@@ -236,11 +236,11 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.SPECIAL_VAR).toBe('value with spaces & special chars!@#$%');
+      expect(env.SPECIAL_VAR).toBe("value with spaces & special chars!@#$%");
     });
 
-    it('should handle very long values', () => {
-      const longValue = 'x'.repeat(10000);
+    it("should handle very long values", () => {
+      const longValue = "x".repeat(10000);
       process.env.LONG_VAR = longValue;
 
       const env = createEnv({
@@ -255,26 +255,26 @@ describe('createEnv', () => {
     });
   });
 
-  describe('complex type transforms', () => {
-    it('should transform string to array', () => {
-      process.env.ALLOWED_ORIGINS = 'http://localhost,https://example.com,https://api.example.com';
+  describe("complex type transforms", () => {
+    it("should transform string to array", () => {
+      process.env.ALLOWED_ORIGINS = "http://localhost,https://example.com,https://api.example.com";
 
       const env = createEnv({
         server: {
-          ALLOWED_ORIGINS: z.string().transform((val) => val.split(',')),
+          ALLOWED_ORIGINS: z.string().transform((val) => val.split(",")),
         },
         isServer: true,
       });
 
       expect(env.ALLOWED_ORIGINS).toEqual([
-        'http://localhost',
-        'https://example.com',
-        'https://api.example.com',
+        "http://localhost",
+        "https://example.com",
+        "https://api.example.com",
       ]);
       expect(Array.isArray(env.ALLOWED_ORIGINS)).toBe(true);
     });
 
-    it('should transform string to JSON object', () => {
+    it("should transform string to JSON object", () => {
       process.env.CONFIG_JSON = '{"key":"value","nested":{"a":1}}';
 
       const env = createEnv({
@@ -284,11 +284,11 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.CONFIG_JSON).toEqual({ key: 'value', nested: { a: 1 } });
+      expect(env.CONFIG_JSON).toEqual({ key: "value", nested: { a: 1 } });
     });
 
-    it('should transform with multiple chained operations', () => {
-      process.env.TRIMMED_UPPER = '  hello world  ';
+    it("should transform with multiple chained operations", () => {
+      process.env.TRIMMED_UPPER = "  hello world  ";
 
       const env = createEnv({
         server: {
@@ -300,11 +300,11 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.TRIMMED_UPPER).toBe('HELLO WORLD');
+      expect(env.TRIMMED_UPPER).toBe("HELLO WORLD");
     });
 
-    it('should coerce string to number', () => {
-      process.env.COERCED_NUMBER = '42';
+    it("should coerce string to number", () => {
+      process.env.COERCED_NUMBER = "42";
 
       const env = createEnv({
         server: {
@@ -314,11 +314,11 @@ describe('createEnv', () => {
       });
 
       expect(env.COERCED_NUMBER).toBe(42);
-      expect(typeof env.COERCED_NUMBER).toBe('number');
+      expect(typeof env.COERCED_NUMBER).toBe("number");
     });
 
-    it('should coerce string to boolean', () => {
-      process.env.COERCED_BOOL = 'true';
+    it("should coerce string to boolean", () => {
+      process.env.COERCED_BOOL = "true";
 
       const env = createEnv({
         server: {
@@ -331,11 +331,11 @@ describe('createEnv', () => {
     });
   });
 
-  describe('mixed server/client/shared', () => {
-    it('should handle all three types together on server', () => {
-      process.env.SERVER_VAR = 'server-value';
-      process.env.VITE_CLIENT_VAR = 'client-value';
-      process.env.SHARED_VAR = 'shared-value';
+  describe("mixed server/client/shared", () => {
+    it("should handle all three types together on server", () => {
+      process.env.SERVER_VAR = "server-value";
+      process.env.VITE_CLIENT_VAR = "client-value";
+      process.env.SHARED_VAR = "shared-value";
 
       const env = createEnv({
         server: {
@@ -350,14 +350,14 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.SERVER_VAR).toBe('server-value');
-      expect(env.VITE_CLIENT_VAR).toBe('client-value');
-      expect(env.SHARED_VAR).toBe('shared-value');
+      expect(env.SERVER_VAR).toBe("server-value");
+      expect(env.VITE_CLIENT_VAR).toBe("client-value");
+      expect(env.SHARED_VAR).toBe("shared-value");
     });
 
-    it('should handle client and shared on client side', () => {
-      process.env.VITE_CLIENT_VAR = 'client-value';
-      process.env.SHARED_VAR = 'shared-value';
+    it("should handle client and shared on client side", () => {
+      process.env.VITE_CLIENT_VAR = "client-value";
+      process.env.SHARED_VAR = "shared-value";
 
       const env = createEnv({
         client: {
@@ -369,13 +369,13 @@ describe('createEnv', () => {
         isServer: false,
       });
 
-      expect(env.VITE_CLIENT_VAR).toBe('client-value');
-      expect(env.SHARED_VAR).toBe('shared-value');
+      expect(env.VITE_CLIENT_VAR).toBe("client-value");
+      expect(env.SHARED_VAR).toBe("shared-value");
     });
   });
 
-  describe('optional and nullable values', () => {
-    it('should handle optional values', () => {
+  describe("optional and nullable values", () => {
+    it("should handle optional values", () => {
       delete process.env.OPTIONAL_VAR;
 
       const env = createEnv({
@@ -388,14 +388,14 @@ describe('createEnv', () => {
       expect(env.OPTIONAL_VAR).toBeUndefined();
     });
 
-    it('should handle nullable values with transform', () => {
-      process.env.NULLABLE_VAR = 'null';
+    it("should handle nullable values with transform", () => {
+      process.env.NULLABLE_VAR = "null";
 
       const env = createEnv({
         server: {
           NULLABLE_VAR: z
             .string()
-            .transform((val) => (val === 'null' ? null : val))
+            .transform((val) => (val === "null" ? null : val))
             .nullable(),
         },
         isServer: true,
@@ -404,7 +404,7 @@ describe('createEnv', () => {
       expect(env.NULLABLE_VAR).toBeNull();
     });
 
-    it('should handle actual null with optional', () => {
+    it("should handle actual null with optional", () => {
       delete process.env.TRULY_OPTIONAL;
 
       const env = createEnv({
@@ -417,23 +417,23 @@ describe('createEnv', () => {
       expect(env.TRULY_OPTIONAL).toBeUndefined();
     });
 
-    it('should handle optional with default', () => {
+    it("should handle optional with default", () => {
       delete process.env.OPTIONAL_WITH_DEFAULT;
 
       const env = createEnv({
         server: {
-          OPTIONAL_WITH_DEFAULT: z.string().optional().default('fallback'),
+          OPTIONAL_WITH_DEFAULT: z.string().optional().default("fallback"),
         },
         isServer: true,
       });
 
-      expect(env.OPTIONAL_WITH_DEFAULT).toBe('fallback');
+      expect(env.OPTIONAL_WITH_DEFAULT).toBe("fallback");
     });
   });
 
-  describe('validation patterns', () => {
-    it('should validate email format', () => {
-      process.env.EMAIL = 'test@example.com';
+  describe("validation patterns", () => {
+    it("should validate email format", () => {
+      process.env.EMAIL = "test@example.com";
 
       const env = createEnv({
         server: {
@@ -442,11 +442,11 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.EMAIL).toBe('test@example.com');
+      expect(env.EMAIL).toBe("test@example.com");
     });
 
-    it('should reject invalid email', () => {
-      process.env.EMAIL = 'not-an-email';
+    it("should reject invalid email", () => {
+      process.env.EMAIL = "not-an-email";
 
       expect(() =>
         createEnv({
@@ -458,8 +458,8 @@ describe('createEnv', () => {
       ).toThrow();
     });
 
-    it('should validate with regex pattern', () => {
-      process.env.SEMVER = '1.2.3';
+    it("should validate with regex pattern", () => {
+      process.env.SEMVER = "1.2.3";
 
       const env = createEnv({
         server: {
@@ -468,11 +468,11 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.SEMVER).toBe('1.2.3');
+      expect(env.SEMVER).toBe("1.2.3");
     });
 
-    it('should validate number ranges', () => {
-      process.env.PORT = '8080';
+    it("should validate number ranges", () => {
+      process.env.PORT = "8080";
 
       const env = createEnv({
         server: {
@@ -484,8 +484,8 @@ describe('createEnv', () => {
       expect(env.PORT).toBe(8080);
     });
 
-    it('should reject out of range numbers', () => {
-      process.env.PORT = '70000';
+    it("should reject out of range numbers", () => {
+      process.env.PORT = "70000";
 
       expect(() =>
         createEnv({
@@ -497,8 +497,8 @@ describe('createEnv', () => {
       ).toThrow();
     });
 
-    it('should validate string length', () => {
-      process.env.TOKEN = 'abc123def456';
+    it("should validate string length", () => {
+      process.env.TOKEN = "abc123def456";
 
       const env = createEnv({
         server: {
@@ -507,16 +507,16 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.TOKEN).toBe('abc123def456');
+      expect(env.TOKEN).toBe("abc123def456");
     });
 
-    it('should validate with refine', () => {
-      process.env.EVEN_NUMBER = '4';
+    it("should validate with refine", () => {
+      process.env.EVEN_NUMBER = "4";
 
       const env = createEnv({
         server: {
           EVEN_NUMBER: z.coerce.number().refine((n) => n % 2 === 0, {
-            message: 'Number must be even',
+            message: "Number must be even",
           }),
         },
         isServer: true,
@@ -525,14 +525,14 @@ describe('createEnv', () => {
       expect(env.EVEN_NUMBER).toBe(4);
     });
 
-    it('should reject refine validation failure', () => {
-      process.env.EVEN_NUMBER = '3';
+    it("should reject refine validation failure", () => {
+      process.env.EVEN_NUMBER = "3";
 
       expect(() =>
         createEnv({
           server: {
             EVEN_NUMBER: z.coerce.number().refine((n) => n % 2 === 0, {
-              message: 'Number must be even',
+              message: "Number must be even",
             }),
           },
           isServer: true,
@@ -541,41 +541,41 @@ describe('createEnv', () => {
     });
   });
 
-  describe('enum validation', () => {
-    it('should validate enum values', () => {
-      process.env.LOG_LEVEL = 'debug';
+  describe("enum validation", () => {
+    it("should validate enum values", () => {
+      process.env.LOG_LEVEL = "debug";
 
       const env = createEnv({
         server: {
-          LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']),
+          LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]),
         },
         isServer: true,
       });
 
-      expect(env.LOG_LEVEL).toBe('debug');
+      expect(env.LOG_LEVEL).toBe("debug");
     });
 
-    it('should reject invalid enum values', () => {
-      process.env.LOG_LEVEL = 'verbose';
+    it("should reject invalid enum values", () => {
+      process.env.LOG_LEVEL = "verbose";
 
       expect(() =>
         createEnv({
           server: {
-            LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']),
+            LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]),
           },
           isServer: true,
         })
       ).toThrow();
     });
 
-    it('should handle native enum', () => {
+    it("should handle native enum", () => {
       enum Environment {
-        Development = 'development',
-        Production = 'production',
-        Test = 'test',
+        Development = "development",
+        Production = "production",
+        Test = "test",
       }
 
-      process.env.APP_ENV = 'production';
+      process.env.APP_ENV = "production";
 
       const env = createEnv({
         server: {
@@ -588,28 +588,28 @@ describe('createEnv', () => {
     });
   });
 
-  describe('union types', () => {
-    it('should handle union of literals', () => {
-      process.env.FEATURE_FLAG = 'enabled';
+  describe("union types", () => {
+    it("should handle union of literals", () => {
+      process.env.FEATURE_FLAG = "enabled";
 
       const env = createEnv({
         server: {
-          FEATURE_FLAG: z.union([z.literal('enabled'), z.literal('disabled'), z.literal('beta')]),
+          FEATURE_FLAG: z.union([z.literal("enabled"), z.literal("disabled"), z.literal("beta")]),
         },
         isServer: true,
       });
 
-      expect(env.FEATURE_FLAG).toBe('enabled');
+      expect(env.FEATURE_FLAG).toBe("enabled");
     });
 
-    it('should handle union with transform', () => {
-      process.env.BOOL_OR_STRING = 'true';
+    it("should handle union with transform", () => {
+      process.env.BOOL_OR_STRING = "true";
 
       const env = createEnv({
         server: {
           BOOL_OR_STRING: z
             .string()
-            .transform((val) => (val === 'true' ? true : val === 'false' ? false : val)),
+            .transform((val) => (val === "true" ? true : val === "false" ? false : val)),
         },
         isServer: true,
       });
@@ -618,13 +618,13 @@ describe('createEnv', () => {
     });
   });
 
-  describe('multiple variables validation', () => {
-    it('should validate many variables at once', () => {
-      process.env.VAR_1 = 'value1';
-      process.env.VAR_2 = 'value2';
-      process.env.VAR_3 = 'value3';
-      process.env.VAR_4 = 'value4';
-      process.env.VAR_5 = 'value5';
+  describe("multiple variables validation", () => {
+    it("should validate many variables at once", () => {
+      process.env.VAR_1 = "value1";
+      process.env.VAR_2 = "value2";
+      process.env.VAR_3 = "value3";
+      process.env.VAR_4 = "value4";
+      process.env.VAR_5 = "value5";
 
       const env = createEnv({
         server: {
@@ -637,16 +637,16 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.VAR_1).toBe('value1');
-      expect(env.VAR_2).toBe('value2');
-      expect(env.VAR_3).toBe('value3');
-      expect(env.VAR_4).toBe('value4');
-      expect(env.VAR_5).toBe('value5');
+      expect(env.VAR_1).toBe("value1");
+      expect(env.VAR_2).toBe("value2");
+      expect(env.VAR_3).toBe("value3");
+      expect(env.VAR_4).toBe("value4");
+      expect(env.VAR_5).toBe("value5");
     });
 
-    it('should report multiple validation errors', () => {
-      process.env.URL_VAR = 'not-a-url';
-      process.env.EMAIL_VAR = 'not-an-email';
+    it("should report multiple validation errors", () => {
+      process.env.URL_VAR = "not-a-url";
+      process.env.EMAIL_VAR = "not-an-email";
 
       expect(() =>
         createEnv({
@@ -660,13 +660,13 @@ describe('createEnv', () => {
     });
   });
 
-  describe('real-world scenarios', () => {
-    it('should handle database connection config', () => {
-      process.env.DB_HOST = 'localhost';
-      process.env.DB_PORT = '5432';
-      process.env.DB_NAME = 'myapp';
-      process.env.DB_USER = 'admin';
-      process.env.DB_PASSWORD = 'secret123';
+  describe("real-world scenarios", () => {
+    it("should handle database connection config", () => {
+      process.env.DB_HOST = "localhost";
+      process.env.DB_PORT = "5432";
+      process.env.DB_NAME = "myapp";
+      process.env.DB_USER = "admin";
+      process.env.DB_PASSWORD = "secret123";
 
       const env = createEnv({
         server: {
@@ -679,18 +679,18 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.DB_HOST).toBe('localhost');
+      expect(env.DB_HOST).toBe("localhost");
       expect(env.DB_PORT).toBe(5432);
-      expect(env.DB_NAME).toBe('myapp');
-      expect(env.DB_USER).toBe('admin');
-      expect(env.DB_PASSWORD).toBe('secret123');
+      expect(env.DB_NAME).toBe("myapp");
+      expect(env.DB_USER).toBe("admin");
+      expect(env.DB_PASSWORD).toBe("secret123");
     });
 
-    it('should handle API configuration', () => {
-      process.env.API_URL = 'https://api.example.com';
-      process.env.API_KEY = 'sk-1234567890abcdef';
-      process.env.API_TIMEOUT = '30000';
-      process.env.API_RETRY_COUNT = '3';
+    it("should handle API configuration", () => {
+      process.env.API_URL = "https://api.example.com";
+      process.env.API_KEY = "sk-1234567890abcdef";
+      process.env.API_TIMEOUT = "30000";
+      process.env.API_RETRY_COUNT = "3";
 
       const env = createEnv({
         server: {
@@ -702,26 +702,26 @@ describe('createEnv', () => {
         isServer: true,
       });
 
-      expect(env.API_URL).toBe('https://api.example.com');
-      expect(env.API_KEY).toBe('sk-1234567890abcdef');
+      expect(env.API_URL).toBe("https://api.example.com");
+      expect(env.API_KEY).toBe("sk-1234567890abcdef");
       expect(env.API_TIMEOUT).toBe(30000);
       expect(env.API_RETRY_COUNT).toBe(3);
     });
 
-    it('should handle feature flags', () => {
-      process.env.ENABLE_ANALYTICS = 'true';
-      process.env.ENABLE_DARK_MODE = 'false';
-      process.env.MAX_UPLOAD_SIZE = '10485760';
+    it("should handle feature flags", () => {
+      process.env.ENABLE_ANALYTICS = "true";
+      process.env.ENABLE_DARK_MODE = "false";
+      process.env.MAX_UPLOAD_SIZE = "10485760";
 
       const env = createEnv({
         server: {
           ENABLE_ANALYTICS: z
             .string()
-            .transform((val) => val === 'true')
+            .transform((val) => val === "true")
             .pipe(z.boolean()),
           ENABLE_DARK_MODE: z
             .string()
-            .transform((val) => val === 'true')
+            .transform((val) => val === "true")
             .pipe(z.boolean()),
           MAX_UPLOAD_SIZE: z.coerce.number().min(0),
         },
@@ -735,19 +735,19 @@ describe('createEnv', () => {
   });
 });
 
-describe('exports', () => {
-  it('should export DEFAULT_CLIENT_PREFIX', () => {
-    expect(DEFAULT_CLIENT_PREFIX).toBe('VITE_');
+describe("exports", () => {
+  it("should export DEFAULT_CLIENT_PREFIX", () => {
+    expect(DEFAULT_CLIENT_PREFIX).toBe("VITE_");
   });
 
-  it('should export CLIENT_PREFIXES', () => {
-    expect(CLIENT_PREFIXES.VITE).toBe('VITE_');
-    expect(CLIENT_PREFIXES.NEXT).toBe('NEXT_PUBLIC_');
-    expect(CLIENT_PREFIXES.NUXT).toBe('NUXT_PUBLIC_');
-    expect(CLIENT_PREFIXES.EXPO).toBe('EXPO_PUBLIC_');
+  it("should export CLIENT_PREFIXES", () => {
+    expect(CLIENT_PREFIXES.VITE).toBe("VITE_");
+    expect(CLIENT_PREFIXES.NEXT).toBe("NEXT_PUBLIC_");
+    expect(CLIENT_PREFIXES.NUXT).toBe("NUXT_PUBLIC_");
+    expect(CLIENT_PREFIXES.EXPO).toBe("EXPO_PUBLIC_");
   });
 
-  it('should export z from zod', () => {
+  it("should export z from zod", () => {
     expect(z).toBeDefined();
     expect(z.string).toBeDefined();
   });

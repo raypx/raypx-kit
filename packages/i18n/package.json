@@ -38,7 +38,7 @@
         "default": "./dist/runtime/index.cjs"
       }
     },
-    "vite": {
+    "./vite": {
       "import": {
         "types": "./dist/vite/index.d.mts",
         "default": "./dist/vite/index.mjs"

@@ -1,9 +1,9 @@
-import type { Plugin } from 'vite';
+import type { Plugin } from "vite";
 
 export function i18nPlugin(): Plugin {
   return {
-    name: 'i18n',
-    enforce: 'pre',
+    name: "i18n",
+    enforce: "pre",
   };
 }
 
