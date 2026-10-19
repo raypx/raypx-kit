@@ -1,68 +1,76 @@
 # Raypx Kit Documentation
 
-Capability inventories and extension designs live here. Package READMEs describe
-the APIs currently shipped to consumers; inventory entries and proposed APIs do
-not imply that those features are implemented.
+Raypx Kit contains seven independently released TypeScript libraries. Start with
+a package guide to use an API, the architecture guide to understand the repository,
+or the development guide to contribute.
 
-This directory also owns the Fumadocs site. Run `bun run docs:dev` at the repository
-root to browse this material at `http://localhost:3100/docs`. The site renders
-these canonical Markdown files and the package guides directly, with
-navigation, full-text search, source links and light/dark themes.
-The interface uses the official `@fumadocs/base-ui` components with `fumadocs-core`.
+## Start here
 
-## Devkit
+| Task                                                   | Read                                                  |
+| ------------------------------------------------------ | ----------------------------------------------------- |
+| Understand package ownership and dependency boundaries | [Architecture](architecture/README.md)                |
+| Set up the repository and run checks                   | [Development](development/README.md)                  |
+| Upgrade tools, runtimes or package dependencies        | [Dependency maintenance](development/dependencies.md) |
+| Prepare independent package versions                   | [Changesets workflow](development/changesets.md)      |
+| Publish or preview packages                            | [Publishing runbook](development/publishing.md)       |
 
-- [Current workspace, architecture and maintenance APIs](../packages/devkit/README.md)
+## Package guides
 
-## Drizzle
+These READMEs are the canonical references for current exports, examples,
+compatibility and consumer installation. They are also included in npm archives.
 
-- [Current API](../packages/drizzle/README.md)
-- [drizzle-plus capability inventory](drizzle/drizzle-plus-capabilities.md)
-- [better-drizzle capability inventory](drizzle/better-drizzle-capabilities.md)
-- [Merge and extension design](drizzle/merge-plan.md)
-- [Source provenance and licenses](../packages/drizzle/NOTICE.md)
+| Package     | Guide                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------- |
+| Devkit      | [Workspace, architecture, toolchain and maintenance APIs](../packages/devkit/README.md) |
+| Drizzle     | [PostgreSQL expressions, results and diagnostics](../packages/drizzle/README.md)        |
+| Drizzle Kit | [Slim upstream CLI and config distribution](../packages/drizzle-kit/README.md)          |
+| Env         | [Validation, nested presets and client access](../packages/env/README.md)               |
+| Intl        | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)  |
+| Logger      | [Structured logging, wide events and request context](../packages/logger/README.md)     |
+| TSConfig    | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)        |
 
-The implementation targets PostgreSQL through postgres.js. The inventories
-retain all upstream capabilities, including features outside that scope.
+Packages remain in Changesets alpha mode until the first approved stable release.
+Consumers pin exact prerelease versions; each manifest supplies its own version.
 
-## Drizzle Kit
+## Designs and migration references
 
-- [Slim drizzle-kit distribution](../packages/drizzle-kit/README.md)
+The following documents explain design decisions, upstream research or migration
+steps. They supplement the package guides. An inventory row or proposed import
+does not make an API available in the current package.
 
-## Env
+### Drizzle
 
-- [Current API, nested presets and client access](../packages/env/README.md)
+- [Extension plan](drizzle/merge-plan.md): current foundation, proposed query,
+  relation and plugin boundaries, and acceptance criteria.
+- [drizzle-plus inventory](drizzle/drizzle-plus-capabilities.md): the complete
+  pinned upstream capability review.
+- [better-drizzle inventory](drizzle/better-drizzle-capabilities.md): upstream
+  APIs, plugins, rules and error codes.
+- [Source provenance](../packages/drizzle/NOTICE.md): pinned revisions,
+  adaptations and retained licenses.
 
-Applications supply their own variable names, schemas and runtime values. The
-package contains no product secrets, service configuration or application presets.
+The implementation scope is PostgreSQL through postgres.js. Inventories also
+retain upstream features outside that scope and label them accordingly.
 
-## Intl
+### Intl
 
-- [Current API and locale integration](../packages/intl/README.md)
-- [Controlled provider architecture and migration](intl/migration.md)
+- [Controlled provider migration](intl/migration.md): responsibility changes,
+  provider and type migration, formatting and request state.
 
-## Logger
+## Editing documentation
 
-- [Structured logging, wide events and Node request context](../packages/logger/README.md)
+Run `bun run docs:dev` from the repository root to browse the site at
+`http://localhost:3100/docs`. Fumadocs renders these files and package guides
+directly, with navigation, local search and source links. Edit each page's
+canonical Markdown rather than making a second copy.
 
-## TSConfig
+Page registration and navigation live in [pages.ts](src/lib/pages.ts); the
+[architecture guide](architecture/README.md#documentation-flow) explains how
+content becomes site pages. Documentation tests run with `bun run test:toolchain`;
+`bun run docs:build` checks compilation and prerendering. The complete
+`bun run verify` gate includes both. Keep full inventories, proposed API labels
+and upstream notices when editing.
 
-- [Presets and compiler guarantees](../packages/tsconfig/README.md)
-
-Every workspace in this repository extends these presets. Consumers own their
-file layout, path aliases, project references and runtime-specific types.
-
-All packages are `0.0.0-alpha.*` prereleases until the first stable release;
-consumers pin exact versions.
-
-## Development and releases
-
-- [Repository setup and independent releases](../README.md)
-- [Changesets workflow](development/changesets.md)
-- [Publishing runbook](development/publishing.md)
-
-Each `@raypx-kit/*` package starts at `0.0.0-alpha.0` and is versioned independently.
-
-Design documents are repository references and are excluded from npm archives.
-Package archives retain their API README, changelog, license and applicable
-source notices and license texts.
+Repository design and maintainer guides are excluded from npm archives. See
+[site ownership](AGENTS.md) and [site provenance](NOTICE.md) for the private
+application's constraints and licensing.

@@ -3,8 +3,8 @@
 ## Purpose
 
 A standalone Drizzle extension library for PostgreSQL through postgres.js.
-Raypx DB is its first consumer; the library owns no Raypx domain behavior and can
-ship independently.
+Raypx DB is an intended consumer; product integration is separate. The library
+owns no Raypx domain behavior and can ship independently.
 
 ## Interface
 

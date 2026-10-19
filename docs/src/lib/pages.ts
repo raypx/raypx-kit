@@ -6,6 +6,12 @@ export const documentationPages = [
     description: "Reusable Raypx Kit libraries, their current APIs and extension designs.",
   },
   {
+    slug: "architecture/index",
+    sourcePath: "docs/architecture/README.md",
+    title: "Architecture",
+    description: "Package ownership, dependency boundaries, build outputs and documentation flow.",
+  },
+  {
     slug: "devkit/index",
     sourcePath: "packages/devkit/README.md",
     title: "Devkit",
@@ -84,9 +90,15 @@ export const documentationPages = [
   },
   {
     slug: "development/index",
-    sourcePath: "README.md",
-    title: "Development and releases",
-    description: "Repository setup, verification and independent package publication.",
+    sourcePath: "docs/development/README.md",
+    title: "Development",
+    description: "Repository setup, commands, verification and adding a package.",
+  },
+  {
+    slug: "development/dependencies",
+    sourcePath: "docs/development/dependencies.md",
+    title: "Dependency maintenance",
+    description: "Version ranges, runtime pins, compatibility checks and upgrade procedure.",
   },
   {
     slug: "development/changesets",
@@ -107,6 +119,7 @@ export const navigationMetadata = {
     title: "Raypx Kit",
     pages: [
       "index",
+      "architecture",
       "devkit",
       "drizzle",
       "drizzle-kit",
@@ -117,6 +130,7 @@ export const navigationMetadata = {
       "development",
     ],
   },
+  "architecture/meta.json": { title: "Architecture", pages: ["index"] },
   "drizzle/meta.json": {
     title: "Drizzle",
     pages: ["index", "drizzle-plus", "better-drizzle", "merge-plan", "provenance"],
@@ -129,7 +143,7 @@ export const navigationMetadata = {
   "tsconfig/meta.json": { title: "TSConfig", pages: ["index"] },
   "development/meta.json": {
     title: "Development",
-    pages: ["index", "changesets", "publishing"],
+    pages: ["index", "dependencies", "changesets", "publishing"],
   },
 };
 

@@ -130,4 +130,4 @@ bun run verify
 ```
 
 Releases use independent Changesets. See the repository's
-[release guide](https://github.com/raypx/raypx-kit/blob/canary/README.md#independent-releases).
+[release guide](https://github.com/raypx/raypx-kit/blob/canary/docs/development/changesets.md).

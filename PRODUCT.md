@@ -1,5 +1,10 @@
 # Raypx Kit Documentation
 
+This brief defines the documentation site's reading experience. Repository
+ownership and package boundaries are documented in the
+[architecture guide](docs/architecture/README.md); canonical guides are listed in
+the [documentation index](docs/README.md).
+
 ## Register
 
 product

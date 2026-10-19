@@ -7,7 +7,13 @@ import { checkDependencyCompatibility } from "./check-dependencies.js";
 /** Repository policy for the shared @raypx-kit/devkit toolchain checks. */
 export function checkToolchain(root: string): string[] {
   const declarations = checkDeclarations(root, {
-    documents: ["README.md", "AGENTS.md", "docs/AGENTS.md", "docs/development/publishing.md"],
+    documents: [
+      "README.md",
+      "AGENTS.md",
+      "docs/AGENTS.md",
+      "docs/development/README.md",
+      "docs/development/publishing.md",
+    ],
     turboGlobalDependencies: [
       ".nvmrc",
       "mise.toml",

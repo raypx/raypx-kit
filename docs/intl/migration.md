@@ -48,12 +48,24 @@ function App() {
 
 Replace `LocaleProvider`, `I18nProvider` and `AsyncI18nProvider` with
 `IntlProvider`. Both `locale` and `messages` are required. Pass `messages={null}`
-for a formatter-only subtree. Move setters and storage to application state, and
-load messages in the application loader before rendering the provider. The SDK
-does not expose `useSetLocale`, storage factories, loader contracts or an async
-cache. There is one upstream context, so all hooks read the nearest provider,
-including one created by another factory. A factory binds types; callers must
-keep the actual provider's catalog and locale compatible with those types.
+for a formatter-only subtree. Load messages in the application loader before
+rendering the provider. The SDK does not expose `useSetLocale`, catalog loader
+contracts or an asynchronous catalog cache.
+
+For controlled preferences, `LanguageProvider` receives the preference, system
+locales, catalogs and `onPreferenceChange` callback from the application.
+`useLanguagePreference` reads that factory's separate `LanguageContext` and
+requires its matching `LanguageProvider`. Translation and formatting hooks use
+the shared upstream context and read the nearest `IntlProvider`, including one
+created by another factory. A factory binds types; callers must keep the actual
+provider's catalog and locale compatible with those types.
+
+Browser applications may use the optional `createBrowserPreferences` and
+`createBrowserLanguage` adapters for storage, cookies and hydration-aware browser
+bindings. Applications still supply storage keys, locale configuration and
+catalogs, and own asynchronous loading. See
+[controlled preferences](../../packages/intl/README.md#control-the-language-preference)
+and [browser persistence](../../packages/intl/README.md#persist-browser-preferences).
 
 Options are merged at the provider boundary: package defaults, factory defaults,
 then explicit props. Format presets merge by category and name; a later same-name
@@ -108,7 +120,8 @@ Keep locale, catalog and reference time in request loader data. Immutable catalo
 modules may be shared across requests; mutable request state may not. Use the
 same loader snapshot for HTML and the first hydration render, then restore
 browser storage in an effect. Persist the preference mode rather than the
-resolved system language. The SDK does not prescribe cookie or storage ownership.
+resolved system language. Applications choose whether to use the browser adapters
+or their own persistence; server and native integrations own their bootstrap data.
 
 ## Release checks
 

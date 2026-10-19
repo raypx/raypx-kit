@@ -7,10 +7,13 @@ publish to npm or change the independent versions of the libraries.
 
 ## Interface
 
-`/docs` contains the overview, Devkit, Drizzle, Drizzle Kit, Env, Intl, Logger and
-TSConfig guides, complete capability inventories, extension designs and maintainer
-documentation. Search is generated from the same content and operates without a
-third-party service.
+`/docs` contains the documentation map, architecture, package guides, design
+references and maintainer documentation. `architecture/README.md` owns repository
+boundaries and build/content flow. `development/README.md` owns setup and checks;
+dependency maintenance, versioning and publishing have focused sibling guides.
+Package READMEs own shipped APIs, and `drizzle/` inventories and plans retain
+their research status. Search is generated from the same content and operates
+without a third-party service.
 
 ## Ownership
 
@@ -18,6 +21,10 @@ third-party service.
 - Keep navigation, table of contents, source links, search and theme controls usable.
 - Compile canonical Markdown directly through Fumadocs; keep page routes and
   navigation in `src/lib/pages.ts`. Do not commit generated build artifacts.
+- Keep the root README as a concise repository entry point; do not mirror it as
+  a development page. Preserve existing site routes when reorganizing source files.
+  Register new canonical pages in both the page list and navigation, and include
+  their source files in `src/lib/source.ts`.
 - Keep all library source, package versions and npm payloads outside this app.
 
 ## Constraints

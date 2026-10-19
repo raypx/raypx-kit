@@ -44,9 +44,14 @@ workspace root and the shared configuration in root `test.config.ts`.
 Prefer public TypeScript entry files directly under `src/`; keep supporting
 implementation modules in subdirectories when useful.
 
-Maintain capability inventories and extension designs in root `docs/<package>/`,
-with navigation in `docs/README.md`. Package READMEs document shipped APIs and
+Keep the root README as the project entry point and `docs/README.md` as the
+documentation map. Repository architecture belongs in `docs/architecture/README.md`;
+setup, dependency maintenance, versioning and publication belong in
+`docs/development/`. Maintain capability inventories and extension designs in
+`docs/<package>/`. Package READMEs are the canonical guides for shipped APIs and
 link to repository design documents; research inventories are not npm payloads.
+Keep commands and policies in their owning guide rather than repeating full
+instructions across the root README, architecture guide and package guides.
 The documentation site compiles canonical Markdown directly through Fumadocs.
 Keep the site private and outside library release versions and archives.
 Keep license texts and source notices alongside the package that ships adapted code.

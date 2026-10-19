@@ -18,23 +18,24 @@ and tag those exact archives. Never run plain `changeset publish`.
    reviewers if desired.
 2. Create the npm organization `raypx-kit` and give maintainers publish access to
    the `@raypx-kit` scope. GitHub organization access does not grant npm access.
-3. On the publishing machine, select Bun 1.4.3 and Node 24.22.0 from the root
-   `packageManager` and `.nvmrc`, respectively. With mise, run
-   `mise trust && mise install`, then activate it in the shell or use
-   `mise exec -- <command>`. `mise.toml` only enables those sources and must not
-   add `[tools]` versions. Install dependencies with
-   `bun install --frozen-lockfile --ignore-scripts`, then run `bun run doctor`
-   and `bun run toolchain:check` before `npm login --force`. npm normally requires
-   a one-time password for publication. `TOOLKIT_NODE_BINARY` may select a Node
-   executable outside PATH,
-   but it must match `.nvmrc`. Public package compatibility ranges stay separate
-   from these development pins.
+3. Follow [repository setup](README.md#setup) to select the pinned Bun and Node,
+   install dependencies and check the toolchain. Keep Node on `PATH` for direct
+   tool binaries; `TOOLKIT_NODE_BINARY` selects only the Node used by runtime and
+   isolated consumer checks. Authenticate with `npm login --force` and confirm
+   the account with `npm whoami --force`. npm may require a one-time password
+   for publication.
+
+Changesets uses npm for registry queries and uploads. The release scripts and CI
+scope `NPM_CONFIG_FORCE=true` to registry transport because npm otherwise rejects
+the repository's strict Bun `devEngines` declaration. Use `--force` for npm
+account commands inside this checkout. Do not set `NPM_CONFIG_WORKSPACES=false`:
+npm can infer the current workspace and reject that conflicting configuration.
 
 ## Manual alpha release
 
 Run every step on an up-to-date `canary` with a clean working tree.
 
-The `raypx-kit-dev` CLI groups maintenance commands under one entry point:
+The release aliases map to the repository CLI:
 
 ```sh
 bun run raypx-kit-dev release plan
@@ -42,20 +43,15 @@ bun run raypx-kit-dev release pack
 bun run raypx-kit-dev release publish
 ```
 
-The existing `release:plan`, `release:pack` and `release:publish` scripts remain
-aliases. `doctor` and `toolchain:check` also remain available as aliases.
-Place options after the final subcommand, such as `release pack --stable`.
-The CLI uses citty; toolchain checks come from `@raypx-kit/devkit` source, which
-parses TOML and YAML with confbox. Neither changes the published libraries.
+Use `release:plan`, `release:pack` and `release:publish` for the corresponding
+commands below. Place options after the final CLI subcommand, such as
+`release pack --stable`.
 
-1. **Version.** Skip this step for a package's first publication. Otherwise run
-   `bun run version-packages`, review the versions and changelogs, and commit
-   them, for example as `chore: version packages`.
-2. **Verify.** `bun run verify` first checks active runtimes with `doctor` and
-   committed version consistency with `toolchain:check`, then checks formatting,
-   lint, unused code and dependencies with Knip, types, tests and builds. It
-   installs every packed library in isolated Bun and Node consumers. The existing
-   CI verification job runs this same command, including Knip.
+1. **Version.** Follow the [Changesets workflow](changesets.md) and commit the
+   prepared versions, changelogs and lockfile. Skip versioning for a package's
+   first publication.
+2. **Verify.** Run `bun run verify`, the same [complete gate](README.md#daily-commands)
+   used by CI, including package builds and isolated archive consumers.
 3. **Plan.** `bun run release:plan` is read-only and never replaces a packed
    plan. It lists every version missing from npm with its dist-tag, fails unless
    each is a `@raypx-kit/*` package at an `-alpha.N` version, and reports
@@ -81,12 +77,8 @@ parses TOML and YAML with confbox. Neither changes the published libraries.
 6. **Push.** Run the `git push origin canary <tags>` command the script prints for
    the tags it found locally, so each tag such as `@raypx-kit/env@0.0.0-alpha.0`
    reaches GitHub.
-7. **Confirm.** Check `npm view @raypx-kit/<package> dist-tags` for every package.
-   Until a package has a stable release, `latest` follows its newest prerelease:
-   npm assigns `latest` at the first publication, and Changesets publishes later
-   prereleases there too. After the first stable release, prereleases use only `alpha`.
-   Consumers pin exact prerelease versions, so this does not change what they
-   install.
+7. **Confirm.** Check `npm view @raypx-kit/<package> dist-tags` for every package
+   against the [pre-mode tag rules](changesets.md#initial-publication-and-pre-mode).
 8. **Consume.** In each consuming repository, pin the exact new version, refresh
    the lockfile and run that repository's verification gate.
 
@@ -103,9 +95,11 @@ versions packages or creates tags.
 the package), run `bun link` in `packages/<name>`, then `bun link @raypx-kit/<name>`
 in the consumer. This changes only the consumer's `node_modules`; its next
 `bun install` restores the registry version. The link resolves to this checkout,
-so the consumer must dedupe singleton peers (`react`, `react-dom`, `use-intl`)
-through Vite's `resolve.dedupe`, or React reports invalid hook calls. Metro does
-not follow links outside its watch folders; preview native apps with a snapshot.
+so React consumers must resolve the linked package's external React peer to
+the application's instance, for example with Vite's `resolve.dedupe` for
+`react` and `react-dom`. Intl's `use-intl` is bundled; a separate installation
+cannot share its context. Metro does not follow links outside its watch
+folders; preview native apps with a snapshot.
 
 **Snapshot.** On any branch with a clean working tree:
 
@@ -116,19 +110,20 @@ bun run release:snapshot --publish --otp <code>
 ```
 
 The command builds, temporarily sets each package version to
-`0.0.0-next-<UTC timestamp>-<commit>`, packs with `bun pm pack`, restores every
-manifest and runs the same archive and isolated consumer checks as a release.
+`0.0.0-next-<UTC timestamp>-<commit>`, packs with `bun pm pack`, and runs the same
+archive and isolated consumer checks as a release. It restores every manifest
+before publication, including when packing or consumer checks fail.
 Archives stay in `.changeset/pack/snapshot/`. Only `--publish` uploads them, under
-the `next` dist-tag, so `latest` and `alpha` never move. Snapshot versions sort
-below every release. Consumers pin the exact printed version and replace it with
+the `next` dist-tag, so `latest` and `alpha` never move. Consumers pin the exact
+printed version and replace it with
 the released alpha before merging. Publishing a snapshot is a maintainer action
 like any other publication. Packages that depend on sibling `@raypx-kit/*`
 packages are refused, because a snapshot rewrites only its own version.
 
 ## CI publication
 
-The release workflow publishes only after the first manual publication of each
-package:
+For npm trusted publishing, first publish each new package manually, then enable
+CI publication:
 
 1. On npmjs.com, add a trusted publisher to every package: GitHub Actions,
    repository `raypx/raypx-kit`, workflow `release.yml`, environment `npm`. For a
@@ -138,8 +133,8 @@ package:
 On `canary`, the workflow verifies, then runs `release:ci`, which chains the same
 `release:pack` and `release:publish` commands for versions absent from npm,
 requesting provenance. The action runs its script without a shell.
-Pushes without new versions pass as no-ops. Optional version PRs are described
-in the [repository README](../../README.md#independent-releases).
+Pushes without new versions pass as no-ops. The separate
+[version PR setup](changesets.md#automatic-version-prs) does not enable publication.
 
 ## First stable release
 

@@ -17,7 +17,8 @@ The inventory preserves every upstream MySQL/SQLite entrypoint, capability, type
 Their specific implementations are **retained in inventory, outside the current implementation scope**, even where upstream already implements them.
 Unless stated otherwise, **Planned** covers shared and PostgreSQL/postgres.js capabilities only.
 
-The [merge plan](merge-plan.md) defines the final public entrypoints and common semantics. `./query` denotes
+The [merge plan](merge-plan.md) proposes future public entrypoints and common semantics.
+The [current API guide](../../packages/drizzle/README.md#current-api) lists shipped exports. `./query` denotes
 the future query layer, containing client, mutation, predicate, ordering, pagination, prepared, lock,
 transaction and raw-execution modules; `./relations` denotes the relation layer. These internal capabilities
 do not each add a published entrypoint. PostgreSQL expressions use `./postgres`, and optional plugins use `./plugins/*`.
@@ -25,7 +26,7 @@ There is no plan for `./mysql`/`./sqlite`.
 Only the upstream-entrypoint table in section 1 and the appendix describe upstream publication contracts.
 
 Names such as `./client`, `./mutations`, `./prepared` and `./predicates` group capabilities;
-they are not published subpaths. The [common merge plan](merge-plan.md) defines the final modules:
+they are not published subpaths. The [common merge plan](merge-plan.md) proposes these modules:
 query capabilities use `./query`, and relations use `./relations`.
 
 ## 1. Entrypoints and compatibility boundaries
@@ -60,8 +61,8 @@ a TypeScript parser. The ORM facade depends on `db._.relations`, relation-object
 `sourceColumns`/`targetColumns`/`through`/`throughTable`, and the junction field `column._.column`;
 see [context.ts](https://github.com/almeidazs/better-drizzle/blob/f93f1b7aa528fe2db4cddc92a047e7a0ae710a0d/src/shared/client/context.ts)
 and [factory.ts](https://github.com/almeidazs/better-drizzle/blob/f93f1b7aa528fe2db4cddc92a047e7a0ae710a0d/src/shared/client/factory.ts).
-The merged implementation rebuilds explicit PostgreSQL table/relation descriptions using public APIs and consumer-supplied metadata.
-Its execution core accepts PostgresJsDatabase/PostgresJsTransaction directly, without a multi-driver adapter.
+The proposed query layer will build explicit PostgreSQL table/relation descriptions using public APIs and consumer-supplied metadata.
+Its execution core will accept PostgresJsDatabase/PostgresJsTransaction directly, without a multi-driver adapter.
 Private client discovery is prohibited. Consumers create and manage postgres.js Sql/TransactionSql;
 the library must not infer them from Drizzle sessions. Real PostgreSQL, postgres.js and declaration tests determine RC compatibility.
 

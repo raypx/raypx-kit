@@ -12,6 +12,7 @@ export const docs = defineDocs({
     async: true,
     files: [
       "docs/README.md",
+      "docs/architecture/*.md",
       "docs/drizzle/*.md",
       "docs/intl/*.md",
       "docs/development/*.md",
@@ -23,7 +24,6 @@ export const docs = defineDocs({
       "packages/intl/README.md",
       "packages/logger/README.md",
       "packages/tsconfig/README.md",
-      "README.md",
     ],
     schema: ({ path }) =>
       z.object({}).transform(() => {

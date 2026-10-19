@@ -37,9 +37,11 @@ controlled React facade without product dependencies.
   provider. Its installed version must match Vite+'s bundled Vitest; record actual
   locked versions in the third-party license list. Preserve use-intl's own compatible
   dependency ranges instead of overriding its transitive major versions.
-- Client factories bind types/static defaults only. The provider requires
-  locale and the current full catalog or null. No provider-owned locale state,
-  loaders, storage, callbacks or context isolation. Hooks read nearest provider.
+- Client factories bind translation types and static defaults. IntlProvider
+  requires locale and the current full catalog or null; it owns no locale state,
+  loaders or storage. Translation hooks read the nearest upstream IntlProvider.
+  LanguageProvider stays controlled through preference props and a change
+  callback; its useLanguagePreference hook uses the bound factory's own context.
 - Preserve readonly catalog keys while widening translated string leaves.
   Preserve upstream namespace/key/ICU value inference and an explicit dynamic
   mode; do not install a product-wide AppConfig augmentation from this library.
@@ -56,8 +58,8 @@ controlled React facade without product dependencies.
 
 Run package check/test/build, then repository verify. Type assertions belong in
 `tests/`; public packed-consumer fixtures live in `tests/fixtures/consumer` and
-are executed by the repository pack check. Core tests run in Node, and client
-tests in `tests/client/` run in jsdom with the repository's
+are executed by the repository pack check. Core tests run in Bun workers with
+the node environment, and client tests in `tests/client/` run in jsdom with the repository's
 `tests/setup/jsdom-preload.ts` preload. Keep the public `src/testing.ts` library
 entry under `src/`. Do not publish or change alpha mode without user authorization.
 Preserve independent versioning and include a breaking changeset.

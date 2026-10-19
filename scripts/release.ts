@@ -300,8 +300,8 @@ export interface SnapshotOptions {
 }
 
 /**
- * Preview archives for consumers before a versioned alpha exists. Snapshot versions sort
- * below every release, never move `latest` or `alpha`, and leave no repository changes.
+ * Preview archives for consumers before a versioned alpha exists. Snapshots use `next`,
+ * never move `latest` or `alpha`, and restore manifests before optional publication.
  */
 export async function snapshot(
   packages: string[] = [],
