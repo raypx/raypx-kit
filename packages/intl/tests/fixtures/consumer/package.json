@@ -1,0 +1,8 @@
+{
+  "name": "intl-declaration-contract",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/react": "^19.3.0"
+  }
+}

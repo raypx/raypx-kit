@@ -1,0 +1,581 @@
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import {
+  assertToolchainRuntime,
+  checkToolchain,
+  pinnedNode,
+  readToolchain,
+} from "../src/toolchain.js";
+
+const { execFileSync } = vi.hoisted(() => ({ execFileSync: vi.fn() }));
+vi.mock("node:child_process", () => ({ execFileSync }));
+
+const roots: string[] = [];
+const nodeVersion = "24.22.0";
+const bunVersion = "1.4.3";
+const workflow = [
+  "jobs:",
+  "  verify:",
+  "    steps:",
+  "      - uses: actions/setup-node@v7",
+  "        with:",
+  "          node-version-file: .nvmrc",
+  "      - uses: oven-sh/setup-bun@v2",
+  "        with:",
+  "          bun-version-file: package.json",
+].join("\n");
+
+function repository(overrides: Record<string, string> = {}): string {
+  const root = mkdtempSync(join(tmpdir(), "raypx-kit-toolchain-test-"));
+  roots.push(root);
+  const files = {
+    ".nvmrc": `${nodeVersion}\n`,
+    "package.json": JSON.stringify({
+      private: true,
+      workspaces: ["docs", "packages/*"],
+      packageManager: `bun@${bunVersion}`,
+      engines: { node: nodeVersion },
+      devEngines: {
+        packageManager: { name: "bun", version: bunVersion, onFail: "error" },
+        runtime: { name: "bun", version: bunVersion, onFail: "error" },
+      },
+      devDependencies: { "@types/node": "^24.19.2" },
+    }),
+    "mise.toml": '[settings]\nidiomatic_version_file_enable_tools = ["node", "bun"]\n',
+    ".github/workflows/ci.yml": workflow,
+    "docs/package.json": JSON.stringify({
+      private: true,
+      devDependencies: { "@types/node": "^24.19.2" },
+    }),
+    "packages/library/package.json": JSON.stringify({
+      name: "@raypx-kit/library",
+      engines: { node: ">=20" },
+    }),
+    "README.md": `Develop with Node **${nodeVersion}** and Bun **${bunVersion}**.\n`,
+    "turbo.json": JSON.stringify({
+      globalDependencies: [".nvmrc", "mise.toml", "scripts/toolchain.ts"],
+    }),
+    ...overrides,
+  };
+  for (const [file, source] of Object.entries(files)) {
+    const path = join(root, file);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, source);
+  }
+  return root;
+}
+
+function changeManifest(root: string, change: (manifest: ReturnType<typeof manifestAt>) => void) {
+  const manifest = manifestAt(root);
+  change(manifest);
+  writeFileSync(join(root, "package.json"), JSON.stringify(manifest));
+}
+
+function manifestAt(root: string) {
+  return JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+    packageManager: string;
+    engines: { node: string };
+    devEngines: Record<string, { name: string; version: string; onFail: string }>;
+    devDependencies: Record<string, string>;
+  };
+}
+
+beforeEach(() => {
+  execFileSync.mockReset();
+  vi.stubEnv("DEVKIT_NODE_BINARY", undefined);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+});
+
+describe("development toolchain declarations", () => {
+  it("accepts consistent sources while keeping the library runtime support range independent", () => {
+    const root = repository();
+    expect(readToolchain(root)).toEqual({ node: nodeVersion, bun: bunVersion });
+    expect(checkToolchain(root)).toEqual([]);
+    expect(execFileSync).not.toHaveBeenCalled();
+  });
+
+  it("accepts the v prefix in the Node pin", () => {
+    expect(readToolchain(repository({ ".nvmrc": `v${nodeVersion}\n` }))).toEqual({
+      node: nodeVersion,
+      bun: bunVersion,
+    });
+  });
+
+  it.each(["24", "lts/*", "^24.22.0"])("rejects the ambiguous Node pin %s", (pin) => {
+    const root = repository({ ".nvmrc": pin });
+    expect(() => readToolchain(root)).toThrow("Pin exact Node and Bun versions");
+    expect(checkToolchain(root)).toEqual([
+      "Pin exact Node and Bun versions in .nvmrc and package.json packageManager.",
+    ]);
+  });
+
+  it.each(["bun@1.4", "bun@latest", "npm@10.9.0"])(
+    "rejects the invalid package manager pin %s",
+    (pin) => {
+      const root = repository();
+      changeManifest(root, (manifest) => {
+        manifest.packageManager = pin;
+      });
+      expect(() => readToolchain(root)).toThrow("Pin exact Node and Bun versions");
+    },
+  );
+
+  it.each([".node-version", ".bun-version", ".tool-versions"])(
+    "rejects the duplicate version source %s",
+    (file) => {
+      expect(checkToolchain(repository({ [file]: nodeVersion }))).toContain(
+        `${file}: use .nvmrc and package.json instead of a second version source`,
+      );
+    },
+  );
+
+  it("rejects versions duplicated in mise instead of reading the canonical pins", () => {
+    expect(
+      checkToolchain(
+        repository({
+          "mise.toml": `[settings]\nidiomatic_version_file_enable_tools = ["node", "bun"]\n[tools]\nnode = "${nodeVersion}"\n`,
+        }),
+      ),
+    ).toContain("mise.toml: read existing pins instead of declaring [tools] versions");
+  });
+
+  it("requires mise to read both runtime pin files", () => {
+    expect(checkToolchain(repository({ "mise.toml": "[settings]\n" }))).toContain(
+      "mise.toml: enable idiomatic version files for node and bun",
+    );
+  });
+
+  it.each([
+    "[settings]\nidiomatic_version_file_enable_tools = ['bun', 'node']\n",
+    '[settings]\nidiomatic_version_file_enable_tools = [\n  "node", # Node pin\n  "bun",\n]\n',
+    'settings = { idiomatic_version_file_enable_tools = ["bun", "node"] }\n',
+  ])("accepts equivalent TOML settings regardless of formatting: %s", (mise) => {
+    expect(checkToolchain(repository({ "mise.toml": mise }))).toEqual([]);
+  });
+
+  it.each([
+    `[tools.node]\nversion = '${nodeVersion}'\n`,
+    `tools.node = '${nodeVersion}'\n`,
+    `tools = { node = '${nodeVersion}' }\n`,
+  ])("rejects equivalent TOML tool declarations: %s", (tools) => {
+    const mise = `${tools}\n[settings]\nidiomatic_version_file_enable_tools = ['node', 'bun']\n`;
+    expect(checkToolchain(repository({ "mise.toml": mise }))).toContain(
+      "mise.toml: read existing pins instead of declaring [tools] versions",
+    );
+  });
+
+  it.each([
+    "idiomatic_version_file_enable_tools = ['node', 'bun']\n",
+    "[unrelated]\nidiomatic_version_file_enable_tools = ['node', 'bun']\n",
+    "[settings]\nidiomatic_version_file_enable_tools = 'node,bun'\n",
+  ])("requires the enabled tool list in the settings table: %s", (mise) => {
+    expect(checkToolchain(repository({ "mise.toml": mise }))).toContain(
+      "mise.toml: enable idiomatic version files for node and bun",
+    );
+  });
+
+  it("reports invalid TOML while continuing to check other declarations", () => {
+    const findings = checkToolchain(
+      repository({
+        "mise.toml": "[settings\n",
+        "README.md": "Develop with Node 24.16.0.\n",
+      }),
+    );
+    expect(findings).toEqual(
+      expect.arrayContaining([
+        "mise.toml: invalid TOML configuration",
+        `README.md: documented Node is 24.16.0, expected ${nodeVersion}`,
+      ]),
+    );
+  });
+
+  it("reports root engine drift and an install guard that no longer enforces Bun", () => {
+    const root = repository();
+    changeManifest(root, (manifest) => {
+      manifest.engines.node = "24.16.0";
+      manifest.devEngines.runtime = { name: "node", version: nodeVersion, onFail: "warn" };
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        `package.json: engines.node is 24.16.0, expected ${nodeVersion}`,
+        `package.json: devEngines.runtime is node@${nodeVersion}, expected bun@${bunVersion}`,
+        "package.json: devEngines.runtime.onFail is warn, expected error",
+      ]),
+    );
+  });
+
+  it("rejects workflow literal versions even when they match today's pins", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": workflow
+        .replace("node-version-file: .nvmrc", `node-version: ${nodeVersion}`)
+        .replace("bun-version-file: package.json", `bun-version: ${bunVersion}`),
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        ".github/workflows/ci.yml: read node-version-file: .nvmrc instead of a literal version",
+        ".github/workflows/ci.yml: read bun-version-file: package.json instead of a literal version",
+      ]),
+    );
+  });
+
+  it("detects a second setup step missing its version-file", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": `${workflow}\n      - uses: actions/setup-node@v7\n`,
+    });
+    expect(checkToolchain(root)).toContain(
+      ".github/workflows/ci.yml: every node setup must read .nvmrc",
+    );
+  });
+
+  it("rejects workflow references to a second pin file", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": workflow.replace(
+        "node-version-file: .nvmrc",
+        "node-version-file: .node-version",
+      ),
+    });
+    expect(checkToolchain(root)).toContain(
+      ".github/workflows/ci.yml: node-version-file must be .nvmrc",
+    );
+  });
+
+  it("accepts quoted actions and source files, inline mappings and YAML comments", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": `jobs:
+  verify:
+    steps:
+      - uses: 'actions/setup-node@v7' # Select Node
+        with: { node-version-file: ".nvmrc" }
+      - uses: "oven-sh/setup-bun@v2"
+        with:
+          bun-version-file: 'package.json' # Select Bun
+`,
+    });
+    expect(checkToolchain(root)).toEqual([]);
+  });
+
+  it("recognizes mixed-case setup repositories with case-sensitive refs", () => {
+    const source = workflow
+      .replace("actions/setup-node@v7", "AcTiOnS/SeTuP-NoDe@Refs/Heads/KeepCase")
+      .replace("oven-sh/setup-bun@v2", "OvEn-Sh/SeTuP-BuN@KeepCase");
+    const root = repository({ ".github/workflows/ci.yml": source });
+    expect(checkToolchain(root)).toEqual([]);
+    expect(readFileSync(join(root, ".github/workflows/ci.yml"), "utf8")).toBe(source);
+  });
+
+  it.each([
+    ["node", "AcTiOnS/SeTuP-NoDe@KeepCase", ".nvmrc", nodeVersion],
+    ["bun", "OvEn-Sh/SeTuP-BuN@KeepCase", "package.json", bunVersion],
+  ])(
+    "rejects literal %s versions in mixed-case setup repositories",
+    (tool, action, file, version) => {
+      const source = `jobs:
+  verify:
+    steps:
+      - uses: ${action}
+        with:
+          ${tool}-version-file: ${file}
+          ${tool}-version: '${version}'
+`;
+      expect(checkToolchain(repository({ ".github/workflows/ci.yml": source }))).toContain(
+        `.github/workflows/ci.yml: read ${tool}-version-file: ${file} instead of a literal version`,
+      );
+    },
+  );
+
+  it.each([
+    ["node", "AcTiOnS/SeTuP-NoDe@KeepCase", ".NVMRC", ".nvmrc"],
+    ["bun", "OvEn-Sh/SeTuP-BuN@KeepCase", "PACKAGE.JSON", "package.json"],
+  ])("keeps %s version-file values case-sensitive", (tool, action, actual, expected) => {
+    const source = `jobs:
+  verify:
+    steps:
+      - uses: ${action}
+        with: { ${tool}-version-file: ${actual} }
+`;
+    expect(checkToolchain(repository({ ".github/workflows/ci.yml": source }))).toContain(
+      `.github/workflows/ci.yml: ${tool}-version-file must be ${expected}`,
+    );
+  });
+
+  it.each([
+    "AcTiOnS/SeTuP-NoDe-Extra@v1",
+    "Other-AcTiOnS/SeTuP-NoDe@v1",
+    "AcTiOnS/SeTuP-NoDe/Subdirectory@v1",
+    "OvEn-Sh/SeTuP-BuN-Extra@v1",
+    "Other-OvEn-Sh/SeTuP-BuN@v1",
+  ])("does not apply setup rules to a different repository or action path: %s", (action) => {
+    const source = `jobs:
+  verify:
+    steps:
+      - uses: ${action}
+        with: { node-version: 26, bun-version: latest }
+`;
+    expect(checkToolchain(repository({ ".github/workflows/ci.yml": source }))).toEqual([]);
+  });
+
+  it("ignores setup-like text in comments, scripts and unrelated actions", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": `${workflow}
+      # uses: actions/setup-node@v7
+      - run: |
+          uses: oven-sh/setup-bun@v2
+          node-version: 26
+          bun-version-file: .bun-version
+      - uses: example/unrelated@v1
+        with:
+          node-version: 26
+          bun-version-file: .bun-version
+`,
+    });
+    expect(checkToolchain(root)).toEqual([]);
+  });
+
+  it.each([
+    `jobs:
+  verify:
+    steps:
+      - uses: actions/setup-node@v7
+      - uses: example/unrelated@v1
+        with: { node-version-file: .nvmrc }
+`,
+    `jobs:
+  verify:
+    steps:
+      - uses: actions/setup-node@v7
+  other:
+    steps:
+      - uses: example/unrelated@v1
+        with: { node-version-file: .nvmrc }
+`,
+  ])("requires each setup step to own its version-file input: %s", (workflow) => {
+    expect(checkToolchain(repository({ ".github/workflows/ci.yml": workflow }))).toContain(
+      ".github/workflows/ci.yml: every node setup must read .nvmrc",
+    );
+  });
+
+  it("does not treat environment variables as setup inputs", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": workflow.replace(
+        "with:\n          node-version-file: .nvmrc",
+        "env:\n          node-version-file: .nvmrc",
+      ),
+    });
+    expect(checkToolchain(root)).toContain(
+      ".github/workflows/ci.yml: every node setup must read .nvmrc",
+    );
+  });
+
+  it("rejects a literal version even alongside the correct version-file", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": workflow.replace(
+        "node-version-file: .nvmrc",
+        `node-version-file: .nvmrc\n          node-version: '${nodeVersion}'`,
+      ),
+    });
+    expect(checkToolchain(root)).toContain(
+      ".github/workflows/ci.yml: read node-version-file: .nvmrc instead of a literal version",
+    );
+  });
+
+  it("allows reusable workflow jobs without steps", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": `${workflow}
+  reusable:
+    uses: example/workflows/.github/workflows/shared.yml@v1
+`,
+    });
+    expect(checkToolchain(root)).toEqual([]);
+  });
+
+  it.each([
+    ["- item\n", "workflow jobs must be a mapping"],
+    ["jobs: []\n", "workflow jobs must be a mapping"],
+    ["jobs: { verify: null }\n", "jobs.verify must be a mapping"],
+    ["jobs: { verify: { steps: {} } }\n", "jobs.verify.steps must be an array"],
+    ["jobs: { verify: { steps: [null] } }\n", "jobs.verify.steps[0] must be a mapping"],
+    [
+      "jobs: { verify: { steps: [{ uses: 'actions/setup-node@v7', with: [] }] } }\n",
+      "jobs.verify.steps[0].with must be a mapping",
+    ],
+  ])("reports malformed workflow structure for %s", (workflow, message) => {
+    expect(checkToolchain(repository({ ".github/workflows/ci.yml": workflow }))).toContain(
+      `.github/workflows/ci.yml: ${message}`,
+    );
+  });
+
+  it("reports invalid YAML while continuing to inspect other workflow files", () => {
+    const root = repository({
+      ".github/workflows/ci.yml": "jobs: [\n",
+      ".github/workflows/release.yaml": workflow.replace(
+        "bun-version-file: package.json",
+        "bun-version-file: .bun-version",
+      ),
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        ".github/workflows/ci.yml: invalid YAML configuration",
+        ".github/workflows/release.yaml: bun-version-file must be package.json",
+      ]),
+    );
+  });
+
+  it("checks Node types in the root and discovered workspaces", () => {
+    const root = repository({
+      "docs/package.json": JSON.stringify({
+        private: true,
+        devDependencies: { "@types/node": "^26.6.5" },
+      }),
+    });
+    changeManifest(root, (manifest) => {
+      manifest.devDependencies["@types/node"] = "^26.6.5";
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        "package.json: @types/node must match the Node 24 major",
+        "docs/package.json: @types/node must match the Node 24 major",
+      ]),
+    );
+  });
+
+  it("reports documented Node and Bun versions that drift from the sources", () => {
+    const root = repository({
+      "README.md": "Develop with Node **24.16.0** and Bun **1.4.2**.\n",
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        `README.md: documented Node is 24.16.0, expected ${nodeVersion}`,
+        `README.md: documented Bun is 1.4.2, expected ${bunVersion}`,
+      ]),
+    );
+  });
+
+  it("requires cache dependencies to follow changes to the development toolchain", () => {
+    const root = repository({ "turbo.json": JSON.stringify({ globalDependencies: [] }) });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        "turbo.json: include .nvmrc in globalDependencies",
+        "turbo.json: include mise.toml in globalDependencies",
+      ]),
+    );
+    expect(checkToolchain(root, { turboGlobalDependencies: ["scripts/toolchain.ts"] })).toEqual([
+      "turbo.json: include scripts/toolchain.ts in globalDependencies",
+    ]);
+  });
+
+  it("checks only the configured documents", () => {
+    const root = repository({
+      "README.md": "Develop with Node 24.16.0.\n",
+      "docs/guide.md": "Install Bun 1.4.2.\n",
+    });
+    expect(checkToolchain(root, { documents: ["docs/guide.md"] })).toEqual([
+      `docs/guide.md: documented Bun is 1.4.2, expected ${bunVersion}`,
+    ]);
+  });
+
+  it("checks runtime types in object-form workspaces and Bun catalogs", () => {
+    const root = repository({ "apps/web/package.json": JSON.stringify({ name: "web" }) });
+    changeManifest(root, (manifest) => {
+      Object.assign(manifest, {
+        workspaces: {
+          packages: ["apps/*"],
+          catalogs: { dev: { "@types/node": "^26.0.0", "@types/bun": "1.4.2" } },
+        },
+      });
+    });
+    expect(checkToolchain(root)).toEqual([
+      "package.json catalog: @types/node must match the Node 24 major",
+      `package.json catalog: @types/bun is 1.4.2, expected ${bunVersion}`,
+    ]);
+  });
+
+  it("leaves catalog and workspace protocol ranges to the catalog they resolve from", () => {
+    const root = repository({
+      "packages/library/package.json": JSON.stringify({
+        name: "@raypx-kit/library",
+        devDependencies: { "@types/node": "catalog:dev", "@types/bun": "catalog:" },
+      }),
+    });
+    expect(checkToolchain(root)).toEqual([]);
+  });
+
+  it("checks pinned runtime images in Dockerfiles", () => {
+    const root = repository({
+      "apps/api/Dockerfile": "FROM node:24.16.0-slim AS run\nFROM oven/bun:1.4.2 AS build\n",
+    });
+    expect(checkToolchain(root)).toEqual([
+      `apps/api/Dockerfile: node image is 24.16.0, expected ${nodeVersion}`,
+      `apps/api/Dockerfile: bun image is 1.4.2, expected ${bunVersion}`,
+    ]);
+  });
+});
+
+describe("active development runtimes", () => {
+  function runtimeRepository(): string {
+    const root = repository();
+    changeManifest(root, (manifest) => {
+      manifest.packageManager = `bun@${process.versions.bun}`;
+    });
+    return root;
+  }
+
+  it("checks the selected Node and returns both canonical versions", () => {
+    execFileSync.mockReturnValue(`v${nodeVersion}\n`);
+    expect(assertToolchainRuntime(runtimeRepository())).toEqual({
+      node: nodeVersion,
+      bun: process.versions.bun,
+      nodeBinary: "node",
+    });
+    expect(execFileSync).toHaveBeenCalledWith("node", ["--version"], {
+      encoding: "utf8",
+      stdio: "pipe",
+    });
+  });
+
+  it("allows a binary override when it provides the pinned Node", () => {
+    vi.stubEnv("DEVKIT_NODE_BINARY", "/custom/node");
+    execFileSync.mockReturnValue(`v${nodeVersion}\n`);
+    expect(assertToolchainRuntime(runtimeRepository()).nodeBinary).toBe("/custom/node");
+    expect(execFileSync).toHaveBeenCalledWith("/custom/node", ["--version"], expect.any(Object));
+  });
+
+  it("does not let a binary override bypass the required Node version", () => {
+    vi.stubEnv("DEVKIT_NODE_BINARY", "/custom/node");
+    execFileSync.mockReturnValue("v24.15.0\n");
+    expect(() => assertToolchainRuntime(runtimeRepository())).toThrow(
+      `Expected Node ${nodeVersion}, got v24.15.0`,
+    );
+  });
+
+  it("reports an unavailable binary override without depending on the host Node", () => {
+    vi.stubEnv("DEVKIT_NODE_BINARY", "/missing/node");
+    execFileSync.mockImplementation(() => {
+      throw new Error("ENOENT");
+    });
+    expect(() => assertToolchainRuntime(runtimeRepository())).toThrow("Node is unavailable");
+    expect(execFileSync).toHaveBeenCalledWith("/missing/node", ["--version"], expect.any(Object));
+  });
+
+  it("reads the binary override from a configured variable", () => {
+    vi.stubEnv("PRODUCT_NODE_BINARY", "/product/node");
+    execFileSync.mockReturnValue(`v${nodeVersion}\n`);
+    expect(pinnedNode(runtimeRepository(), { nodeBinaryEnv: "PRODUCT_NODE_BINARY" })).toBe(
+      "/product/node",
+    );
+  });
+
+  it("rejects a Bun mismatch before probing Node", () => {
+    const root = repository();
+    changeManifest(root, (manifest) => {
+      manifest.packageManager = "bun@0.0.0";
+    });
+    expect(() => assertToolchainRuntime(root)).toThrow("Expected Bun 0.0.0");
+    expect(execFileSync).not.toHaveBeenCalled();
+  });
+});

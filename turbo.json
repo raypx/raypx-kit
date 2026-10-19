@@ -1,0 +1,37 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "check": {
+      "dependsOn": ["^check"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["check", "^build"],
+      "outputs": ["dist/**", ".output/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  },
+  "globalDependencies": [
+    ".nvmrc",
+    "mise.toml",
+    "scripts/toolchain.ts",
+    "packages/devkit/src/toolchain.ts",
+    "tests/setup/**",
+    "docs/**",
+    "README.md",
+    ".changeset/README.md",
+    "PRODUCT.md",
+    "packages/*/README.md",
+    "packages/*/NOTICE.md",
+    "packages/*/LICENSE",
+    "packages/tsconfig/*.json",
+    "test.config.ts"
+  ]
+}

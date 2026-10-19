@@ -1,0 +1,37 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "bun --check --tsconfig-override tsconfig.json",
+    "build": "bun --bun vp build",
+    "dev": "bun --bun vp dev --host 127.0.0.1 --port 3100",
+    "preview": "bun --bun vp preview --host 127.0.0.1 --port 3100"
+  },
+  "dependencies": {
+    "@fumadocs/base-ui": "^16.17.7",
+    "@tanstack/react-router": "^1.170.45",
+    "@tanstack/react-start": "^1.169.3",
+    "@tanstack/start-static-server-functions": "^1.167.43",
+    "fumadocs-core": "^16.17.7",
+    "fumadocs-mdx": "^15.4.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@raypx-kit/tsconfig": "workspace:*",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "nitro": "~3.0.260903-beta",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.3.0",
+    "vite-plus": "^1.3.0"
+  }
+}
