@@ -6,6 +6,6 @@ const search = createFromSource(source, { language: "english" });
 
 export const Route = createFileRoute("/api/search")({
   server: {
-    handlers: { GET: () => search.staticGET() },
+    handlers: { GET: ({ request }) => search.GET(request) },
   },
 });

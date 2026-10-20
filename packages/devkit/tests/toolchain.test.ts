@@ -26,6 +26,17 @@ const workflow = [
   "        with:",
   "          bun-version-file: package.json",
 ].join("\n");
+const compositeAction = [
+  "runs:",
+  "  using: composite",
+  "  steps:",
+  "    - uses: actions/setup-node@v7",
+  "      with:",
+  "        node-version-file: .nvmrc",
+  "    - uses: oven-sh/setup-bun@v2",
+  "      with:",
+  "        bun-version-file: package.json",
+].join("\n");
 
 function repository(overrides: Record<string, string> = {}): string {
   const root = mkdtempSync(join(tmpdir(), "raypx-kit-toolchain-test-"));
@@ -424,6 +435,92 @@ describe("development toolchain declarations", () => {
         ".github/workflows/release.yaml: bun-version-file must be package.json",
       ]),
     );
+  });
+
+  it.each(["yml", "yaml"])(
+    "accepts pinned runtimes moved into a nested composite action.%s",
+    (extension) => {
+      const root = repository({
+        ".github/workflows/ci.yml": `jobs:
+  verify:
+    steps:
+      - uses: ./.github/actions/nested/setup-toolchain
+`,
+        [`.github/actions/nested/setup-toolchain/action.${extension}`]: compositeAction,
+      });
+      expect(checkToolchain(root)).toEqual([]);
+      expect(execFileSync).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["node", ".nvmrc", nodeVersion],
+    ["bun", "package.json", bunVersion],
+  ])("rejects literal %s versions inside composite actions", (tool, source, version) => {
+    const file = ".github/actions/setup-toolchain/action.yml";
+    const root = repository({
+      [file]: compositeAction.replace(
+        `${tool}-version-file: ${source}`,
+        `${tool}-version-file: ${source}\n        ${tool}-version: '${version}'`,
+      ),
+    });
+    expect(checkToolchain(root)).toContain(
+      `${file}: read ${tool}-version-file: ${source} instead of a literal version`,
+    );
+  });
+
+  it("requires each composite setup step to read the canonical pin file", () => {
+    const file = ".github/actions/setup-toolchain/action.yaml";
+    const root = repository({
+      [file]: compositeAction
+        .replace("node-version-file: .nvmrc", "unrelated: ignored")
+        .replace("bun-version-file: package.json", "bun-version-file: .bun-version"),
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        `${file}: every node setup must read .nvmrc`,
+        `${file}: bun-version-file must be package.json`,
+      ]),
+    );
+  });
+
+  it.each([
+    ["runs: []\n", "action runs must be a mapping"],
+    ["runs: { using: composite }\n", "runs.steps must be an array"],
+    ["runs: { using: composite, steps: {} }\n", "runs.steps must be an array"],
+    ["runs: { using: composite, steps: [null] }\n", "runs.steps[0] must be a mapping"],
+    [
+      "runs: { using: composite, steps: [{ uses: 'actions/setup-node@v7', with: [] }] }\n",
+      "runs.steps[0].with must be a mapping",
+    ],
+  ])("reports malformed composite action structure for %s", (action, message) => {
+    const file = ".github/actions/setup-toolchain/action.yml";
+    expect(checkToolchain(repository({ [file]: action }))).toContain(`${file}: ${message}`);
+  });
+
+  it("continues checking other actions after invalid composite YAML", () => {
+    const root = repository({
+      ".github/actions/broken/action.yml": "runs: [\n",
+      ".github/actions/setup-toolchain/action.yaml": compositeAction.replace(
+        "bun-version-file: package.json",
+        "bun-version-file: .bun-version",
+      ),
+    });
+    expect(checkToolchain(root)).toEqual(
+      expect.arrayContaining([
+        ".github/actions/broken/action.yml: invalid YAML configuration",
+        ".github/actions/setup-toolchain/action.yaml: bun-version-file must be package.json",
+      ]),
+    );
+  });
+
+  it("leaves JavaScript and Docker actions outside composite step checks", () => {
+    const root = repository({
+      ".github/actions/javascript/action.yml": "runs: { using: node24, main: index.js }\n",
+      ".github/actions/docker/action.yaml": "runs: { using: docker, image: Dockerfile }\n",
+    });
+    expect(checkToolchain(root)).toEqual([]);
+    expect(execFileSync).not.toHaveBeenCalled();
   });
 
   it("checks Node types in the root and discovered workspaces", () => {

@@ -138,7 +138,8 @@ const { node, bun, nodeBinary } = assertToolchainRuntime(root, {
 `onFail: "error"`), rejects `.node-version`, `.bun-version` and `.tool-versions`,
 requires `mise.toml` to read the existing pins without `[tools]`, requires every
 `actions/setup-node` and `oven-sh/setup-bun` step to read `.nvmrc` and
-`package.json`, matches the `@types/node` range baseline by major and the
+`package.json` in workflows under `.github/workflows/` and composite actions
+under `.github/actions/`, matches the `@types/node` range baseline by major and the
 `@types/bun` range baseline to the Bun pin in every manifest and Bun catalog,
 and checks Dockerfile `node:` and `oven/bun:` images,
 documented `Node x.y.z` and `Bun x.y.z` versions and Turbo global dependencies.

@@ -205,8 +205,10 @@ content to the site; there is no synchronized Markdown copy.
 
 The build rewrites registered documentation links to site routes and keeps other
 repository files as GitHub source links. TanStack Start prerenders the registered
-pages and search endpoint; Fumadocs builds search from the same content source.
-The application uses the Nitro Bun preset and remains outside npm publication
+pages; Fumadocs serves search results from the same content source through the
+TanStack Start file route at `/api/search`. Nitro builds a Cloudflare Worker for
+the API alongside static page assets, using its Bun preset during development.
+The application remains outside npm publication
 and library release versions. UI routing and site dependencies do not become
 library runtime dependencies.
 

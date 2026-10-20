@@ -1,6 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { staticFunctionMiddleware } from "@tanstack/start-static-server-functions";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
 import { DocsLayout } from "@fumadocs/base-ui/layouts/docs";
 import {
@@ -18,7 +17,6 @@ import { docs, getSourceUrl, source } from "../../lib/source";
 
 const loadPage = createServerFn({ method: "GET" })
   .validator(z.array(z.string()))
-  .middleware([staticFunctionMiddleware])
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
     if (!page) throw notFound();

@@ -112,8 +112,9 @@ exports its JSON presets directly. Package scripts invoke local `turbo`,
 `tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
 follow their Node shebangs. Keep `bun --bun vp` for tests because their workers
 use Bun-specific flags and the Intl jsdom preload. The internal documentation
-site also retains `bun --bun vp` development/build/preview commands: its Nitro
-`bun` preset produces server code that requires Bun during prerendering.
+site retains `bun --bun vp` for its Bun development server. Its build and preview
+commands invoke `vp` directly so Wrangler runs with Node. Nitro builds a
+`cloudflare_module` Worker for deployment.
 Repository TypeScript maintenance scripts, native type checking and archive
 packing continue to use Bun explicitly. Node and npm 10.9+ are also needed for
 packaged consumer checks and registry publication.

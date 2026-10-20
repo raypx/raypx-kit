@@ -1,4 +1,4 @@
-import { useStaticSearch } from "fumadocs-core/search/client";
+import { useFetchSearch } from "fumadocs-core/search/client";
 import {
   SearchDialog,
   SearchDialogClose,
@@ -28,7 +28,7 @@ function EmptySearchResults() {
 }
 
 export default function DocsSearchDialog(props: SharedProps) {
-  const search = useStaticSearch({ from: "/api/search" });
+  const search = useFetchSearch({ api: "/api/search" });
 
   return (
     <SearchDialog {...search} {...props}>

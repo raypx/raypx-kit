@@ -1,0 +1,33 @@
+name: Report job diagnostics
+description: Summarize the original job status and retain sanitized diagnostics when the job fails.
+
+inputs:
+  job-status:
+    description: Job status before this action runs.
+    required: true
+  artifact-name:
+    description: Unique name for this job's failure diagnostics.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Summarize job
+      if: always()
+      shell: bash
+      env:
+        DIAGNOSTICS_JOB_STATUS: ${{ inputs.job-status }}
+      run: bun scripts/ci/diagnostics.ts summary "$DIAGNOSTICS_JOB_STATUS"
+    - name: Retain failure diagnostics
+      if: ${{ always() && (inputs.job-status == 'failure' || failure()) }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          .artifacts/ci/diagnostics/*.log
+          .artifacts/ci/diagnostics/*.json
+          .artifacts/ci/diagnostics/summary.md
+          .artifacts/ci/diagnostics/reports/*.xml
+        include-hidden-files: true
+        if-no-files-found: ignore
+        retention-days: 7

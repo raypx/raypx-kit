@@ -24,15 +24,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          package-manager-cache: false
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
-      - name: Install locked dependencies
-        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      - name: Set up repository toolchain
+        uses: ./.github/actions/setup-toolchain
       - name: Verify toolchain
         run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - uses: changesets/action/select-mode@v2.0.0
@@ -54,21 +47,12 @@ jobs:
           Run this workflow again to create the version PR. Package publishing is
           configured separately through `NPM_PUBLISH_ENABLED`.
           SUMMARY
-      - name: Summarize release planning
+      - name: Report release planning diagnostics
         if: always()
-        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
-      - name: Retain failure diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/report-diagnostics
         with:
-          name: release-plan-diagnostics
-          path: |
-            .artifacts/ci/diagnostics/*.log
-            .artifacts/ci/diagnostics/*.json
-            .artifacts/ci/diagnostics/summary.md
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 7
+          job-status: ${{ job.status }}
+          artifact-name: release-plan-diagnostics
 
   version:
     needs: plan
@@ -83,15 +67,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          package-manager-cache: false
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
-      - name: Install locked dependencies
-        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      - name: Set up repository toolchain
+        uses: ./.github/actions/setup-toolchain
       - name: Verify toolchain
         run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - uses: changesets/action/version@v2.0.0
@@ -99,21 +76,12 @@ jobs:
           script: bun scripts/ci/diagnostics.ts run version-packages bun run version-packages
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
-      - name: Summarize version preparation
+      - name: Report version preparation diagnostics
         if: always()
-        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
-      - name: Retain failure diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/report-diagnostics
         with:
-          name: release-version-diagnostics
-          path: |
-            .artifacts/ci/diagnostics/*.log
-            .artifacts/ci/diagnostics/*.json
-            .artifacts/ci/diagnostics/summary.md
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 7
+          job-status: ${{ job.status }}
+          artifact-name: release-version-diagnostics
 
   publish:
     needs: plan
@@ -131,16 +99,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v7
+      - name: Set up repository toolchain
+        uses: ./.github/actions/setup-toolchain
         with:
-          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org/
-          package-manager-cache: false
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
-      - name: Install locked dependencies
-        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
       - name: Verify development toolchain
         run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - name: Verify source before publication
@@ -160,19 +122,9 @@ jobs:
           NPM_CONFIG_PROVENANCE: "true"
           # Limit the npm transport override to this publication step.
           NPM_CONFIG_FORCE: "true"
-      - name: Summarize publication
+      - name: Report publication diagnostics
         if: always()
-        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
-      - name: Retain failure diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/report-diagnostics
         with:
-          name: release-publish-diagnostics
-          path: |
-            .artifacts/ci/diagnostics/*.log
-            .artifacts/ci/diagnostics/*.json
-            .artifacts/ci/diagnostics/summary.md
-            .artifacts/ci/diagnostics/reports/*.xml
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 7
+          job-status: ${{ job.status }}
+          artifact-name: release-publish-diagnostics

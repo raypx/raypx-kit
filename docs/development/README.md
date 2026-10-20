@@ -77,9 +77,10 @@ directly.
 
 Package scripts invoke `turbo`, `tsdown`, `changeset`, `knip`, `vp check` and
 `vp fmt` directly. Tests retain `bun --bun vp` because workers use Bun-specific
-flags and the Intl jsdom preload. The documentation site's development, build and
-preview commands also retain Bun: Nitro's `bun` output requires it during
-prerendering. Repository TypeScript scripts, native type checks and archive
+flags and the Intl jsdom preload. The documentation development server also uses
+`bun --bun vp` with Nitro's Bun preset. Its build and preview invoke `vp` directly
+so Wrangler runs with Node and serves the production Cloudflare Worker.
+Repository TypeScript scripts, native type checks and archive
 packing use Bun explicitly.
 
 Workspace checks use `bun --check --tsconfig-override tsconfig.json` without a
@@ -150,6 +151,18 @@ Before moving the baseline, run the complete `bun run verify` gate on the propos
 hosted image, including builds and isolated archive consumers, then update both
 workflows and this guide together.
 
+Each job checks out its source and calls `.github/actions/setup-toolchain` to
+install the pinned runtimes and locked dependencies. The publication job supplies
+its npm registry URL; checkout history, permissions and verification steps belong
+to the calling workflow. Toolchain declaration checks inspect both workflow steps
+and the local composite actions.
+
+The setup action caches Bun downloads under the runner's temporary directory and
+sets `BUN_INSTALL_CACHE_DIR` for the rest of the job, including isolated consumer
+installations. Cache keys include the OS, architecture, Bun version and lockfile
+hash; a fallback reuses downloads from the same Bun version. Every job still runs
+`bun install --frozen-lockfile --ignore-scripts`, including on a cache hit.
+
 ## CI diagnostics
 
 CI runs the four verification phases as named steps. Each command records its
@@ -164,6 +177,11 @@ results. Local reports remain ignored files; CI collects sanitized reports into
 the diagnostics directory. On failure, CI uploads only those diagnostics with a
 seven-day retention period; dotenv files, credentials and installed consumer
 directories are excluded. These generated directories are ignored by Git.
+
+Every job calls `.github/actions/report-diagnostics` with `if: always()`, its
+original `job.status` and a unique artifact name. The action generates the summary
+for that status and uploads sanitized diagnostics if the job or summary fails.
+Verification phases remain separate named workflow steps.
 
 ## CI database integration
 
@@ -265,9 +283,58 @@ navigation in `docs/src/lib/pages.ts` and content selection in
 `docs/src/lib/source.ts`. Register new pages in both places. Registered Markdown
 links become site routes; other repository files link to GitHub.
 
-The build prerenders documentation and search. The site has no npm publication
+The build prerenders documentation pages and bundles a search API. The site has no npm publication
 and does not change library versions. See [site ownership](../AGENTS.md) and
 [template provenance](../NOTICE.md).
+
+### Cloudflare deployment
+
+Nitro's `cloudflare_module` preset builds the documentation Worker in
+`docs/.output/server`, with prerendered pages and browser assets in
+`docs/.output/public`. Root `wrangler.jsonc` names the Worker `raypx-kit-docs`,
+binds its static assets as `ASSETS` and routes `/api/*` through the Worker first.
+HTML routes use URLs without trailing slashes.
+
+The TanStack Start file route `docs/src/routes/api/search.ts` handles
+`GET /api/search?query=...` with Fumadocs' `GET` handler. The search dialog uses
+`useFetchSearch` to fetch results instead of downloading the complete index.
+The search endpoint is not prerendered and needs no static response header override.
+
+The CI workflow uploads the verified Worker and static assets on `canary` pushes and manual
+`canary` runs. Its `deploy-docs` job waits for verification, every compatibility
+matrix cell and PostgreSQL integration to succeed, then downloads that same
+run's `docs-site` artifact and runs `bun run docs:deploy` without rebuilding.
+Pull requests and manual runs on other branches do not deploy.
+
+Before the first deployment, configure these GitHub Actions secrets at repository
+level or in the `cloudflare-docs` environment:
+
+| Secret                  | Value                                                       |
+| ----------------------- | ----------------------------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account that will own the documentation Worker   |
+| `CLOUDFLARE_API_TOKEN`  | An **Edit Cloudflare Workers** token scoped to that account |
+
+Missing credentials fail the deployment job with a setup message. The deployment
+uses the `cloudflare-docs` GitHub environment and retains sanitized failure
+diagnostics through the shared reporting action. Wrangler prints the deployment
+URL; a custom domain can be configured in the Worker's Cloudflare settings.
+
+For a local deployment, authenticate with `bunx wrangler login`, then run:
+
+```sh
+bun run docs:build
+bun run docs:deploy
+```
+
+Validate the deployment configuration without publishing:
+
+```sh
+bun run docs:deploy --dry-run --outdir .artifacts/docs-deploy
+```
+
+See Nitro's [Cloudflare deployment guide](https://nitro.build/deploy/providers/cloudflare),
+Cloudflare's [static assets routing guide](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
+and [GitHub Actions authentication](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
 
 ## Adding a package
 

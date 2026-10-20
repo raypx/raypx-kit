@@ -18,11 +18,17 @@ type MarkdownNode = {
   children?: MarkdownNode[];
 };
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   server: { port: 3100, strictPort: true },
+  ssr: { noExternal: true },
   plugins: [
     nitro({
-      preset: "bun",
+      preset: command === "serve" ? "bun" : "cloudflare_module",
+      cloudflare: { deployConfig: false },
+      commands: {
+        preview:
+          "node ../node_modules/wrangler/bin/wrangler.js dev --config ../wrangler.jsonc --local",
+      },
       serverDir: false,
       serverEntry: false,
     }),
@@ -58,9 +64,9 @@ export default defineConfig({
         crawlLinks: false,
         failOnError: true,
       },
-      pages: ["/", ...documentationPaths, "/api/search"].map((path) => ({ path })),
+      pages: ["/", ...documentationPaths].map((path) => ({ path })),
       sitemap: { enabled: false },
     }),
     react(),
   ],
-});
+}));

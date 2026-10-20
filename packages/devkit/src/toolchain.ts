@@ -140,6 +140,20 @@ function checkSetupStep(file: string, location: string, step: Record<string, unk
   return findings;
 }
 
+function checkSetupSteps(file: string, location: string, steps: unknown): string[] {
+  if (!Array.isArray(steps)) return [`${file}: ${location} must be an array`];
+  const findings: string[] = [];
+  for (const [index, step] of steps.entries()) {
+    const stepLocation = `${location}[${index}]`;
+    if (!isRecord(step)) {
+      findings.push(`${file}: ${stepLocation} must be a mapping`);
+      continue;
+    }
+    findings.push(...checkSetupStep(file, stepLocation, step));
+  }
+  return findings;
+}
+
 function checkWorkflows(root: string): string[] {
   const findings: string[] = [];
   for (const file of globSync(".github/workflows/*.{yml,yaml}", { cwd: root })) {
@@ -161,19 +175,28 @@ function checkWorkflows(root: string): string[] {
         continue;
       }
       if (job.steps === undefined) continue;
-      if (!Array.isArray(job.steps)) {
-        findings.push(`${file}: ${location}.steps must be an array`);
-        continue;
-      }
-      for (const [index, step] of job.steps.entries()) {
-        const stepLocation = `${location}.steps[${index}]`;
-        if (!isRecord(step)) {
-          findings.push(`${file}: ${stepLocation} must be a mapping`);
-          continue;
-        }
-        findings.push(...checkSetupStep(file, stepLocation, step));
-      }
+      findings.push(...checkSetupSteps(file, `${location}.steps`, job.steps));
     }
+  }
+  return findings;
+}
+
+function checkCompositeActions(root: string): string[] {
+  const findings: string[] = [];
+  for (const file of globSync(".github/actions/**/action.{yml,yaml}", { cwd: root })) {
+    let action: unknown;
+    try {
+      action = parseYAML(readFileSync(join(root, file), "utf8"), { filename: file });
+    } catch {
+      findings.push(`${file}: invalid YAML configuration`);
+      continue;
+    }
+    if (!isRecord(action) || !isRecord(action.runs)) {
+      findings.push(`${file}: action runs must be a mapping`);
+      continue;
+    }
+    if (action.runs.using !== "composite") continue;
+    findings.push(...checkSetupSteps(file, "runs.steps", action.runs.steps));
   }
   return findings;
 }
@@ -243,7 +266,7 @@ export function checkToolchain(
     for (const [, version] of source.matchAll(/^FROM\s+oven\/bun:(\d+\.\d+\.\d+)/gm))
       expect(file, "bun image", version, pins.bun);
   }
-  findings.push(...checkWorkflows(root));
+  findings.push(...checkWorkflows(root), ...checkCompositeActions(root));
   for (const file of documents) {
     if (!existsSync(join(root, file))) continue;
     const document = readFileSync(join(root, file), "utf8").replaceAll("**", "");

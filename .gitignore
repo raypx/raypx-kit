@@ -1,6 +1,7 @@
 node_modules/
 .turbo/
 .artifacts/
+/.wrangler/
 /.changeset/publish-plan.json
 /.changeset/pack/
 /packages/*node_modules/

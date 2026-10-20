@@ -9,15 +9,14 @@
   "type": "module",
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "bun --bun vp build",
+    "build": "vp build",
     "dev": "bun --bun vp dev --host 127.0.0.1 --port 3100",
-    "preview": "bun --bun vp preview --host 127.0.0.1 --port 3100"
+    "preview": "vp preview --host 127.0.0.1 --port 3100"
   },
   "dependencies": {
     "@fumadocs/base-ui": "^16.17.7",
     "@tanstack/react-router": "^1.170.45",
     "@tanstack/react-start": "^1.169.3",
-    "@tanstack/start-static-server-functions": "^1.167.43",
     "fumadocs-core": "^16.17.7",
     "fumadocs-mdx": "^15.4.8",
     "react": "^19.3.1",

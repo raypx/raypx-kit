@@ -33,7 +33,9 @@ without a third-party service.
 - Use the official `@fumadocs/base-ui` components and `fumadocs-core` with caret
   ranges that resolve to the same installed version. The root `toolchain:check`
   verifies this pairing. Do not reintroduce the Radix-based `fumadocs-ui` package.
-- Keep the Nitro `bun` preset and `bun --bun vp` development/build/preview commands.
+- Use Nitro's `bun` preset for development and `cloudflare_module` for builds.
+  Use `bun --bun vp` for development and invoke `vp` directly for build and
+  preview so Wrangler runs with Node.
   Node 24.22.0 is the repository consumer-check and npm transport baseline.
 - Library tsdown builds belong to their packages. This internal application keeps
   its Vite+ build and does not generate library declarations or archives.
@@ -44,7 +46,7 @@ without a third-party service.
 - Preserve current versus proposed API status, source provenance and all inventory rows.
 - Resolve Markdown links against their canonical source during compilation;
   registered pages use site routes and other repository files link to GitHub.
-- Use lazy content loading and a static search index, with no production database,
+- Use lazy content loading and a search API built from canonical content, with no production database,
   authentication, external search provider or application environment dependency.
 - Keep the UI in English and retain localized message examples in their intended languages.
 - Respect light/dark themes, keyboard access and reduced-motion preferences.
