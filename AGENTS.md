@@ -191,7 +191,13 @@ library tarball contents and isolated Bun/Node consumers. `build` runs package
 `check` first through Turbo.
 Set `TOOLKIT_NODE_BINARY` to a Node executable matching `.nvmrc` if Node is not on
 PATH; it does not bypass the development pin. Real database tests require an
-explicit disposable database and remain separate from unit verification.
+independent CI job with a temporary PostgreSQL 17 service. Default unit tests,
+coverage, tarball checks and local `verify` remain database-free. Drizzle's
+explicit `test:integration` command requires CI and `DRIZZLE_TEST_DATABASE_URL`;
+missing either must fail rather than skip. Use only test-owned schemas and tables,
+clean them up, and close connections. Only a successful Drizzle integration job
+provides evidence of real PG17 execution; local `verify` does not provide that
+evidence. PostgreSQL 18 is outside the test matrix.
 
 `bun run knip` checks workspace source files, dependency usage and internal
 exports. Keep public library entry points as API roots, including APIs with no

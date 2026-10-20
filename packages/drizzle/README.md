@@ -129,5 +129,18 @@ bun install --frozen-lockfile
 bun run verify
 ```
 
+Default unit tests, coverage, tarball checks and local `verify` do not need a
+database. CI configures a separate integration job with a temporary PostgreSQL 17
+service and runs `bun run --cwd packages/drizzle test:integration`. This explicit
+command requires CI and `DRIZZLE_TEST_DATABASE_URL`; missing either fails instead
+of skipping tests.
+
+The integration suite is configured to exercise JSONB expressions and decoding,
+UPSERT, SQLSTATE metadata and EXPLAIN against the real service. It uses and cleans
+up test-only schemas and tables, with no product schema or migration dependency.
+Only a successful Drizzle integration job provides evidence of real PG17
+execution; passing local `verify` does not. PostgreSQL 18 is outside the test
+matrix.
+
 Releases use independent Changesets. See the repository's
 [release guide](https://github.com/raypx/raypx-kit/blob/canary/docs/development/changesets.md).

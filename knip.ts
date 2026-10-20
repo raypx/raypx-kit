@@ -33,6 +33,8 @@ const config: KnipConfig = {
     },
     "packages/drizzle": {
       ...library,
+      // The CI-only suite uses its own configuration and global setup.
+      vitest: { config: ["vitest.config.ts", "vitest.integration.config.ts"] },
     },
     "packages/env": {
       ...library,

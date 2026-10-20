@@ -126,6 +126,7 @@ versions keep these shared development tools from linking package release cycles
 | Isolated consumers               | Install the actual archive outside the workspace; load public exports with Bun and Node, check supported CommonJS conditions and binary links, and resolve declarations with NodeNext |
 | Package consumer fixtures        | Additional public runtime and type contracts against the installed archive, with their own dependency and compiler environments                                                       |
 | Consumers without optional peers | Independently verify Drizzle's driver-free entries and strict declarations, and confirm ORM-dependent entries still require the missing ORM                                           |
+| CI database integration          | A separate job configures temporary PostgreSQL 17 and the explicit Drizzle suite for real JSONB, UPSERT, SQLSTATE and EXPLAIN behavior                                                |
 
 Tests use Bun workers with Vitest's `node` or `jsdom` environment. Intl's client
 tests use a Bun-specific jsdom preload. These test-runtime choices do not make
@@ -135,8 +136,16 @@ Ordinary archive declaration checks skip third-party declaration bodies where
 optional upstream adapters are absent. Focused consumer fixtures can require
 stricter checks; the consumer without optional peers uses `skipLibCheck: false`
 without ambient Node or DOM types. Source aliases cannot substitute for these
-installed-package contracts. Drizzle's current checks cover SQL construction,
-result mapping and types; they do not run a live PostgreSQL integration suite.
+installed-package contracts. Default unit tests, coverage, tarball checks and
+local `verify` remain database-free, including Drizzle's SQL construction, mocked
+result mapping and type checks.
+
+Drizzle's separate CI job runs `test:integration` against a temporary PostgreSQL 17
+service through `DRIZZLE_TEST_DATABASE_URL`. The command fails without CI or the
+test URL. Its schema and table fixtures belong only to the test run and are
+cleaned up with their connections. Only a successful Drizzle integration job
+provides evidence of real PG17 execution; local `verify` does not. PostgreSQL 18
+is outside the test matrix. See the [CI integration policy](../development/README.md#ci-database-integration).
 
 ## Documentation flow
 

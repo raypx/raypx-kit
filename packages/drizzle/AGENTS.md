@@ -67,9 +67,23 @@ Preserve the additional consumer without optional peers: it checks `/errors` and
 
 ## Verification
 
+Default `test`, `test:unit`, `test:coverage`, tarball checks and the root `verify`
+must not require or connect to a database. Keep integration files outside those
+default test selections.
+
 ```bash
 bun run build --filter=@raypx-kit/drizzle
 bun run --cwd packages/drizzle check
 bun run --cwd packages/drizzle test
 bun run --cwd packages/drizzle pack:check
 ```
+
+CI runs `bun run --cwd packages/drizzle test:integration` in a separate job with
+a temporary PostgreSQL 17 service. The command requires a CI environment and
+`DRIZZLE_TEST_DATABASE_URL`; missing either is an error, never a skipped suite.
+Exercise real JSONB values and decoding, UPSERT behavior, SQLSTATE error metadata
+and EXPLAIN through postgres.js. Use test-only schemas and tables, clean them up
+and close connections; never use product schemas or migrations. Do not log the
+connection URL. Only a successful Drizzle integration job establishes real PG17
+execution evidence; local `verify` does not. PostgreSQL 18 is outside the test
+matrix.

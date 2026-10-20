@@ -1,3 +1,12 @@
+import { configDefaults, defineConfig } from "vite-plus/test/config";
 import { workspaceTests } from "../../test.config.js";
 
-export default workspaceTests();
+const config = workspaceTests();
+
+export default defineConfig({
+  ...config,
+  test: {
+    ...config.test,
+    exclude: [...configDefaults.exclude, "tests/integration/**"],
+  },
+});

@@ -25,5 +25,5 @@ export function buildExplain(statement: SQLWrapper, options: ExplainOptions = {}
   const parts = ["FORMAT JSON"];
   if (options.analyze) parts.push("ANALYZE true");
   if (options.buffers) parts.push("BUFFERS true");
-  return sql`EXPLAIN (${sql.raw(parts.join(", "))}) ${statement}`;
+  return sql`EXPLAIN (${sql.raw(parts.join(", "))}) ${statement.getSQL()}`;
 }

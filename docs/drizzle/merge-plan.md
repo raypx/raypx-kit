@@ -72,11 +72,19 @@ and all other drivers are outside the compatibility commitment.
 Builds include ESM, declarations and sourcemaps. Drizzle is a peer dependency and
 is never bundled. Its compatibility declaration is restricted to
 `drizzle-orm >=1.0.0-rc.5-5935859 <1.0.0-rc.5-z`, with `postgres@^3.4.9`.
-Repository checks cover types, SQL construction, mocked postgres.js result
-decoding and installed tarball consumers using the builds selected by `bun.lock`.
-These checks do not execute against a PostgreSQL server. Live postgres.js/PG17
-acceptance remains separate from the normal verification gate; future extensions
-must satisfy the database and version-specific criteria below.
+Default repository checks cover types, SQL construction, mocked postgres.js
+result decoding and installed tarball consumers using the builds selected by
+`bun.lock`. Unit tests, coverage, tarball checks and local `verify` stay
+database-free. A separate CI job configures a temporary PostgreSQL 17 service and
+runs `bun run --cwd packages/drizzle test:integration` with
+`DRIZZLE_TEST_DATABASE_URL`. It exercises real JSONB, UPSERT, SQLSTATE and EXPLAIN
+behavior using test-only schemas and tables with cleanup. The explicit command
+fails without CI or the test URL rather than skipping.
+
+Only a successful Drizzle integration job provides evidence of real PG17
+execution; passing local `verify` does not. PostgreSQL 18 is outside the test
+matrix. Future extensions must satisfy the database and version-specific criteria
+below. See the [CI integration policy](../development/README.md#ci-database-integration).
 The former `./pg` subpath has been replaced by `./postgres`, without an alias.
 There are no Node- or Bun-specific runtime imports and no runtime dependencies
 on Raypx workspaces.
@@ -280,17 +288,17 @@ cancellation guarantee themselves.
 
 ## Implementation phases and acceptance
 
-| Phase                                | Deliverables                                                                                                                                  | Completion criteria                                                                                                                                                                    |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A: Current foundation                | Implemented foundation helpers, standalone package build, complete inventories, this integration design and independent release configuration | Existing evidence: types/unit tests, SQL construction, mocked driver decoding, tarball installation, Bun/Node imports, license/export checks. Pending: live postgres.js/PG17 execution |
-| B: Complete SQL layer                | 18 common functions, CASE/selection/JSON aggregation, VALUES, CTEs and time-type utilities                                                    | Individual SQL and decoding cases; PG17/18 capability gates; execution of every expression through postgres.js                                                                         |
-| C: Unified query layer               | CRUD, uniqueness, count/exists, offset/keyset, updateEach/upsertMany, prepared queries and locks                                              | postgres.js prepare configuration, real concurrency/locks, transaction rollback, bulk conflicts, NULL ordering and dynamic-scope tests                                                 |
-| D: Relations and plugins             | include/filters/sorts/count and relation writes; timestamps/uuid/rules/tenant/soft-delete/validation/cache                                    | Transactions across layers, tenant/soft-delete consistency, plugin ordering, commit/rollback, cache races and correction of types without evaluators                                   |
-| E: Compatibility and developer tools | PostgreSQL-scoped plus/better compatibility entry points, development-check plugins and migration guides                                      | Inventory rows distinguish implemented/planned/out-of-scope status; tested postgres.js, PG17/18 and Drizzle peer matrix                                                                |
+| Phase                                | Deliverables                                                                                                                                  | Completion criteria                                                                                                                                                                                             |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A: Current foundation                | Implemented foundation helpers, standalone package build, complete inventories, this integration design and independent release configuration | Types/unit tests, SQL construction, mocked driver decoding, tarball installation, Bun/Node imports and license/export checks. Real PG17 execution evidence comes only from a successful Drizzle integration job |
+| B: Complete SQL layer                | 18 common functions, CASE/selection/JSON aggregation, VALUES, CTEs and time-type utilities                                                    | Individual SQL and decoding cases; PG17/18 capability gates; execution of every expression through postgres.js                                                                                                  |
+| C: Unified query layer               | CRUD, uniqueness, count/exists, offset/keyset, updateEach/upsertMany, prepared queries and locks                                              | postgres.js prepare configuration, real concurrency/locks, transaction rollback, bulk conflicts, NULL ordering and dynamic-scope tests                                                                          |
+| D: Relations and plugins             | include/filters/sorts/count and relation writes; timestamps/uuid/rules/tenant/soft-delete/validation/cache                                    | Transactions across layers, tenant/soft-delete consistency, plugin ordering, commit/rollback, cache races and correction of types without evaluators                                                            |
+| E: Compatibility and developer tools | PostgreSQL-scoped plus/better compatibility entry points, development-check plugins and migration guides                                      | Inventory rows distinguish implemented/planned/out-of-scope status; tested postgres.js, PG17/18 and Drizzle peer matrix                                                                                         |
 
 No phase removes an inventory capability merely because Raypx does not need it.
 An implemented export identifies a shipped API; it does not establish that every
-phase acceptance criterion, including pending live database checks, has passed.
+phase acceptance criterion, including the required live database checks, has passed.
 Order general-purpose and PostgreSQL work by dependencies and verification cost.
 Preserve every MySQL/SQLite entry point, type, implementation difference and
 declared capability with the status "retained in the inventory, outside the

@@ -47,7 +47,7 @@
     "check": "bun --check --tsconfig-override tsconfig.json",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run --passWithNoTests --exclude '**/component.test.{ts,tsx}' --exclude '**/*.component.test.{ts,tsx}' --exclude '**/*.integration.test.{ts,tsx}'",
-    "test:integration": "bun --bun vp test --run --passWithNoTests integration.test",
+    "test:integration": "bun --bun vp test --run --config vitest.integration.config.ts",
     "test:component": "bun --bun vp test --run --passWithNoTests component.test",
     "test:coverage": "bun --bun vp test --run --passWithNoTests --coverage --coverage.reporter=text --coverage.reporter=json --coverage.reporter=lcov",
     "build": "tsdown",

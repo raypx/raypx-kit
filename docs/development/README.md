@@ -45,7 +45,7 @@ documented versions and installed dependency combinations.
 | `bun run build`          | Workspace checks and builds, including the documentation site    |
 | `bun run pack:check`     | Pack current package output and check isolated archive consumers |
 | `bun run release:check`  | Changesets versioning rules in disposable local fixtures         |
-| `bun run verify`         | The complete CI gate                                             |
+| `bun run verify`         | The complete local gate, also used by CI                         |
 
 Start with the affected package's narrow checks:
 
@@ -57,9 +57,10 @@ bun run build --filter=@raypx-kit/drizzle
 
 `verify` runs runtime and declaration checks, lint, types, Knip, maintenance tests,
 workspace tests and builds, archive consumers, then Changesets fixtures. CI runs
-the same command. The normal gate does not enable coverage or require a database.
-Run a package's `test:coverage` after changing its test runtime or coverage provider;
-real database tests require an explicitly selected disposable database.
+the same command and an independent Drizzle database integration job. Local
+`verify`, default unit tests, coverage and tarball checks do not require a database;
+the normal gate does not enable coverage. Run a package's `test:coverage` after
+changing its test runtime or coverage provider.
 
 ## Tool and test boundaries
 
@@ -109,6 +110,25 @@ tool bindings and system utilities still run against the runner's OS libraries.
 Before moving the baseline, run the complete `bun run verify` gate on the proposed
 hosted image, including builds and isolated archive consumers, then update both
 workflows and this guide together.
+
+## CI database integration
+
+Drizzle's real database integration suite runs only in a separate CI job, using a
+temporary PostgreSQL 17 service. That job runs
+`bun run --cwd packages/drizzle test:integration` with
+`DRIZZLE_TEST_DATABASE_URL` pointing to its test database. The command requires
+both CI and the URL and fails explicitly when either is missing; it does not
+silently skip. Local setup and `bun run verify` have no database prerequisite.
+
+The suite is configured to cover real JSONB expressions and decoding, UPSERT,
+SQLSTATE error metadata and EXPLAIN through postgres.js. Test fixtures create
+only test-owned schemas and tables, clean them up and close connections. Product
+schemas, migrations and credentials are outside this job.
+
+Only a successful Drizzle integration job provides evidence of real PG17
+execution. Passing local `verify` does not include that evidence. PostgreSQL 18
+is outside the test matrix; future version-specific features require their own
+verification evidence.
 
 ## Archive consumers
 
