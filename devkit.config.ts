@@ -4,6 +4,13 @@ import type { Metadata } from "./packages/devkit/src/workspaces.js";
 /** Repository policy; runtime pins and public package contracts keep their own sources. */
 export default {
   workspaces: {
+    "packages/codemods": {
+      kind: "tooling",
+      target: "node",
+      sourceEntries: {
+        ".": "./src/index.ts",
+      },
+    },
     docs: {
       kind: "app",
       target: "browser",

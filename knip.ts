@@ -8,7 +8,7 @@ const libraryProject = [
   "!tests/fixtures/consumer/**",
 ];
 const library = {
-  // tsdown.config.ts declares the 23 public source entries across the five libraries.
+  // tsdown.config.ts declares public source entries and CLI binaries.
   // Its plugin roots those APIs without treating every implementation file as public.
   entry: [],
   project: libraryProject,
@@ -29,6 +29,9 @@ const config: KnipConfig = {
       includeEntryExports: true,
     },
     "packages/devkit": {
+      ...library,
+    },
+    "packages/codemods": {
       ...library,
     },
     "packages/drizzle": {

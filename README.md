@@ -8,6 +8,7 @@ own their schemas, secrets, business rules and runtime configuration.
 
 | Package                                                  | Purpose                                                                              |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [@raypx-kit/codemods](packages/codemods/README.md)       | Explicit-file migration runner and CLI; built-in migrations are added as needed      |
 | [@raypx-kit/devkit](packages/devkit/README.md)           | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers   |
 | [@raypx-kit/drizzle](packages/drizzle/README.md)         | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics |
 | [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md) | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                      |

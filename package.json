@@ -12,6 +12,7 @@
     "doctor": "bun run raypx-kit-dev doctor",
     "toolchain:check": "bun run raypx-kit-dev toolchain check",
     "architecture:check": "bun run raypx-kit-dev architecture check",
+    "codemod": "bun packages/codemods/src/cli.ts",
     "build": "turbo run build",
     "check": "bun --check --tsconfig-override tsconfig.json && turbo run check",
     "test": "bun run test:toolchain && turbo run test",

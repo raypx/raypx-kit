@@ -1,6 +1,6 @@
 # Architecture
 
-Raypx Kit publishes seven independently versioned packages. It separates reusable
+Raypx Kit publishes eight independently versioned packages. It separates reusable
 library behavior from application policy, repository maintenance and the internal
 documentation application. Published interfaces come from each package's
 `package.json` exports and README; research inventories do not expand them.
@@ -12,6 +12,7 @@ and [dependency policy](../development/dependencies.md).
 
 ```text
 packages/
+  codemods/     Explicit-file migration runner and CLI scaffold
   devkit/       Repository maintenance library
   drizzle/      PostgreSQL expressions and result helpers
   drizzle-kit/  Extracted upstream CLI distribution
@@ -41,6 +42,7 @@ package entries and framework-recognized configuration filenames remain stable.
 
 | Package                                             | Library responsibility                                                                                                                       | Consumer responsibility                                                                               |
 | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [Codemods](../../packages/codemods/README.md)       | Run transformations over explicit files, preview changes and write only when requested                                                       | Migration semantics, file selection, review and rollback                                              |
 | [Devkit](../../packages/devkit/README.md)           | Workspace discovery, metadata and import checks; toolchain declarations; static catalogs; documentation links; process and artifact helpers  | Repository policy, paths, expected runtime pins, cache trust and application health probes            |
 | [Drizzle](../../packages/drizzle/README.md)         | Typed projections, explicit UPSERT mappings, JSONB expressions, uniqueness classification, result unwrapping and sanitized EXPLAIN summaries | PostgreSQL schemas, postgres.js clients, transactions, migrations, query execution and business rules |
 | [Drizzle Kit](../../packages/drizzle-kit/README.md) | Retain upstream CLI commands and `defineConfig` in a smaller distribution                                                                    | Schema/configuration files, a compatible ORM, database access and migration decisions                 |
@@ -57,11 +59,12 @@ schemas, authorization, accounting and other domain rules stay in those applicat
 
 Subpaths below are relative to their package names. The manifests remain the
 authoritative export list.
-All public packages declare Node `>=22.14`; the five library builds target the
+All public packages declare Node `>=22.14`; the six tsdown builds target the
 same runtime floor. The development runtime pin remains separate.
 
 | Package     | Public entries                                                                                             | Dependency boundary                                                                                                                              |
 | ----------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Codemods    | Root runner API; `raypx-kit-codemod` executable                                                            | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                      |
 | Devkit      | `/workspaces`, `/architecture`, `/toolchain`, `/catalogs`, `/docs`, `/process`, `/artifact`; no root entry | Node APIs and external parser/configuration dependencies; its Turbo helper runs under Bun                                                        |
 | Drizzle     | Root, `/postgres`, `/errors`, `/results`, `/diagnostics`                                                   | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                               |
 | Drizzle Kit | Root `defineConfig` for ESM and CommonJS; `drizzle-kit` executable                                         | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                    |
@@ -69,6 +72,12 @@ same runtime floor. The development runtime pin remains separate.
 | Intl        | Root, `/client`, `/browser`, `/server`, `/types`, `/testing`                                               | React is a required external peer; `use-intl` and the explicitly allowed FormatJS-related dependencies are bundled, including their declarations |
 | Logger      | Root, `/context`, `/pipeline`                                                                              | evlog is an external runtime dependency, not a peer or bundled copy; `/context` uses its Node asynchronous storage                               |
 | TSConfig    | `/base.json`, `/node.json`, `/browser.json`, `/library.json`, `/react-library.json`; no root entry         | JSON presets extend sibling presets; consumers install the compiler and ambient type packages they need                                          |
+
+Codemods provides a runner, not a set of automatic project upgrades. Callers pass
+a transformation and explicit file paths to `runCodemod`; previews are the default
+and writes require `write: true`. The CLI exposes the built-in registry, which
+contains no migrations initially. Add an AST parser only when a concrete migration
+needs one, and cover that migration with fixtures before registering it.
 
 Drizzle's optional peer is an installation choice for independent helpers.
 `/errors` and `/results` work without the ORM or a database driver. Root,
@@ -93,13 +102,13 @@ do not import the Node context entry.
 
 ## From source to installable artifacts
 
-| Packages                           | Build path                                                                 | Published result                                                                                                                                              |
-| ---------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Devkit, Drizzle, Env, Intl, Logger | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
-| Drizzle Kit                        | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
-| TSConfig                           | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
+| Packages                                     | Build path                                                                 | Published result                                                                                                                                              |
+| -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codemods, Devkit, Drizzle, Env, Intl, Logger | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
+| Drizzle Kit                                  | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
+| TSConfig                                     | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
 
-The five tsdown configurations explicitly preserve output extensions and their
+The six tsdown configurations explicitly preserve output extensions and their
 consumer runtime targets. Those targets are independent of the repository's
 development runtime pins. Drizzle Kit preserves both ESM and CommonJS exports;
 its omitted programmatic API and payload bundles are not recreated locally.
@@ -116,7 +125,7 @@ licenses, and extracted upstream code retains its source bytes and license.
 
 The internal root owns shared development tools and composes repository policy
 through `scripts/` and [devkit.config.ts](../../devkit.config.ts). That typed
-configuration contains all eight workspaces' architecture rules and the toolchain
+configuration contains all nine workspaces' architecture rules and the toolchain
 document and Turbo dependency check lists. The scripts explicitly import it and
 pass plain data to Devkit; scanning another repository never executes its
 configuration. Workspace metadata maps must cover the discovered workspace paths
@@ -131,7 +140,7 @@ include it so policy changes invalidate cached workspace tasks. The TSConfig
 workspace supplies compiler presets during repository development.
 
 Bun owns installation, native type checks, repository TypeScript scripts and
-archive packing. Turbo orders workspace tasks; tsdown builds the five libraries.
+archive packing. Turbo orders workspace tasks; tsdown builds the six ESM packages.
 Vite+ supplies formatting, linting, tests and the documentation application's
 Vite commands. Knip treats the declared library entries as public roots while
 checking unused implementation code and dependencies. Independent Changesets

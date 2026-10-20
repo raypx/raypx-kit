@@ -12,6 +12,12 @@ export const documentationPages = [
     description: "Package ownership, dependency boundaries, build outputs and documentation flow.",
   },
   {
+    slug: "codemods/index",
+    sourcePath: "packages/codemods/README.md",
+    title: "Codemods",
+    description: "Explicit-file migration runner, dry-run previews and an extensible CLI registry.",
+  },
+  {
     slug: "devkit/index",
     sourcePath: "packages/devkit/README.md",
     title: "Devkit",
@@ -120,6 +126,7 @@ export const navigationMetadata = {
     pages: [
       "index",
       "architecture",
+      "codemods",
       "devkit",
       "drizzle",
       "drizzle-kit",
@@ -131,6 +138,7 @@ export const navigationMetadata = {
     ],
   },
   "architecture/meta.json": { title: "Architecture", pages: ["index"] },
+  "codemods/meta.json": { title: "Codemods", pages: ["index"] },
   "drizzle/meta.json": {
     title: "Drizzle",
     pages: ["index", "drizzle-plus", "better-drizzle", "merge-plan", "provenance"],

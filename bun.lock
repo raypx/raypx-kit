@@ -48,6 +48,16 @@
         "vite-plus": "^1.3.0",
       },
     },
+    "packages/codemods": {
+      "name": "@raypx-kit/codemods",
+      "version": "0.0.0-alpha.0",
+      "bin": {
+        "raypx-kit-codemod": "./dist/cli.mjs",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "^5.0.5",
+      },
+    },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
       "version": "0.0.0-alpha.0",
@@ -538,6 +548,8 @@
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
     "@quansync/fs": ["@quansync/fs@1.1.0", "", { "dependencies": { "quansync": "^1.0.0" } }, "sha512-qAPG/t3HqML1TlN7sY/pTbEjzFVAKsMjNNMGheyDosro+kT4iw2KCUoHcVdmliwWjorm4elZbgNQyU2eD97eDg=="],
+
+    "@raypx-kit/codemods": ["@raypx-kit/codemods@workspace:packages/codemods"],
 
     "@raypx-kit/devkit": ["@raypx-kit/devkit@workspace:packages/devkit"],
 

@@ -1,6 +1,6 @@
 # Raypx Kit Documentation
 
-Raypx Kit contains seven independently released TypeScript libraries. Start with
+Raypx Kit contains eight independently released TypeScript packages. Start with
 a package guide to use an API, the architecture guide to understand the repository,
 or the development guide to contribute.
 
@@ -21,6 +21,7 @@ compatibility and consumer installation. They are also included in npm archives.
 
 | Package     | Guide                                                                                   |
 | ----------- | --------------------------------------------------------------------------------------- |
+| Codemods    | [Migration runner, CLI and adding transformations](../packages/codemods/README.md)      |
 | Devkit      | [Workspace, architecture, toolchain and maintenance APIs](../packages/devkit/README.md) |
 | Drizzle     | [PostgreSQL expressions, results and diagnostics](../packages/drizzle/README.md)        |
 | Drizzle Kit | [Slim upstream CLI and config distribution](../packages/drizzle-kit/README.md)          |

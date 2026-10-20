@@ -41,6 +41,7 @@ documented versions and installed dependency combinations.
 | `bun run check`              | Root and workspace TypeScript checks                             |
 | `bun run knip`               | Unused source files, dependencies and internal exports           |
 | `bun run architecture:check` | Workspace imports, public source entries and platform boundaries |
+| `bun run codemod list`       | List built-in migrations; the initial registry is empty          |
 | `bun run test:toolchain`     | Root maintenance tests and documentation tests                   |
 | `bun run test`               | Maintenance/documentation tests, then workspace tests            |
 | `bun run build`              | Workspace checks and builds, including the documentation site    |
@@ -70,7 +71,7 @@ changing its test runtime or coverage provider.
 Bun owns installation and script orchestration. Turbo schedules workspace tasks;
 `build` depends on that workspace's `check` and dependency builds. Vite+ owns
 formatting, linting, tests and the documentation application's Vite commands.
-tsdown builds the five ESM libraries and their declarations. Drizzle Kit copies
+tsdown builds the six ESM packages and their declarations. Drizzle Kit copies
 upstream artifacts through its extractor; TSConfig publishes its JSON presets
 directly.
 
@@ -106,7 +107,7 @@ findings.
 ## Repository check configuration
 
 [devkit.config.ts](../../devkit.config.ts) is the typed source of repository
-checking policy. Its `workspaces` map contains all eight workspace paths, with
+checking policy. Its `workspaces` map contains all nine workspace paths, with
 their kind, platform, per-entry platform overrides, explicit source entries for
 generated exports and bundled dependency exceptions. Keys are repository-relative
 paths such as `packages/env`, without `./` or a trailing slash. Its `toolchain`
@@ -212,7 +213,7 @@ consumer directories for diagnosis. Archive checks do not publish packages.
 
 ## Consumer compatibility matrix
 
-The verification job prepares seven archives from its completed build and records
+The verification job prepares eight archives from its completed build and records
 their SHA-256 digests and dependency profiles. The compatibility jobs download
 those archives and verify the digests before installing them outside the
 workspace. They retain the pinned development runtimes for orchestration and

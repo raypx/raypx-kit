@@ -9,6 +9,7 @@ and focused documentation before modifying it.
 
 ## Repository shape
 
+`packages/codemods` owns the explicit-file migration runner and CLI;
 `packages/drizzle` owns Drizzle extensions; `packages/env` owns typed environment
 validation and reusable presets; `packages/intl` owns generic internationalization;
 `packages/tsconfig` owns the published strict TypeScript presets;
@@ -86,7 +87,7 @@ script runs `bun scripts/cli.ts` using citty. Keep `doctor`,
 `release:snapshot` as aliases.
 `architecture:check` runs `raypx-kit-dev architecture check` against workspace
 source entries without requiring built output. Root `devkit.config.ts` owns all
-eight workspaces' platform targets, source-entry mappings and bundled dependency
+nine workspaces' platform targets, source-entry mappings and bundled dependency
 exceptions, plus toolchain document and Turbo dependency check lists. Keep it
 typed with the existing Devkit interfaces and include it in root type checking
 and Turbo global dependencies. Maintenance scripts explicitly import this trusted
@@ -104,7 +105,7 @@ do not change published package APIs.
 
 Bun owns installation and repository scripts. Turbo owns task orchestration.
 Vite+ owns formatting, linting, tests and the documentation application's Vite
-commands. Direct tsdown builds Devkit, Drizzle, Env, Intl and Logger, including
+commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl and Logger, including
 their declarations, from each package's `tsdown.config.ts`; its dependency range
 starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
 exports its JSON presets directly. Package scripts invoke local `turbo`,
