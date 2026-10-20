@@ -1,7 +1,7 @@
 # Architecture
 
 Raypx Kit publishes seven independently versioned packages. It separates reusable
-library behavior from application policy, repository maintenance and the private
+library behavior from application policy, repository maintenance and the internal
 documentation application. Published interfaces come from each package's
 `package.json` exports and README; research inventories do not expand them.
 
@@ -19,14 +19,23 @@ packages/
   intl/         Locale, translation and controlled React integration
   logger/       evlog facade and asynchronous logger context
   tsconfig/     Published compiler presets
-scripts/        Private policy, verification and release orchestration
-tests/          Repository maintenance tests and shared test setup
-docs/           Canonical Markdown and the private documentation application
+scripts/
+  cli.ts        Internal maintenance command entry
+  checks/       Source architecture, dependencies and toolchain policy
+  packages/     Archives, isolated consumers and compatibility matrix
+  release/      Release commands, scope checks and validation
+  ci/           CI diagnostics and consumer runtime setup
+tests/
+  scripts/      Maintenance tests grouped by the same responsibilities
+  setup/        Shared test preloads
+docs/           Canonical Markdown and the internal documentation application
 ```
 
 Public TypeScript entries live directly under each library's `src/`. Supporting
 implementation modules may live beneath them. Tests belong to the owning
 workspace's `tests/` directory; they are not library build entries.
+Internal maintenance filenames use their containing directory for context; public
+package entries and framework-recognized configuration filenames remain stable.
 
 ## Package responsibilities
 
@@ -48,6 +57,8 @@ schemas, authorization, accounting and other domain rules stay in those applicat
 
 Subpaths below are relative to their package names. The manifests remain the
 authoritative export list.
+All public packages declare Node `>=22.14`; the five library builds target the
+same runtime floor. The development runtime pin remains separate.
 
 | Package     | Public entries                                                                                             | Dependency boundary                                                                                                                              |
 | ----------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -101,13 +112,23 @@ and applicable source notices. Research documents, tests and workspace dependenc
 are not copied into published libraries. Bundled third-party code retains its
 licenses, and extracted upstream code retains its source bytes and license.
 
-## Development dependencies and private orchestration
+## Development dependencies and internal orchestration
 
-The private root owns shared development tools and composes repository policy
-through `scripts/`. Its toolchain wrapper imports Devkit source directly, so
+The internal root owns shared development tools and composes repository policy
+through `scripts/` and [devkit.config.ts](../../devkit.config.ts). That typed
+configuration contains all eight workspaces' architecture rules and the toolchain
+document and Turbo dependency check lists. The scripts explicitly import it and
+pass plain data to Devkit; scanning another repository never executes its
+configuration. Workspace metadata maps must cover the discovered workspace paths
+exactly. Manifests retain exports, dependencies and supported runtime ranges;
+`.nvmrc` and root `packageManager` retain the development pins.
+
+The wrappers import Devkit source directly, so
 maintenance checks do not require a prebuilt Devkit archive. This is a development
 dependency direction, not a dependency from a published library back to the root.
-The TSConfig workspace supplies compiler presets during repository development.
+Root type checking includes the configuration, and Turbo global dependencies
+include it so policy changes invalidate cached workspace tasks. The TSConfig
+workspace supplies compiler presets during repository development.
 
 Bun owns installation, native type checks, repository TypeScript scripts and
 archive packing. Turbo orders workspace tasks; tsdown builds the five libraries.
@@ -121,11 +142,13 @@ versions keep these shared development tools from linking package release cycles
 | Layer                            | Contract checked                                                                                                                                                                      |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Source checks and package tests  | Strict source/test types, implementation behavior and deliberate error cases; library builds include production sources only                                                          |
+| Workspace architecture           | Explicit source entries, dependency cycles, declared runtime imports, public cross-workspace imports and platform boundaries before building                                          |
 | Knip                             | Source reachability, declared dependencies and internal exports, with public entries preserved even without workspace callers                                                         |
 | Archive checks                   | Expected files, exported targets, binaries, complete retained notices and dependency protocols suitable for publication                                                               |
 | Isolated consumers               | Install the actual archive outside the workspace; load public exports with Bun and Node, check supported CommonJS conditions and binary links, and resolve declarations with NodeNext |
 | Package consumer fixtures        | Additional public runtime and type contracts against the installed archive, with their own dependency and compiler environments                                                       |
 | Consumers without optional peers | Independently verify Drizzle's driver-free entries and strict declarations, and confirm ORM-dependent entries still require the missing ORM                                           |
+| CI compatibility matrix          | Reuse the same archives at each package's minimum supported Node and the development pin, with minimum and locked peer versions                                                       |
 | CI database integration          | A separate job configures temporary PostgreSQL 17 and the explicit Drizzle suite for real JSONB, UPSERT, SQLSTATE and EXPLAIN behavior                                                |
 
 Tests use Bun workers with Vitest's `node` or `jsdom` environment. Intl's client
@@ -140,6 +163,23 @@ installed-package contracts. Default unit tests, coverage, tarball checks and
 local `verify` remain database-free, including Drizzle's SQL construction, mocked
 result mapping and type checks.
 
+The architecture gate receives workspace metadata and explicit source-entry
+mappings from root `devkit.config.ts`, so it checks production source without
+requiring `dist/`. Missing or unknown workspace paths are errors, and inline
+manifest policy cannot fill gaps in the supplied map. Platform
+overrides describe browser, Node and Bun entries independently. Explicit bundled
+dependency declarations cover source dependencies intentionally included in an
+archive; they do not permit internal cross-workspace access. Drizzle Kit's local
+extractor is checked as tooling, while its copied upstream payload is verified
+by the archive contracts.
+
+Compatibility jobs consume archives produced with the pinned development
+toolchain. They select packages by their declared Node support and run public
+export, CLI and fixture contracts with a separate consumer Node executable.
+Minimum peer versions and the lockfile's tested peer versions use independent
+installations. These jobs supplement the ordinary Bun/Node archive checks and
+do not require a local database.
+
 Drizzle's separate CI job runs `test:integration` against a temporary PostgreSQL 17
 service through `DRIZZLE_TEST_DATABASE_URL`. The command fails without CI or the
 test URL. Its schema and table fixtures belong only to the test run and are
@@ -149,7 +189,7 @@ is outside the test matrix. See the [CI integration policy](../development/READM
 
 ## Documentation flow
 
-The private `docs` workspace compiles canonical root Markdown, package READMEs
+The internal `docs` workspace compiles canonical root Markdown, package READMEs
 and notices through Fumadocs. `docs/src/lib/pages.ts` registers source paths,
 page metadata and navigation. `docs/src/lib/source.ts` supplies that registered
 content to the site; there is no synchronized Markdown copy.

@@ -67,6 +67,103 @@ const testFile =
 const codeFile = /\.[cm]?[jt]sx?$/;
 const runtimeFile = /\/(?:src|server|native|app)\//;
 
+function children(node: Node): Node[] {
+  const record = node as unknown as Record<string, unknown>;
+  return (visitorKeys[node.type] ?? []).flatMap((key) =>
+    (Array.isArray(record[key]) ? record[key] : [record[key]]).filter(
+      (child): child is Node => !!child && typeof child === "object" && "type" in child,
+    ),
+  );
+}
+
+/** Resolve local bindings so data named `document` is not mistaken for the DOM. */
+function reachesDomGlobal(file: string, source: string): boolean {
+  const { program, errors } = parseSync(file, source);
+  if (errors.length) throw new Error(`${file}: ${errors[0]!.message}`);
+  interface Scope {
+    names: Set<string>;
+    parent: Scope | undefined;
+  }
+  const lexicalScopes = new Set([
+    "BlockStatement",
+    "ForStatement",
+    "ForInStatement",
+    "ForOfStatement",
+    "SwitchStatement",
+  ]);
+  function bind(node: Node | null | undefined, names: Set<string>) {
+    if (!node) return;
+    if (node.type === "Identifier") names.add(node.name);
+    else if (node.type === "RestElement") bind(node.argument, names);
+    else if (node.type === "AssignmentPattern") bind(node.left, names);
+    else if (node.type === "ArrayPattern") for (const child of node.elements) bind(child, names);
+    else if (node.type === "ObjectPattern")
+      for (const property of node.properties)
+        bind(property.type === "RestElement" ? property.argument : property.value, names);
+  }
+  function declarations(node: Node, names: Set<string>, nested = false) {
+    if (
+      node.type === "FunctionDeclaration" ||
+      node.type === "FunctionExpression" ||
+      node.type === "ArrowFunctionExpression" ||
+      node.type === "ClassDeclaration" ||
+      node.type === "ClassExpression"
+    ) {
+      if (!nested && "id" in node) bind(node.id, names);
+      return;
+    }
+    if (node.type === "VariableDeclaration") {
+      if (!nested || node.kind === "var")
+        for (const declaration of node.declarations) bind(declaration.id, names);
+      return;
+    }
+    if (!nested && node.type === "ImportDeclaration") {
+      for (const specifier of node.specifiers) bind(specifier.local, names);
+      return;
+    }
+    for (const child of children(node))
+      declarations(child, names, nested || lexicalScopes.has(child.type));
+  }
+  function bound(name: string, scope: Scope | undefined): boolean {
+    return !!scope && (scope.names.has(name) || bound(name, scope.parent));
+  }
+  const dom = new Set(["window", "document", "localStorage", "sessionStorage"]);
+  function walk(node: Node, parent: Scope | undefined): boolean {
+    let scope = parent;
+    if (
+      node.type === "Program" ||
+      lexicalScopes.has(node.type) ||
+      node.type === "FunctionDeclaration" ||
+      node.type === "FunctionExpression" ||
+      node.type === "ArrowFunctionExpression" ||
+      node.type === "CatchClause"
+    ) {
+      scope = { names: new Set(), parent };
+      if (
+        node.type === "FunctionDeclaration" ||
+        node.type === "FunctionExpression" ||
+        node.type === "ArrowFunctionExpression"
+      ) {
+        for (const parameter of node.params) bind(parameter, scope.names);
+        if ("id" in node) bind(node.id, scope.names);
+        if (node.body) declarations(node.body, scope.names);
+      } else if (node.type === "CatchClause") bind(node.param, scope.names);
+      else
+        for (const child of children(node))
+          declarations(child, scope.names, lexicalScopes.has(child.type));
+    }
+    if (
+      node.type === "MemberExpression" &&
+      node.object.type === "Identifier" &&
+      dom.has(node.object.name) &&
+      !bound(node.object.name, scope)
+    )
+      return true;
+    return children(node).some((child) => walk(child, scope));
+  }
+  return walk(program, undefined);
+}
+
 function hostViolation(request: string, target: Target): boolean {
   if (request.startsWith("bun:")) return target !== "bun";
   if (request.startsWith("node:") || builtins.has(request))
@@ -92,7 +189,7 @@ function resolveCode(index: WorkspaceIndex, path: string): string | undefined {
 
 /**
  * Checks workspace metadata, exports, the dependency graph and every runtime import:
- * declarations, private paths, platform targets, tooling and test-only boundaries.
+ * declarations, internal paths, platform targets, tooling and test-only boundaries.
  */
 export function checkArchitecture(index: WorkspaceIndex): string[] {
   const findings = [...index.findings];
@@ -109,11 +206,16 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
   for (const workspace of index.workspaces) {
     const { manifest, path, metadata } = workspace;
     if (!metadata || !kinds.includes(metadata.kind) || !targets.includes(metadata.target)) {
-      findings.push(`${path}/package.json: invalid or missing ${index.metadataKey} metadata`);
+      const finding =
+        index.metadataSource === "options"
+          ? `${path}: ${metadata === undefined ? "missing" : "invalid"} supplied workspace metadata`
+          : `${path}/package.json: invalid or missing ${index.metadataKey} metadata`;
+      if (!findings.includes(finding)) findings.push(finding);
       continue;
     }
-    if (!manifest.private || manifest.type !== "module")
-      findings.push(`${path}: workspaces must be private ESM`);
+    if (manifest.type !== "module") findings.push(`${path}: workspaces must be ESM`);
+    if (metadata.kind === "app" && !manifest.private)
+      findings.push(`${path}: applications must be private`);
     for (const [entry, target] of Object.entries(metadata.entryTargets ?? {})) {
       if (!manifest.exports?.[entry] || !targets.includes(target))
         findings.push(`${path}: invalid entryTargets override ${entry}`);
@@ -122,6 +224,24 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
       if (!scope || !targets.includes(target))
         findings.push(`${path}: invalid sourceTargets override ${scope}`);
     }
+    for (const [entry, source] of Object.entries(metadata.sourceEntries ?? {})) {
+      if (
+        !manifest.exports?.[entry] ||
+        !source.startsWith("./") ||
+        source.split("/").includes("..") ||
+        !codeFile.test(source) ||
+        (source.includes("*")
+          ? !entry.includes("*") || !globSync(posix.join(path, source), { cwd: index.root }).length
+          : !existsSync(join(index.root, path, source)))
+      )
+        findings.push(`${path}: invalid sourceEntries override ${entry}: ${source}`);
+    }
+    for (const name of metadata.bundledDependencies ?? []) {
+      if (!manifest.devDependencies?.[name] || index.byName.has(name))
+        findings.push(
+          `${path}: bundled dependency must be an external development dependency: ${name}`,
+        );
+    }
     if (metadata.kind === "library" && !Object.keys(manifest.exports ?? {}).length)
       findings.push(`${path}: libraries need explicit exports`);
     for (const [entry, value] of Object.entries(manifest.exports ?? {})) {
@@ -129,7 +249,11 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
         const exists = exported.includes("*")
           ? globSync(posix.join(path, exported), { cwd: index.root }).length > 0
           : existsSync(join(index.root, path, exported));
-        if (!exported.startsWith("./") || exported.includes("..") || !exists)
+        if (
+          !exported.startsWith("./") ||
+          exported.includes("..") ||
+          (!metadata.sourceEntries?.[entry] && !exists)
+        )
           findings.push(`${path}: missing or invalid export ${entry}: ${exported}`);
       }
     }
@@ -213,7 +337,13 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
         const declared =
           workspace.manifest.dependencies?.[name] ||
           workspace.manifest.peerDependencies?.[name] ||
-          (typesOnly && workspace.manifest.devDependencies?.[name]);
+          (workspace.metadata?.bundledDependencies?.includes(name) &&
+            workspace.manifest.devDependencies?.[name]) ||
+          (typesOnly &&
+            (workspace.manifest.devDependencies?.[name] ||
+              workspace.manifest.devDependencies?.[
+                `@types/${name.startsWith("@") ? name.slice(1).replace("/", "__") : name}`
+              ]));
         if (!declared)
           findings.push(
             `${file}: undeclared ${typesOnly ? "type" : "runtime"} dependency ${request}`,
@@ -221,7 +351,7 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
       }
       return resolved.paths;
     }
-    if (resolved.privatePath) findings.push(`${file}: private cross-workspace import ${request}`);
+    if (resolved.internalPath) findings.push(`${file}: internal cross-workspace import ${request}`);
     if (to !== workspace) {
       if (to.metadata?.kind === "app")
         findings.push(`${file}: application source cannot be imported: ${request}`);
@@ -282,9 +412,7 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
         try {
           if (
             (target === "universal" || target === "native") &&
-            /(?<![\w.])(?:window|document|localStorage|sessionStorage)\s*[.(]/.test(
-              readFileSync(join(index.root, file), "utf8"),
-            )
+            reachesDomGlobal(file, readFileSync(join(index.root, file), "utf8"))
           )
             findings.push(`${workspace.path}: ${entry} reaches DOM global in ${file}`);
           for (const edge of getImports(file))
@@ -293,7 +421,8 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
           findings.push(String(error));
         }
       }
-      for (const path of exportPaths(value)) {
+      const source = workspace.metadata?.sourceEntries?.[entry];
+      for (const path of source ? [source] : exportPaths(value)) {
         const exported = posix.join(workspace.path, path);
         if (exported.includes("*"))
           for (const file of globSync(exported, { cwd: index.root }))

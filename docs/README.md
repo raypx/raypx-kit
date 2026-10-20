@@ -72,5 +72,5 @@ content becomes site pages. Documentation tests run with `bun run test:toolchain
 and upstream notices when editing.
 
 Repository design and maintainer guides are excluded from npm archives. See
-[site ownership](AGENTS.md) and [site provenance](NOTICE.md) for the private
+[site ownership](AGENTS.md) and [site provenance](NOTICE.md) for the internal
 application's constraints and licensing.

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-An English Fumadocs site for Raypx Kit. This private application does not
+An English Fumadocs site for Raypx Kit. This internal application does not
 publish to npm or change the independent versions of the libraries.
 
 ## Interface
@@ -35,7 +35,7 @@ without a third-party service.
   verifies this pairing. Do not reintroduce the Radix-based `fumadocs-ui` package.
 - Keep the Nitro `bun` preset and `bun --bun vp` development/build/preview commands.
   Node 24.22.0 is the repository consumer-check and npm transport baseline.
-- Library tsdown builds belong to their packages. This private application keeps
+- Library tsdown builds belong to their packages. This internal application keeps
   its Vite+ build and does not generate library declarations or archives.
 - Read Node from `.nvmrc` and Bun from root `packageManager`; mise only enables
   those sources without `[tools]` versions. Use `mise trust && mise install`,

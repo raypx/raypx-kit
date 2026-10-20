@@ -1,4 +1,5 @@
 {
   "extends": "@raypx-kit/tsconfig/node.json",
-  "include": ["src/**/*.ts", "tsdown.config.ts", "vitest.config.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "tsdown.config.ts", "vitest.config.ts", "tests/**/*.ts"],
+  "exclude": ["tests/fixtures/consumer/**"]
 }

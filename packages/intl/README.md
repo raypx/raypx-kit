@@ -7,7 +7,7 @@ application-owned locale configuration and catalogs.
 bun add @raypx-kit/intl react@^19.3.1
 ```
 
-ESM and declarations support Node 20+ and Bun. React 19 is the only external
+ESM and declarations support Node 22.14+ and Bun. React 19 is the only external
 peer, including for synchronous root/server usage. `use-intl` 4.14.9 and its
 FormatJS dependencies are bundled into `dist/`, declarations included, through
 their public `use-intl/core` and `use-intl/react` APIs. Import translation, formatting and
@@ -297,5 +297,5 @@ the actual failing locale, path and side. The separate `/testing` entry uses
 Exports are `.`, `/client`, `/browser`, `/server`, `/types` and `/testing`. Third-party
 source is not vendored. Apache-2.0 applies to this package's implementation.
 
-Package tests live in `tests/`, with React/browser tests in `tests/client/`.
+Package tests live in `tests/`, with React provider and browser adapter tests in `tests/react/`.
 The archive checks run the declaration contracts in `tests/fixtures/consumer`.

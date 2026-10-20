@@ -1,9 +1,9 @@
 {
   "extends": "@raypx-kit/tsconfig/node.json",
   "include": [
+    "devkit.config.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "test.config.ts",
     "knip.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts"

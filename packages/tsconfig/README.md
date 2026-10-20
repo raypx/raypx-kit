@@ -3,6 +3,7 @@
 Strict TypeScript presets for ESM libraries, browser applications and
 Node-compatible runtimes. Each preset sets compiler behavior only; projects own
 their file layout, path aliases and runtime-specific types.
+The package declares Node 22.14+ support; its published presets remain plain JSON.
 
 ```sh
 bun add -d @raypx-kit/tsconfig typescript

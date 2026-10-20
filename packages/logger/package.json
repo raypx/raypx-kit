@@ -52,6 +52,6 @@
     "@vitest/coverage-v8": "^5.0.5"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.14"
   }
 }

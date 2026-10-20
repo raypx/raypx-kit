@@ -59,7 +59,7 @@ controlled React facade without product dependencies.
 Run package check/test/build, then repository verify. Type assertions belong in
 `tests/`; public packed-consumer fixtures live in `tests/fixtures/consumer` and
 are executed by the repository pack check. Core tests run in Bun workers with
-the node environment, and client tests in `tests/client/` run in jsdom with the repository's
+the node environment, and React tests in `tests/react/` run in jsdom with the repository's
 `tests/setup/jsdom-preload.ts` preload. Keep the public `src/testing.ts` library
 entry under `src/`. Do not publish or change alpha mode without user authorization.
 Preserve independent versioning and include a breaking changeset.

@@ -4,6 +4,8 @@
 
 Initial Raypx Kit prerelease.
 
+- Require Node 22.14+ and align the ESM build target with that runtime floor.
+
 - Include typed column projections, explicit UPSERT mappings, parameterized JSONB expressions,
   postgres.js uniqueness classification, result helpers and sanitized EXPLAIN diagnostics.
 - Keep Drizzle external as an optional peer: error and result helpers work without it;

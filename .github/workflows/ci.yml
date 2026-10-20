@@ -16,6 +16,9 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      matrix: ${{ steps.compatibility.outputs.matrix }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -27,10 +30,105 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-      - name: Install
-        run: bun install --frozen-lockfile --ignore-scripts
-      - name: Verify toolchain, source, unused code and published artifacts
-        run: bun run verify
+      - name: Install locked dependencies
+        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      - name: Verify development toolchain
+        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
+      - name: Verify architecture, formatting, lint, types and unused code
+        run: bun scripts/ci/diagnostics.ts run source bun run verify:source
+      - name: Test libraries and build documentation and packages
+        run: bun scripts/ci/diagnostics.ts run tests-build bun run verify:tests
+      - name: Verify archives, consumer contracts and release preparation
+        run: bun scripts/ci/diagnostics.ts run artifacts bun run verify:artifacts
+      - name: Prepare compatibility archives from the verified build
+        run: bun scripts/ci/diagnostics.ts run compatibility-archives bun scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
+      - name: Select public runtime and peer dependency contracts
+        id: compatibility
+        run: |
+          matrix="$(bun scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility)"
+          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+      - name: Share exact compatibility archives
+        uses: actions/upload-artifact@v7
+        with:
+          name: compatibility-archives
+          path: |
+            .artifacts/compatibility/*.tgz
+            .artifacts/compatibility/index.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - name: Summarize verification
+        if: always()
+        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
+      - name: Retain failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verify-diagnostics
+          path: |
+            .artifacts/ci/diagnostics/*.log
+            .artifacts/ci/diagnostics/*.json
+            .artifacts/ci/diagnostics/summary.md
+            .artifacts/ci/diagnostics/reports/*.xml
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+
+  compatibility:
+    name: Consumers on Node ${{ matrix.node }} / ${{ matrix.peers }} peers
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.verify.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Repository tooling keeps its development pin; only installed consumers use the matrix Node.
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - name: Install locked development tooling
+        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      - name: Verify development toolchain
+        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
+      - uses: actions/download-artifact@v8
+        with:
+          name: compatibility-archives
+          path: .artifacts/compatibility
+      - name: Download and verify isolated consumer Node
+        env:
+          CONSUMER_NODE_VERSION: ${{ matrix.node }}
+        run: bun scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
+      - name: Check installed archive consumers
+        run: >-
+          bun scripts/ci/diagnostics.ts run consumers
+          bun scripts/packages/compatibility.ts check
+          --artifacts .artifacts/compatibility
+          --node "$RUNNER_TEMP/consumer-node/node-v${{ matrix.node }}-linux-x64/bin/node"
+          --expected-node '${{ matrix.node }}'
+          --peers '${{ matrix.peers }}'
+      - name: Summarize compatibility checks
+        if: always()
+        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
+      - name: Retain failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: compatibility-${{ matrix.node }}-${{ matrix.peers }}-diagnostics
+          path: |
+            .artifacts/ci/diagnostics/*.log
+            .artifacts/ci/diagnostics/*.json
+            .artifacts/ci/diagnostics/summary.md
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
 
   drizzle-integration:
     name: Drizzle PostgreSQL integration
@@ -61,11 +159,27 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-      - name: Install
-        run: bun install --frozen-lockfile --ignore-scripts
-      - name: Verify toolchain
-        run: bun run doctor && bun run toolchain:check
+      - name: Install locked dependencies
+        run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      - name: Verify development toolchain
+        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - name: Test Drizzle against PostgreSQL
-        run: bun run --cwd packages/drizzle test:integration
+        run: bun scripts/ci/diagnostics.ts run postgres bun run --cwd packages/drizzle test:integration
         env:
           DRIZZLE_TEST_DATABASE_URL: postgresql://drizzle:drizzle@localhost:${{ job.services.postgres.ports[5432] }}/drizzle_test
+      - name: Summarize PostgreSQL integration
+        if: always()
+        run: bun scripts/ci/diagnostics.ts summary '${{ job.status }}'
+      - name: Retain failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: drizzle-integration-diagnostics
+          path: |
+            .artifacts/ci/diagnostics/*.log
+            .artifacts/ci/diagnostics/*.json
+            .artifacts/ci/diagnostics/summary.md
+            .artifacts/ci/diagnostics/reports/*.xml
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7

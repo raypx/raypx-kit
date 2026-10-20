@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite-plus/test/config";
 
-import { workspaceTests } from "../../test.config.js";
+import { workspaceTests } from "../../tests/config.js";
 
 const shared = workspaceTests();
 
@@ -17,15 +17,15 @@ export default defineConfig({
           name: "core",
           environment: "node",
           include: ["tests/**/*.{test,spec}.{ts,tsx}"],
-          exclude: ["tests/client/**"],
+          exclude: ["tests/react/**"],
           execArgv: ["--no-env-file", "--no-install"],
         },
       },
       {
         test: {
-          name: "client",
+          name: "react",
           environment: "jsdom",
-          include: ["tests/client/**/*.{test,spec}.{ts,tsx}"],
+          include: ["tests/react/**/*.{test,spec}.{ts,tsx}"],
           execArgv: [
             "--no-env-file",
             "--no-install",

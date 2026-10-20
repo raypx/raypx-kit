@@ -34,18 +34,19 @@ documented versions and installed dependency combinations.
 
 ## Daily commands
 
-| Command                  | What it checks or runs                                           |
-| ------------------------ | ---------------------------------------------------------------- |
-| `bun run lint`           | Vite+ formatting and lint checks                                 |
-| `bun run format`         | Apply Vite+ formatting                                           |
-| `bun run check`          | Root and workspace TypeScript checks                             |
-| `bun run knip`           | Unused source files, dependencies and internal exports           |
-| `bun run test:toolchain` | Root maintenance tests and documentation tests                   |
-| `bun run test`           | Maintenance/documentation tests, then workspace tests            |
-| `bun run build`          | Workspace checks and builds, including the documentation site    |
-| `bun run pack:check`     | Pack current package output and check isolated archive consumers |
-| `bun run release:check`  | Changesets versioning rules in disposable local fixtures         |
-| `bun run verify`         | The complete local gate, also used by CI                         |
+| Command                      | What it checks or runs                                           |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `bun run lint`               | Vite+ formatting and lint checks                                 |
+| `bun run format`             | Apply Vite+ formatting                                           |
+| `bun run check`              | Root and workspace TypeScript checks                             |
+| `bun run knip`               | Unused source files, dependencies and internal exports           |
+| `bun run architecture:check` | Workspace imports, public source entries and platform boundaries |
+| `bun run test:toolchain`     | Root maintenance tests and documentation tests                   |
+| `bun run test`               | Maintenance/documentation tests, then workspace tests            |
+| `bun run build`              | Workspace checks and builds, including the documentation site    |
+| `bun run pack:check`         | Pack current package output and check isolated archive consumers |
+| `bun run release:check`      | Changesets versioning rules in disposable local fixtures         |
+| `bun run verify`             | The complete local gate, also used by CI                         |
 
 Start with the affected package's narrow checks:
 
@@ -55,9 +56,11 @@ bun run --cwd packages/drizzle test
 bun run build --filter=@raypx-kit/drizzle
 ```
 
-`verify` runs runtime and declaration checks, lint, types, Knip, maintenance tests,
-workspace tests and builds, archive consumers, then Changesets fixtures. CI runs
-the same command and an independent Drizzle database integration job. Local
+`verify` runs runtime and declaration checks, workspace architecture, lint, types,
+Knip, maintenance tests, workspace tests and builds, archive consumers, then
+Changesets fixtures. Its four phases (`verify:toolchain`, `verify:source`,
+`verify:tests`, `verify:artifacts`) also provide the named CI steps. CI adds an
+archive compatibility matrix and an independent Drizzle database integration job. Local
 `verify`, default unit tests, coverage and tarball checks do not require a database;
 the normal gate does not enable coverage. Run a package's `test:coverage` after
 changing its test runtime or coverage provider.
@@ -81,12 +84,17 @@ packing use Bun explicitly.
 Workspace checks use `bun --check --tsconfig-override tsconfig.json` without a
 source entrypoint. This invokes Bun's native type checker rather than resolving
 the `check` package script. Every workspace extends an `@raypx-kit/tsconfig`
-preset; the private root declares this shared workspace dependency.
+preset; the internal root declares this shared workspace dependency.
 
 Keep tests under each workspace's `tests/`. Root maintenance tests live in
 `tests/scripts/`, documentation tests in `docs/tests/`, and shared preloads in
-`tests/setup/`. Package `vitest.config.ts` files import `workspaceTests` from root
-`test.config.ts`. Type checks include tests; library build configs include only
+`tests/setup/`. Maintenance scripts are grouped by responsibility in
+`scripts/checks/`, `scripts/packages/`, `scripts/release/` and `scripts/ci/`, with
+the command entry at `scripts/cli.ts`. Root script tests mirror these directories
+where applicable. Use the directory for context instead of repeating it in
+filenames; keep public package entries and framework configuration names stable.
+Package `vitest.config.ts` files import `workspaceTests` from root
+`tests/config.ts`. Type checks include tests; library build configs include only
 `src/`.
 
 Knip reads public library roots from the explicit tsdown entries, so an API does
@@ -94,6 +102,36 @@ not need a workspace caller to remain public. It also models maintenance scripts
 framework routes and configuration entries. Keep exceptions in `knip.ts` narrow
 and explain the dynamic usage; do not make every source file an entry to suppress
 findings.
+
+## Repository check configuration
+
+[devkit.config.ts](../../devkit.config.ts) is the typed source of repository
+checking policy. Its `workspaces` map contains all eight workspace paths, with
+their kind, platform, per-entry platform overrides, explicit source entries for
+generated exports and bundled dependency exceptions. Keys are repository-relative
+paths such as `packages/env`, without `./` or a trailing slash. Its `toolchain`
+section lists documents whose runtime mentions must match the pins, and required
+Turbo global dependencies.
+
+Maintenance scripts explicitly import this file and pass its data to Devkit.
+`discover(root, { metadata: config.workspaces })` stays synchronous and never
+loads an inspected repository's configuration. The supplied map must cover every
+discovered workspace exactly; missing or unknown paths fail, and package manifest
+metadata cannot fill gaps. This repository keeps no `devkit` fields in workspace
+manifests. Devkit's default `metadataKey` interface remains available for other
+consumers. Root type checking and Turbo cache keys include the configuration.
+
+`architecture:check` inspects source imports before building and rejects circular
+workspace dependencies, internal cross-workspace imports, undeclared runtime
+imports and incompatible platform APIs. A bundled dependency exception must also
+be declared in the workspace's `devDependencies` and actually bundled by its build.
+Extracted upstream CLI payloads retain their separate archive checks. See
+[Devkit's metadata contract](../../packages/devkit/README.md#workspace-architecture).
+
+Keep exports, dependencies and supported runtime ranges in the owning manifest;
+keep the development Node pin in `.nvmrc` and the Bun pin in root `packageManager`.
+The configuration references those declarations through checks rather than
+duplicating their values.
 
 ## CI runner baseline
 
@@ -110,6 +148,21 @@ tool bindings and system utilities still run against the runner's OS libraries.
 Before moving the baseline, run the complete `bun run verify` gate on the proposed
 hosted image, including builds and isolated archive consumers, then update both
 workflows and this guide together.
+
+## CI diagnostics
+
+CI runs the four verification phases as named steps. Each command records its
+exit status, elapsed time and sanitized output under `.artifacts/ci/diagnostics/`;
+a failed command still fails its step and job. All CI and release jobs have
+explicit execution limits. Job summaries list completed stages and available
+test counts, including failures and interrupted stages.
+
+Tests retain their usual console reporter and write a JUnit report at each
+workspace's `.artifacts/junit.xml`. Turbo restores the report with cached test
+results. Local reports remain ignored files; CI collects sanitized reports into
+the diagnostics directory. On failure, CI uploads only those diagnostics with a
+seven-day retention period; dotenv files, credentials and installed consumer
+directories are excluded. These generated directories are ignored by Git.
 
 ## CI database integration
 
@@ -148,13 +201,53 @@ Optional contracts live in `packages/<name>/tests/fixtures/consumer/`:
 - `package.json` adds dependencies for the full consumer.
 - `tsconfig.json` enables the fixture's declaration contract.
 - `runtime.mjs` runs with both Bun and Node, including without a fixture tsconfig.
-- `without-optional-peers.mjs` and `.ts` enable a separate consumer that omits
-  optional peers and extra fixture dependencies. Its runtime runs on both
-  runtimes; its type contract uses strict NodeNext with `skipLibCheck: false`.
+- `without-optional-peers/runtime.mjs` and `without-optional-peers/types.ts`
+  enable a separate consumer that omits optional peers and extra fixture
+  dependencies. Its runtime runs on both runtimes; its type contract uses strict
+  NodeNext with `skipLibCheck: false`.
 
 These fixtures resolve installed tarballs, so source lint and Knip exclude them
 from workspace resolution. Set `TOOLKIT_KEEP_PACK_CHECK=1` to retain disposable
 consumer directories for diagnosis. Archive checks do not publish packages.
+
+## Consumer compatibility matrix
+
+The verification job prepares seven archives from its completed build and records
+their SHA-256 digests and dependency profiles. The compatibility jobs download
+those archives and verify the digests before installing them outside the
+workspace. They retain the pinned development runtimes for orchestration and
+type checking, and use a separate, checksum-verified Node binary for consumer
+runtime checks. The development `doctor` requirement remains unchanged.
+
+Every public package declares Node `>=22.14` support. Each package runs on the
+exact minimum version (`22.14.0`) and on the development Node pin. The matrix
+therefore contains four cells, with two independent dependency profiles for each
+runtime:
+
+- `minimum` installs exact peer lower bounds, including the admitted Drizzle
+  prerelease lower bound.
+- `current` installs exact versions from the frozen workspace installation,
+  checked against `bun.lock`; it does not select a newly published peer release.
+
+The matrix reuses export loading, supported CommonJS loading, CLI help, runtime
+fixtures and strict declaration contracts. Drizzle's separate consumer without
+optional peers also runs on each selected runtime. Compilation uses the pinned
+Bun and compiler; the selected Node binary executes the JavaScript consumers.
+These jobs do not connect to a database or publish packages.
+
+To reproduce a matrix cell after building, keep the development Node on `PATH`
+and select a separate Node executable:
+
+```sh
+bun run compatibility:check prepare --artifacts .artifacts/compatibility
+bun run compatibility:check matrix --artifacts .artifacts/compatibility
+bun run compatibility:check check --artifacts .artifacts/compatibility \
+  --node /path/to/node --expected-node 22.14.0 --peers minimum
+```
+
+The selected binary must match its exact declared matrix version. Compatibility
+testing remains separate from local `verify` so routine development does not
+download extra runtimes or depend on a database.
 
 ## Documentation site
 
@@ -165,7 +258,7 @@ bun run docs:build
 bun run docs:preview
 ```
 
-Edit canonical Markdown, not generated copies. The private Fumadocs application
+Edit canonical Markdown, not generated copies. The internal Fumadocs application
 compiles root documentation and package READMEs directly, with page metadata and
 navigation in `docs/src/lib/pages.ts` and content selection in
 `docs/src/lib/source.ts`. Register new pages in both places. Registered Markdown
@@ -179,6 +272,8 @@ and does not change library versions. See [site ownership](../AGENTS.md) and
 
 1. Add `packages/<name>` with its manifest, README, license, initial changelog and
    package instructions. Declare explicit public exports and supported engines.
+   Add its workspace path to root `devkit.config.ts`, including architecture
+   metadata and source mappings for built exports.
    Keep reusable code independent of Raypx product workspaces and retain source
    provenance for adapted code.
 2. Add a strict check, tests and a build suitable for the package. ESM libraries
@@ -189,7 +284,7 @@ and does not change library versions. See [site ownership](../AGENTS.md) and
    Follow the [dependency policy](dependencies.md), including peer and bundled
    dependency rules.
 4. Add the workspace to `knip.ts` and the expected package list in
-   `tests/scripts/release-scope.test.ts`. `pack:check` discovers public packages
+   `tests/scripts/release/scope.test.ts`. `pack:check` discovers public packages
    automatically; add focused consumer fixtures when their types or runtime
    behavior need an installed-tarball contract.
 5. Update the root package table, [documentation index](../README.md), repository

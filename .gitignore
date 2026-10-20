@@ -1,5 +1,6 @@
 node_modules/
 .turbo/
+.artifacts/
 /.changeset/publish-plan.json
 /.changeset/pack/
 /packages/*node_modules/

@@ -4,6 +4,8 @@
 
 Initial Raypx Kit prerelease.
 
+- Declare Node 22.14+ support consistently with the other public packages.
+
 - Refresh compatible dependencies and use caret ranges for ordinary dependencies;
   keep the coverage provider synchronized with Vite+'s bundled Vitest.
 - Publish the strict `base`, `node`, `browser`, `library` and `react-library` presets

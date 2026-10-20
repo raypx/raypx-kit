@@ -14,16 +14,20 @@ const actions = vi.hoisted(() => ({
   snapshot: vi.fn(),
   checkToolchain: vi.fn(),
   assertToolchainRuntime: vi.fn(),
+  checkRepositoryArchitecture: vi.fn(),
 }));
-vi.mock("../../scripts/release.js", () => ({
+vi.mock("../../scripts/release/commands.js", () => ({
   plan: actions.plan,
   pack: actions.pack,
   publish: actions.publish,
   snapshot: actions.snapshot,
 }));
-vi.mock("../../scripts/toolchain.js", () => ({
+vi.mock("../../scripts/checks/toolchain.js", () => ({
   checkToolchain: actions.checkToolchain,
   assertToolchainRuntime: actions.assertToolchainRuntime,
+}));
+vi.mock("../../scripts/checks/architecture.js", () => ({
+  checkRepositoryArchitecture: actions.checkRepositoryArchitecture,
 }));
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -42,7 +46,7 @@ function runCli(rawArgs: string[], env: NodeJS.ProcessEnv = {}) {
     writeFileSync(
       preload,
       `import { mock } from "bun:test";
-mock.module(${JSON.stringify(join(root, "scripts/release.ts"))}, () =>
+mock.module(${JSON.stringify(join(root, "scripts/release/commands.ts"))}, () =>
   Object.fromEntries(["plan", "pack", "publish", "snapshot"].map(name => [name,
     (...args) => console.log(JSON.stringify({ release: name, args }))
   ]))
@@ -63,6 +67,7 @@ mock.module(${JSON.stringify(join(root, "scripts/release.ts"))}, () =>
 beforeEach(() => {
   for (const action of Object.values(actions)) action.mockReset();
   actions.checkToolchain.mockReturnValue([]);
+  actions.checkRepositoryArchitecture.mockReturnValue([]);
   actions.assertToolchainRuntime.mockReturnValue({
     node: "24.22.0",
     bun: "1.4.3",
@@ -82,6 +87,7 @@ describe("development CLI routes", () => {
     ["release", "--stable", "publish"],
     ["--stable", "release", "pack"],
     ["toolchain", "--unexpected", "check"],
+    ["architecture", "--unexpected", "check"],
   ])("rejects misplaced parent options before dispatch: %j", async (...rawArgs) => {
     await expect(runCommand(command, { rawArgs })).rejects.toThrow(
       "Options must follow the final subcommand",
@@ -128,6 +134,33 @@ describe("development CLI routes", () => {
     expect(actions.assertToolchainRuntime).not.toHaveBeenCalled();
     expectNoRelease();
   });
+
+  it("checks architecture without invoking runtime or release operations", async () => {
+    await runCommand(command, { rawArgs: ["architecture", "check"] });
+    expect(actions.checkRepositoryArchitecture).toHaveBeenCalledExactlyOnceWith(root);
+    expect(console.log).toHaveBeenCalledWith("Workspace architecture passed.");
+    expect(actions.assertToolchainRuntime).not.toHaveBeenCalled();
+    expectNoRelease();
+  });
+
+  it("reports architecture violations as a failed command", async () => {
+    actions.checkRepositoryArchitecture.mockReturnValue(["packages/example: internal import"]);
+    await expect(runCommand(command, { rawArgs: ["architecture", "check"] })).rejects.toThrow(
+      "Architecture check failed:\n  packages/example: internal import",
+    );
+    expectNoRelease();
+  });
+
+  it.each(["--unexpected", "unexpected"])(
+    "rejects invalid architecture argument before checking: %s",
+    async (argument) => {
+      await expect(
+        runCommand(command, { rawArgs: ["architecture", "check", argument] }),
+      ).rejects.toThrow();
+      expect(actions.checkRepositoryArchitecture).not.toHaveBeenCalled();
+      expectNoRelease();
+    },
+  );
 
   it.each(["missing", "release missing"])("rejects unknown command %s", async (input) => {
     await expect(runCommand(command, { rawArgs: input.split(" ") })).rejects.toThrow(

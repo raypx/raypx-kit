@@ -40,7 +40,7 @@ export const command = defineCommand({
       meta: { name: "doctor", description: "Check the active Node and Bun executables" },
       run: async ({ args }) => {
         assertArguments(args, []);
-        const { assertToolchainRuntime } = await import("./toolchain.js");
+        const { assertToolchainRuntime } = await import("./checks/toolchain.js");
         const { node, bun, nodeBinary } = assertToolchainRuntime(root);
         console.log(
           `Bun ${bun}; Node ${node} (${nodeBinary}); ${process.platform}/${process.arch}`,
@@ -58,13 +58,35 @@ export const command = defineCommand({
           },
           run: async ({ args }) => {
             assertArguments(args, []);
-            const { checkToolchain } = await import("./toolchain.js");
+            const { checkToolchain } = await import("./checks/toolchain.js");
             const findings = checkToolchain(root);
             if (findings.length)
               throw new Error(
                 `Toolchain configuration failed:\n${findings.map((finding) => `  ${finding}`).join("\n")}`,
               );
             console.log("Toolchain configuration passed.");
+          },
+        }),
+      },
+    }),
+    architecture: defineCommand({
+      meta: {
+        name: "architecture",
+        description: "Inspect workspace dependency and runtime boundaries",
+      },
+      setup: assertSubcommandPosition,
+      subCommands: {
+        check: defineCommand({
+          meta: { name: "check", description: "Check source imports and public entry boundaries" },
+          run: async ({ args }) => {
+            assertArguments(args, []);
+            const { checkRepositoryArchitecture } = await import("./checks/architecture.js");
+            const findings = checkRepositoryArchitecture(root);
+            if (findings.length)
+              throw new Error(
+                `Architecture check failed:\n${findings.map((finding) => `  ${finding}`).join("\n")}`,
+              );
+            console.log("Workspace architecture passed.");
           },
         }),
       },
@@ -84,7 +106,7 @@ export const command = defineCommand({
           args: { stable: stableArg },
           run: async ({ args }) => {
             assertArguments(args, ["stable"]);
-            const { plan } = await import("./release.js");
+            const { plan } = await import("./release/commands.js");
             await plan(args.stable);
           },
         }),
@@ -93,7 +115,7 @@ export const command = defineCommand({
           args: { stable: stableArg },
           run: async ({ args }) => {
             assertArguments(args, ["stable"]);
-            const { pack } = await import("./release.js");
+            const { pack } = await import("./release/commands.js");
             await pack(args.stable);
           },
         }),
@@ -107,7 +129,7 @@ export const command = defineCommand({
             otp: { type: "string", description: "One-time password passed to Changesets" },
           },
           run: async ({ args, rawArgs }) => {
-            const { publish } = await import("./release.js");
+            const { publish } = await import("./release/commands.js");
             await publish(args.stable, publishArguments(rawArgs));
           },
         }),
@@ -131,7 +153,7 @@ export const command = defineCommand({
             if (unknown) throw new Error(`Unknown option --${unknown}`);
             if (args.otp !== undefined && !args.publish)
               throw new Error("--otp requires --publish.");
-            const { snapshot } = await import("./release.js");
+            const { snapshot } = await import("./release/commands.js");
             await snapshot(args._, {
               publish: args.publish,
               ...(args.otp === undefined ? {} : { otp: String(args.otp) }),

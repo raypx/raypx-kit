@@ -20,6 +20,7 @@ Package READMEs describe shipped APIs and installation requirements. All package
 start at `0.0.0-alpha.0` and are independently versioned in Changesets alpha mode;
 consumers pin exact prerelease versions. Drizzle query clients, relations and
 plugins in the design documents remain planned work.
+All public packages support Node `22.14+`; repository development uses the pin below.
 
 ## Quick start
 
@@ -41,7 +42,7 @@ and common commands.
 bun run docs:dev  # http://localhost:3100/docs
 ```
 
-The private Fumadocs site renders the canonical repository Markdown directly;
+The internal Fumadocs workspace renders the canonical repository Markdown directly;
 edit the source linked from each page.
 
 ## Documentation

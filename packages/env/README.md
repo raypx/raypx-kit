@@ -10,7 +10,8 @@ consumers.
 bun add @raypx-kit/env zod@^4.6.7
 ```
 
-The package is ESM-only. Zod is a required external peer, so consumer schemas and
+The package is ESM-only and supports Node 22.14+ and Bun.
+Zod is a required external peer, so consumer schemas and
 the package use the same Zod runtime. Bun and Node.js consumers can use the package
 without Vite; browser builds can supply runtime values explicitly.
 

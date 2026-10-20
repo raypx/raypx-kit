@@ -1,5 +1,5 @@
 import { defineConfig } from "vite-plus/test/config";
-import { workspaceTests } from "./test.config.js";
+import { workspaceTests } from "./tests/config.js";
 
 const config = workspaceTests();
 export default defineConfig({

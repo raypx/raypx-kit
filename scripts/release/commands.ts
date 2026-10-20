@@ -6,7 +6,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assertReleasePackage, releaseScope, snapshotPackageNames } from "./release-scope.js";
+import { assertReleasePackage, releaseScope, snapshotPackageNames } from "./scope.js";
 
 /** One entry of Changesets' publish plan; packing adds the tarball. */
 interface PlanEntry {
@@ -40,7 +40,7 @@ const dependencyFields = [
   "peerDependencies",
 ] as const;
 
-const root = fileURLToPath(new URL("../", import.meta.url));
+const root = fileURLToPath(new URL("../../", import.meta.url));
 // Earlier archives stay beside this directory; only this release output is replaced.
 const packDirectory = join(root, ".changeset/pack/release");
 const planFile = join(packDirectory, "publish-plan.json");
@@ -231,7 +231,7 @@ export async function pack(stable = false): Promise<void> {
   await writeFile(planFile, `${JSON.stringify(document, null, 2)}\n`);
 
   // Install and load the exact archives in isolated Bun and Node consumers.
-  run(["scripts/check-packages.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
+  run(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
   // Recorded last: publication refuses archives that did not pass the consumer checks.
   await recordCommit();
   describe("Packed for publication:", planned);
@@ -353,7 +353,7 @@ export async function snapshot(
     const planPath = join(snapshotDirectory, "publish-plan.json");
     await writeFile(planPath, `${JSON.stringify({ version: 1, plan: [entries] }, null, 2)}\n`);
     // The same archive rules and isolated Bun/Node consumers as a real release.
-    runOrThrow(["scripts/check-packages.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planPath });
+    runOrThrow(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planPath });
   } finally {
     for (const [file, source] of originals) await writeFile(file, source);
   }

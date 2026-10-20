@@ -6,7 +6,7 @@ export default defineConfig({
     ignorePatterns: [
       "packages/*/dist/**",
       // Public consumer contracts resolve installed tarballs, not workspace source.
-      // check-packages.ts type-checks these in their isolated dependency environment.
+      // scripts/packages/check.ts type-checks these in their isolated dependency environment.
       "packages/*/tests/fixtures/consumer/**",
       "docs/content/**",
       "docs/.output/**",

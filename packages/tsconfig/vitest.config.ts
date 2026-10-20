@@ -1,3 +1,3 @@
-import { workspaceTests } from "../../test.config.js";
+import { workspaceTests } from "../../tests/config.js";
 
 export default workspaceTests();

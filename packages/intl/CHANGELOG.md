@@ -4,6 +4,8 @@
 
 Initial Raypx Kit prerelease.
 
+- Require Node 22.14+ and align the ESM build target with that runtime floor.
+
 - Provide configurable locale negotiation, typed ICU translation and native formatting.
 - Include controlled `IntlProvider` and `LanguageProvider`, browser preference adapters,
   structural server hints, error-code translation and catalog parity tooling.

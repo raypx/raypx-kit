@@ -24,6 +24,13 @@ The README documents the complete shipped API.
 - No product names, package scopes, catalogs, routes or environment variables.
   Product conventions are options; defaults use the `devkit` metadata key and
   `DEVKIT_*` variables.
+- Accept repository policy as plain data. Explicit workspace metadata is keyed by
+  repository-relative workspace paths and must cover the discovered workspaces
+  exactly; do not merge it with manifest metadata. Keep the default `metadataKey`
+  interface compatible for consumers that store policy in package manifests.
+- Never discover, import or execute a repository configuration file implicitly.
+  Raypx Kit's internal scripts import root `devkit.config.ts` explicitly; that
+  filename and repository-specific policy do not belong in this package's runtime.
 - Never execute inspected sources or catalogs; parse them with oxc-parser.
 - Never print loaded environment values or secrets.
 - Use Node APIs only; `turbo` alone requires Bun at call time.

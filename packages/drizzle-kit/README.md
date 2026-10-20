@@ -4,6 +4,7 @@
 `defineConfig`, without the prebuilt programmatic API and payload bundles that
 make up most of the upstream package. Installed size drops from about 101 MB to
 about 7 MB; the runtime dependency names are preserved.
+The distribution supports Node 22.14+ and Bun.
 
 ```sh
 bun add -d @raypx-kit/drizzle-kit 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z'

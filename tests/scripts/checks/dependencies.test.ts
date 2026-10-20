@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vite-plus/test";
-import { checkDependencyCompatibility } from "../../scripts/check-dependencies.js";
+import { checkDependencyCompatibility } from "../../../scripts/checks/dependencies.js";
 
 const fixtures: string[] = [];
 

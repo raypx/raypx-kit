@@ -7,7 +7,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [".artifacts/junit.xml"]
     },
     "build": {
       "dependsOn": ["check", "^build"],
@@ -21,7 +21,8 @@
   "globalDependencies": [
     ".nvmrc",
     "mise.toml",
-    "scripts/toolchain.ts",
+    "devkit.config.ts",
+    "scripts/checks/toolchain.ts",
     "packages/devkit/src/toolchain.ts",
     "tests/setup/**",
     "docs/**",
@@ -32,6 +33,6 @@
     "packages/*/NOTICE.md",
     "packages/*/LICENSE",
     "packages/tsconfig/*.json",
-    "test.config.ts"
+    "tests/config.ts"
   ]
 }

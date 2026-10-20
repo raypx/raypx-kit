@@ -16,7 +16,7 @@ validation and reusable presets; `packages/intl` owns generic internationalizati
 `packages/drizzle-kit` owns the slim upstream CLI distribution;
 `packages/logger` owns evlog-based structured logging, wide events and Node
 request context.
-Root `docs/` is a private Fumadocs application and owns
+Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
 and have explicit ESM exports, a README, license, independent version and tests.
 Configuration packages export their package-root files directly instead of `dist/`.
@@ -27,19 +27,26 @@ the isolated archive consumer by `pack:check`. Their own tsconfig checks public
 types against the installed tarball; they are excluded from source lint resolution.
 An optional `runtime.mjs` in the same fixture runs against the installed archive
 with both Bun and the pinned Node, including fixtures without a tsconfig.
-Optional `without-optional-peers.mjs` and `.ts` contracts use a second isolated
-consumer that omits optional peers and extra fixture dependencies. Runtime
-contracts run with Bun and Node; type contracts use strict NodeNext checks with
-`skipLibCheck: false`.
+Optional `without-optional-peers/runtime.mjs` and `without-optional-peers/types.ts`
+contracts use a second isolated consumer that omits optional peers and extra
+fixture dependencies. Runtime contracts run with Bun and Node; type contracts use
+strict NodeNext checks with `skipLibCheck: false`.
 Every workspace's TypeScript configuration extends an `@raypx-kit/tsconfig` preset,
-declared once by the private root through `workspace:*`; Turbo's global
-dependencies include the presets. Shared test configuration lives at the root; it
-is not a published runtime dependency.
+declared once by the internal root through `workspace:*`; Turbo's global
+dependencies include the presets. Shared test configuration lives in root
+`tests/config.ts`; it is not a published runtime dependency.
 Keep every test under its owning workspace's `tests/` directory. Repository
-maintenance tests live in root `tests/scripts/`, shared test preloads in
-`tests/setup/`, and package fixtures in `tests/fixtures/`. Type checks include
-tests; library builds include only `src/`. Keep Vitest configuration at each
-workspace root and the shared configuration in root `test.config.ts`.
+maintenance tests live in root `tests/scripts/`, mirroring the maintenance script
+directories where applicable; shared test preloads live in `tests/setup/`, and
+package fixtures in `tests/fixtures/`. Type checks include tests; library builds
+include only `src/`. Keep Vitest configuration at each workspace root and import
+the shared configuration from root `tests/config.ts`.
+
+Keep the internal CLI at `scripts/cli.ts`. Group maintenance modules by their
+responsibility under `scripts/checks/`, `scripts/packages/`, `scripts/release/`
+and `scripts/ci/`; use the directory for context instead of repeating that context
+in every filename. Keep public package entry filenames and framework-recognized
+configuration names stable.
 
 Prefer public TypeScript entry files directly under `src/`; keep supporting
 implementation modules in subdirectories when useful.
@@ -53,7 +60,7 @@ link to repository design documents; research inventories are not npm payloads.
 Keep commands and policies in their owning guide rather than repeating full
 instructions across the root README, architecture guide and package guides.
 The documentation site compiles canonical Markdown directly through Fumadocs.
-Keep the site private and outside library release versions and archives.
+Keep the documentation workspace internal and outside library release versions and archives.
 Keep license texts and source notices alongside the package that ships adapted code.
 Write repository and package documentation in English. Keep localized message
 examples in their intended languages and preserve code identifiers and source links.
@@ -65,6 +72,8 @@ authoritative Node pin; the root `packageManager` is the authoritative Bun pin.
 Keep `engines`, `devEngines`, CI setup and documented versions consistent with
 those sources through `bun run toolchain:check`. Public package Node compatibility
 ranges are independent of the repository development pin.
+All public packages declare Node `>=22.14`; library builds target `node22.14.0`.
+Consumer compatibility runs at that exact floor and at the development Node pin.
 
 mise is the recommended version manager. Its configuration only enables reading
 the two pins and must not add `[tools]` versions. Run `mise trust && mise install`,
@@ -75,10 +84,22 @@ Install dependencies before invoking the repository CLI. The root `raypx-kit-dev
 script runs `bun scripts/cli.ts` using citty. Keep `doctor`,
 `toolchain:check` and `release:plan`, `release:pack`, `release:publish`,
 `release:snapshot` as aliases.
+`architecture:check` runs `raypx-kit-dev architecture check` against workspace
+source entries without requiring built output. Root `devkit.config.ts` owns all
+eight workspaces' platform targets, source-entry mappings and bundled dependency
+exceptions, plus toolchain document and Turbo dependency check lists. Keep it
+typed with the existing Devkit interfaces and include it in root type checking
+and Turbo global dependencies. Maintenance scripts explicitly import this trusted
+configuration and pass its pure data to Devkit; discovery must never load or
+execute an inspected repository's configuration. Supplied workspace metadata is
+complete: missing or unknown workspace paths fail, and manifest metadata is not
+a fallback. Keep package manifests free of this repository's `devkit` policy;
+exports and dependencies remain authoritative there. Bundled dependency exceptions
+must be explicit and limited to dependencies actually bundled by the package build.
 Toolchain declaration checks come from `packages/devkit` (which parses TOML and
-YAML with confbox). `scripts/toolchain.ts` composes those checks with this
-repository's installed dependency checks from `scripts/check-dependencies.ts`.
-Retain the existing process and output helpers. These private maintenance tools
+YAML with confbox). `scripts/checks/toolchain.ts` composes those checks with this
+repository's installed dependency checks from `scripts/checks/dependencies.ts`.
+Retain the existing process and output helpers. These internal maintenance tools
 do not change published package APIs.
 
 Bun owns installation and repository scripts. Turbo owns task orchestration.
@@ -89,7 +110,7 @@ starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
 exports its JSON presets directly. Package scripts invoke local `turbo`,
 `tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
 follow their Node shebangs. Keep `bun --bun vp` for tests because their workers
-use Bun-specific flags and the Intl jsdom preload. The private documentation
+use Bun-specific flags and the Intl jsdom preload. The internal documentation
 site also retains `bun --bun vp` development/build/preview commands: its Nitro
 `bun` preset produces server code that requires Bun during prerendering.
 Repository TypeScript maintenance scripts, native type checking and archive
@@ -108,7 +129,7 @@ with plain `changeset publish` or `npm publish <directory>`, which pack this Bun
 workspace with npm and publish those protocols verbatim. The root Vite override
 keeps plugins on Vite+'s bundled core. Do not add a second formatter or linter. Each
 test-bearing package keeps its own `vitest.config.ts`, importing `workspaceTests`
-from root `test.config.ts`. Do not import application test preloads.
+from root `tests/config.ts`. Do not import application test preloads.
 Installed coverage providers must resolve to the same version as Vite+'s bundled
 Vitest. Verify coverage commands when updating either dependency; the normal gate
 does not enable coverage.
@@ -185,10 +206,20 @@ Version PRs also require the repository's Actions PR-creation permission.
 ## Verification
 
 Run a changed package's narrow test first, then `bun run verify`. The root gate
-starts with `doctor` and `toolchain:check`, then checks formatting, lint, unused
+starts with `doctor`, `toolchain:check` and `architecture:check`, then checks formatting, lint, unused
 code and dependencies with Knip, strict types, tests, the documentation build,
 library tarball contents and isolated Bun/Node consumers. `build` runs package
 `check` first through Turbo.
+`verify:toolchain`, `verify:source`, `verify:tests` and `verify:artifacts` are the
+same ordered phases used by local `verify` and the named CI steps. Keep their
+commands in the root manifest rather than duplicating verification policy in YAML.
+CI additionally tests the same archives against minimum supported Node and peer
+versions and the pinned development Node and locked peer versions. Consumer Node
+binaries are independent of the development runtime; never relax `doctor` to run
+that matrix. Compatibility checks do not execute database tests.
+Generated CI logs, test reports and consumer artifacts live under `.artifacts/`
+and must stay out of Git and public archives. Preserve failed command exit codes;
+never upload dotenv files, credentials or whole consumer installations.
 Set `TOOLKIT_NODE_BINARY` to a Node executable matching `.nvmrc` if Node is not on
 PATH; it does not bypass the development pin. Real database tests require an
 independent CI job with a temporary PostgreSQL 17 service. Default unit tests,

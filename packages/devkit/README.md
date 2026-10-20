@@ -24,38 +24,97 @@ contains no product rules, so repositories compose their own policy from it.
 
 ## Workspace architecture
 
-Each workspace declares metadata under a package.json key, `devkit` by default:
+Repositories can keep their check policy in a typed file and pass plain data to
+Devkit. For example, a repository with one `packages/messages` workspace can use
+`devkit.config.ts`:
 
-```json
-{
-  "devkit": {
-    "kind": "library",
-    "target": "universal",
-    "entryTargets": { "./client": "browser" },
-    "sourceTargets": { "src/client/**": "browser" }
-  }
-}
+```ts
+import type { ToolchainOptions } from "@raypx-kit/devkit/toolchain";
+import type { Metadata } from "@raypx-kit/devkit/workspaces";
+
+export default {
+  workspaces: {
+    "packages/messages": {
+      kind: "library",
+      target: "universal",
+      entryTargets: { "./client": "browser" },
+      sourceTargets: { "src/client/**": "browser" },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./client": "./src/client.ts",
+      },
+    },
+  } satisfies Record<string, Metadata>,
+  toolchain: {
+    documents: ["README.md", "AGENTS.md"],
+    turboGlobalDependencies: [".nvmrc", "mise.toml", "devkit.config.ts"],
+  } satisfies ToolchainOptions,
+};
 ```
 
-`kind` is `app`, `library` or `tooling`; targets are `universal`, `browser`,
-`native`, `node` and `bun`.
+The repository's own script imports that trusted configuration explicitly:
 
 ```ts
 import { checkArchitecture } from "@raypx-kit/devkit/architecture";
 import { discover } from "@raypx-kit/devkit/workspaces";
+import config from "../devkit.config.js";
 
-const findings = checkArchitecture(discover(root, { metadataKey: "devkit" }));
+const index = discover(root, { metadata: config.workspaces });
+const findings = checkArchitecture(index);
 ```
+
+`metadata` accepts a `Readonly<Record<string, Metadata>>` keyed by discovered
+workspace paths relative to `root`, such as `packages/messages`. Keys must match
+the discovered paths exactly, without `./` or a trailing slash. The map is the
+complete metadata source: missing and unknown workspaces are findings, and
+manifest metadata is not merged or used as a fallback. Discovery is synchronous;
+it never finds, imports or executes a configuration file. The filename and
+loading mechanism belong to the caller.
+
+`kind` is `app`, `library` or `tooling`; targets are `universal`, `browser`,
+`native`, `node` and `bun`. Every workspace is ESM; application workspaces must
+declare `private: true`, while libraries and tooling can be publishable.
+
+`sourceEntries` maps a public export key to its maintained TypeScript or
+JavaScript source. Use it when `exports` points to generated output so the gate
+can inspect sources before building. Each mapping must name an existing source
+within its workspace and correspond to an actual export. Without a mapping,
+the check follows the declared export targets directly. Package-root JSON
+configuration exports therefore need no source mapping.
+
+`bundledDependencies` lists external development dependencies deliberately bundled
+into the published runtime. Each name must be declared in `devDependencies`, and
+the package build must bundle it. This option permits those source imports; it
+does not exempt workspace boundaries or platform checks. Ordinary runtime
+dependencies and peers remain in their respective manifest fields.
+
+Without an explicit `metadata` map, discovery retains the manifest interface.
+Each workspace stores its metadata under `package.json#devkit` by default; a
+custom `metadataKey` selects a different field:
+
+```ts
+const index = discover(root, { metadataKey: "devkit" });
+```
+
+An external map moves checking policy only. Workspace membership, exports and
+dependencies still come from package manifests, and aliases come from workspace
+TypeScript configurations. Keep a repository's typed policy file in its type
+check and build-cache dependencies.
 
 `discover` also reports directories under `apps/` and `packages/` without a
 manifest; pass `containers` to change them. `checkArchitecture` statically parses
 runtime sources under `src/`, `server/`, `native/` and `app/` and walks every
-public export. It reports private workspace members and invalid metadata,
+public source entry. It reports public applications and invalid metadata,
 libraries without exports, missing export targets, non-`workspace:*` internal
 ranges, dependency cycles including development dependencies, undeclared runtime
-or type imports, private cross-workspace paths, application or tooling imports
+or type imports, internal cross-workspace paths, application or tooling imports
 from runtime code, test-only imports, host APIs used outside their target and DOM
 globals reachable from universal or native entries.
+
+`resolveImport` marks paths that bypass a workspace's public exports with
+`internalPath: true`; architecture findings call these internal cross-workspace
+imports. Package publication status is separate and uses the standard manifest
+`private` field.
 
 This package's own tests live under `tests/`; production entries live under
 `src/` and are the only sources included in the library build.
@@ -67,11 +126,9 @@ other declaration must follow those two sources.
 
 ```ts
 import { assertToolchainRuntime, checkToolchain, pinnedNode } from "@raypx-kit/devkit/toolchain";
+import config from "../devkit.config.js";
 
-const findings = checkToolchain(root, {
-  documents: ["README.md", "AGENTS.md"],
-  turboGlobalDependencies: [".nvmrc", "mise.toml"],
-});
+const findings = checkToolchain(root, config.toolchain);
 const { node, bun, nodeBinary } = assertToolchainRuntime(root, {
   nodeBinaryEnv: "DEVKIT_NODE_BINARY",
 });

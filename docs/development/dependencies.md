@@ -37,6 +37,12 @@ Node and Bun runtime pins remain exact in `.nvmrc` and root `packageManager`.
 the pinned Bun version. Public package engine ranges describe consumer support
 independently of repository development pins.
 
+The [consumer compatibility matrix](README.md#consumer-compatibility-matrix)
+tests the exact Node and peer lower bounds alongside the development Node and
+locked peer versions. When changing a support range, review the resulting matrix
+and its public runtime and declaration contracts. Keep the development runtime
+pin unchanged when selecting additional consumer binaries.
+
 ## Peers and bundled dependencies
 
 Keep consumer-owned framework and ORM instances external. Drizzle ORM is an

@@ -4,6 +4,8 @@
 
 Initial Raypx Kit prerelease.
 
+- Require Node 22.14+ and align the ESM build target with that runtime floor.
+
 - Refresh compatible dependencies and use caret ranges for ordinary dependencies;
   keep the coverage provider synchronized with Vite+'s bundled Vitest.
 - Provide typed `createEnv` and `defineEnv` with nested presets, later schema overrides,

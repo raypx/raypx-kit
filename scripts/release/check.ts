@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = fileURLToPath(new URL("../", import.meta.url));
+const root = fileURLToPath(new URL("../../", import.meta.url));
 const rootManifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
   packageManager: string;
 };
@@ -102,7 +102,7 @@ try {
     "Changesets: one package received a patch; the unrelated library and private docs retained their versions.",
   );
 
-  // scripts/release.ts and the publishing runbook rely on these pre-mode rules.
+  // scripts/release/commands.ts and the publishing runbook rely on these pre-mode rules.
   const alpha = await fixture(
     { first: "0.0.0-alpha.0", second: "0.0.0-alpha.0" },
     { tag: "alpha" },

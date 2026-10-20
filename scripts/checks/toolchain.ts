@@ -1,26 +1,13 @@
+import devkitConfig from "../../devkit.config.js";
 import {
   assertToolchainRuntime as assertRuntime,
   checkToolchain as checkDeclarations,
-} from "../packages/devkit/src/toolchain.js";
-import { checkDependencyCompatibility } from "./check-dependencies.js";
+} from "../../packages/devkit/src/toolchain.js";
+import { checkDependencyCompatibility } from "./dependencies.js";
 
 /** Repository policy for the shared @raypx-kit/devkit toolchain checks. */
 export function checkToolchain(root: string): string[] {
-  const declarations = checkDeclarations(root, {
-    documents: [
-      "README.md",
-      "AGENTS.md",
-      "docs/AGENTS.md",
-      "docs/development/README.md",
-      "docs/development/publishing.md",
-    ],
-    turboGlobalDependencies: [
-      ".nvmrc",
-      "mise.toml",
-      "scripts/toolchain.ts",
-      "packages/devkit/src/toolchain.ts",
-    ],
-  });
+  const declarations = checkDeclarations(root, devkitConfig.toolchain);
   return [...declarations, ...checkDependencyCompatibility(root)];
 }
 

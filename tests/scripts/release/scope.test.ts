@@ -2,9 +2,9 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { assertReleasePackage, snapshotPackageNames } from "../../scripts/release-scope.js";
+import { assertReleasePackage, snapshotPackageNames } from "../../../scripts/release/scope.js";
 
-const root = fileURLToPath(new URL("../../", import.meta.url));
+const root = fileURLToPath(new URL("../../../", import.meta.url));
 const packages = readdirSync(join(root, "packages"), { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => {

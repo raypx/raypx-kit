@@ -13,7 +13,7 @@ import {
 import { Suspense, use } from "react";
 import { z } from "zod";
 import { getMDXComponents } from "../../components/mdx";
-import { baseOptions } from "../../lib/layout.shared";
+import { baseOptions } from "../../lib/layout";
 import { docs, getSourceUrl, source } from "../../lib/source";
 
 const loadPage = createServerFn({ method: "GET" })

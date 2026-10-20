@@ -2,12 +2,13 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
 
-const root = new URL("../../", import.meta.url);
+const root = new URL("../../../", import.meta.url);
 const drizzle = fileURLToPath(new URL("packages/drizzle/", root));
 const vp = fileURLToPath(new URL("node_modules/vite-plus/bin/vp", root));
 
 function runTests(args: string[], env: NodeJS.ProcessEnv = {}) {
-  return spawnSync(process.execPath, ["--bun", vp, "test", ...args], {
+  // Nested failure probes must not overwrite the real Drizzle suite's JUnit report.
+  return spawnSync(process.execPath, ["--bun", vp, "test", ...args, "--reporter=default"], {
     cwd: drizzle,
     encoding: "utf8",
     timeout: 15_000,

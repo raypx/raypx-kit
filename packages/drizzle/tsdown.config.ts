@@ -13,6 +13,6 @@ export default defineConfig({
   format: ["esm"],
   sourcemap: true,
   fixedExtension: true,
-  target: "node20.0.0",
+  target: "node22.14.0",
   deps: { neverBundle: [/^drizzle-orm(?:\/|$)/, /^postgres(?:\/|$)/] },
 });

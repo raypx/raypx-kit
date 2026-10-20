@@ -6,12 +6,16 @@ export type Target = (typeof targets)[number];
 export const kinds = ["app", "library", "tooling"] as const;
 export type Kind = (typeof kinds)[number];
 
-/** Per-workspace boundary metadata, stored under a configurable package.json key. */
+/** Per-workspace boundary metadata, supplied explicitly or read from package.json. */
 export interface Metadata {
   kind: Kind;
   target: Target;
   entryTargets?: Record<string, Target>;
   sourceTargets?: Record<string, Target>;
+  /** Maintained source behind an export whose published target is generated. */
+  sourceEntries?: Record<string, string>;
+  /** Development dependencies explicitly bundled into the published runtime. */
+  bundledDependencies?: string[];
 }
 export interface Manifest {
   name: string;
@@ -34,12 +38,16 @@ export interface Workspace {
 export interface WorkspaceIndex {
   root: string;
   metadataKey: string;
+  /** Origin of workspace metadata; omitted legacy indexes use the manifest. */
+  metadataSource?: "manifest" | "options";
   workspaces: Workspace[];
   byName: Map<string, Workspace>;
   findings: string[];
 }
 export interface DiscoverOptions {
-  /** The package.json field holding {@link Metadata}. */
+  /** Complete metadata by exact workspace-relative path; never merged with manifests. */
+  metadata?: Readonly<Record<string, Metadata>>;
+  /** The package.json field holding {@link Metadata}, used only when metadata is omitted. */
   metadataKey?: string;
   /** Directories whose children must each be a workspace. */
   containers?: readonly string[];
@@ -79,7 +87,7 @@ export function workspacePatterns(manifest: { workspaces?: unknown }): string[] 
 
 export function discover(
   root: string,
-  { metadataKey = "devkit", containers = ["apps", "packages"] }: DiscoverOptions = {},
+  { metadata, metadataKey = "devkit", containers = ["apps", "packages"] }: DiscoverOptions = {},
 ): WorkspaceIndex {
   const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const findings: string[] = [];
@@ -90,6 +98,14 @@ export function discover(
   ).sort()) {
     const path = file.replaceAll("\\", "/").slice(0, -13);
     const entry = JSON.parse(readFileSync(join(root, file), "utf8")) as Manifest;
+    const workspaceMetadata =
+      metadata === undefined
+        ? (entry[metadataKey] as Metadata | undefined)
+        : Object.hasOwn(metadata, path)
+          ? metadata[path]
+          : undefined;
+    if (metadata !== undefined && workspaceMetadata === undefined)
+      findings.push(`${path}: missing supplied workspace metadata`);
     let aliases: Record<string, string[]> = {};
     const config = join(root, path, "tsconfig.json");
     if (existsSync(config)) {
@@ -102,7 +118,7 @@ export function discover(
     workspaces.push({
       path,
       manifest: entry,
-      metadata: entry[metadataKey] as Metadata | undefined,
+      metadata: workspaceMetadata,
       aliases,
     });
   }
@@ -111,6 +127,12 @@ export function discover(
     if (byName.has(workspace.manifest.name))
       findings.push(`duplicate workspace: ${workspace.manifest.name}`);
     byName.set(workspace.manifest.name, workspace);
+  }
+  if (metadata !== undefined) {
+    const paths = new Set(workspaces.map((workspace) => workspace.path));
+    for (const path of Object.keys(metadata).sort()) {
+      if (!paths.has(path)) findings.push(`${path}: metadata supplied for unknown workspace`);
+    }
   }
   for (const parent of containers) {
     if (!existsSync(join(root, parent))) continue;
@@ -121,7 +143,14 @@ export function discover(
         findings.push(`${path}: missing workspace manifest`);
     }
   }
-  return { root, metadataKey, workspaces, byName, findings };
+  return {
+    root,
+    metadataKey,
+    metadataSource: metadata === undefined ? "manifest" : "options",
+    workspaces,
+    byName,
+    findings,
+  };
 }
 
 export function workspaceFor(index: WorkspaceIndex, file: string) {
@@ -162,12 +191,15 @@ export function resolveImport(
       matches(pattern, subpath),
     );
     const suffix = entry?.[0].includes("*") ? subpath.slice(entry[0].split("*")[0]!.length) : "";
+    const source = entry && target.metadata?.sourceEntries?.[entry[0]];
     return {
       target,
       subpath,
-      privatePath: !entry,
+      internalPath: !entry,
       paths: entry
-        ? exportPaths(entry[1]).map((p) => posix.join(target.path, p.replace("*", suffix)))
+        ? (source ? [source] : exportPaths(entry[1])).map((p) =>
+            posix.join(target.path, p.replace("*", suffix)),
+          )
         : [],
       targetPlatform:
         target.metadata?.entryTargets?.[entry?.[0] ?? subpath] ??
@@ -191,7 +223,7 @@ export function resolveImport(
   return {
     target: owner,
     subpath: ".",
-    privatePath: !!owner && owner !== from,
+    internalPath: !!owner && owner !== from,
     paths: path ? [path] : [],
     targetPlatform: owner ? sourceTarget(owner, path!) : ("universal" as Target),
   };

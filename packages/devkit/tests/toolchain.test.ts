@@ -55,7 +55,7 @@ function repository(overrides: Record<string, string> = {}): string {
     }),
     "README.md": `Develop with Node **${nodeVersion}** and Bun **${bunVersion}**.\n`,
     "turbo.json": JSON.stringify({
-      globalDependencies: [".nvmrc", "mise.toml", "scripts/toolchain.ts"],
+      globalDependencies: [".nvmrc", "mise.toml", "scripts/checks/toolchain.ts"],
     }),
     ...overrides,
   };
@@ -464,9 +464,9 @@ describe("development toolchain declarations", () => {
         "turbo.json: include mise.toml in globalDependencies",
       ]),
     );
-    expect(checkToolchain(root, { turboGlobalDependencies: ["scripts/toolchain.ts"] })).toEqual([
-      "turbo.json: include scripts/toolchain.ts in globalDependencies",
-    ]);
+    expect(
+      checkToolchain(root, { turboGlobalDependencies: ["scripts/checks/toolchain.ts"] }),
+    ).toEqual(["turbo.json: include scripts/checks/toolchain.ts in globalDependencies"]);
   });
 
   it("checks only the configured documents", () => {
