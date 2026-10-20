@@ -88,6 +88,13 @@ export const documentationPages = [
     description: "evlog structured logging, wide events and request context for Node.",
   },
   {
+    slug: "storage/index",
+    sourcePath: "packages/storage/README.md",
+    title: "Storage",
+    description:
+      "Object storage for S3-compatible services, the filesystem and memory with signed URLs.",
+  },
+  {
     slug: "tsconfig/index",
     sourcePath: "packages/tsconfig/README.md",
     title: "TSConfig",
@@ -133,6 +140,7 @@ export const navigationMetadata = {
       "env",
       "intl",
       "logger",
+      "storage",
       "tsconfig",
       "development",
     ],
@@ -148,6 +156,7 @@ export const navigationMetadata = {
   "env/meta.json": { title: "Env", pages: ["index"] },
   "intl/meta.json": { title: "Intl", pages: ["index", "migration"] },
   "logger/meta.json": { title: "Logger", pages: ["index"] },
+  "storage/meta.json": { title: "Storage", pages: ["index"] },
   "tsconfig/meta.json": { title: "TSConfig", pages: ["index"] },
   "development/meta.json": {
     title: "Development",

@@ -28,6 +28,7 @@ compatibility and consumer installation. They are also included in npm archives.
 | Env         | [Validation, nested presets and client access](../packages/env/README.md)               |
 | Intl        | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)  |
 | Logger      | [Structured logging, wide events and request context](../packages/logger/README.md)     |
+| Storage     | [Drivers, policies and signed URLs](../packages/storage/README.md)                      |
 | TSConfig    | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)        |
 
 Packages remain in Changesets alpha mode until the first approved stable release.

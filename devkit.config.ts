@@ -82,6 +82,23 @@ export default {
         "./pipeline": "./src/pipeline.ts",
       },
     },
+    "packages/storage": {
+      kind: "library",
+      target: "universal",
+      entryTargets: {
+        "./fs": "node",
+      },
+      sourceTargets: {
+        "src/fs.ts": "node",
+      },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./signed": "./src/signed.ts",
+        "./memory": "./src/memory.ts",
+        "./fs": "./src/fs.ts",
+        "./s3": "./src/s3.ts",
+      },
+    },
     "packages/tsconfig": {
       kind: "tooling",
       target: "universal",

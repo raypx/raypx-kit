@@ -17,6 +17,7 @@ validation and reusable presets; `packages/intl` owns generic internationalizati
 `packages/drizzle-kit` owns the slim upstream CLI distribution;
 `packages/logger` owns evlog-based structured logging, wide events and Node
 request context.
+`packages/storage` owns object storage drivers and signed upload and download URLs.
 Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
 and have explicit ESM exports, a README, license, independent version and tests.

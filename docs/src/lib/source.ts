@@ -24,6 +24,7 @@ export const docs = defineDocs({
       "packages/env/README.md",
       "packages/intl/README.md",
       "packages/logger/README.md",
+      "packages/storage/README.md",
       "packages/tsconfig/README.md",
     ],
     schema: ({ path }) =>

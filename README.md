@@ -6,16 +6,17 @@ own their schemas, secrets, business rules and runtime configuration.
 
 ## Packages
 
-| Package                                                  | Purpose                                                                              |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [@raypx-kit/codemods](packages/codemods/README.md)       | Explicit-file migration runner and CLI; built-in migrations are added as needed      |
-| [@raypx-kit/devkit](packages/devkit/README.md)           | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers   |
-| [@raypx-kit/drizzle](packages/drizzle/README.md)         | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics |
-| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md) | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                      |
-| [@raypx-kit/env](packages/env/README.md)                 | Zod environment validation, nested presets, defaults and guarded client access       |
-| [@raypx-kit/intl](packages/intl/README.md)               | Locale negotiation, ICU translation, formatting and controlled React providers       |
-| [@raypx-kit/logger](packages/logger/README.md)           | evlog structured logging, wide events and Node request context                       |
-| [@raypx-kit/tsconfig](packages/tsconfig/README.md)       | Strict TypeScript presets for libraries, browsers and Node                           |
+| Package                                                  | Purpose                                                                               |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [@raypx-kit/codemods](packages/codemods/README.md)       | Explicit-file migration runner and CLI; built-in migrations are added as needed       |
+| [@raypx-kit/devkit](packages/devkit/README.md)           | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers    |
+| [@raypx-kit/drizzle](packages/drizzle/README.md)         | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics  |
+| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md) | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                       |
+| [@raypx-kit/env](packages/env/README.md)                 | Zod environment validation, nested presets, defaults and guarded client access        |
+| [@raypx-kit/intl](packages/intl/README.md)               | Locale negotiation, ICU translation, formatting and controlled React providers        |
+| [@raypx-kit/logger](packages/logger/README.md)           | evlog structured logging, wide events and Node request context                        |
+| [@raypx-kit/storage](packages/storage/README.md)         | Object storage for S3-compatible services, the filesystem and memory with signed URLs |
+| [@raypx-kit/tsconfig](packages/tsconfig/README.md)       | Strict TypeScript presets for libraries, browsers and Node                            |
 
 Package READMEs describe shipped APIs and installation requirements. All packages
 start at `0.0.0-alpha.0` and are independently versioned in Changesets alpha mode;

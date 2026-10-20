@@ -25,6 +25,7 @@ describe("release package scope", () => {
       "env",
       "intl",
       "logger",
+      "storage",
       "tsconfig",
     ]);
     for (const { name } of packages) expect(() => assertReleasePackage(name)).not.toThrow();
