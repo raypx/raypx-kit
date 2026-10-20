@@ -137,7 +137,7 @@
     },
     "packages/logger": {
       "name": "@raypx-kit/logger",
-      "version": "0.0.0-alpha.0",
+      "version": "0.0.0-alpha.1",
       "dependencies": {
         "evlog": "^2.33.1",
       },
