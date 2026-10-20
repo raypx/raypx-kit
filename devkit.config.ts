@@ -80,6 +80,8 @@ export default {
         ".": "./src/index.ts",
         "./context": "./src/context.ts",
         "./pipeline": "./src/pipeline.ts",
+        "./safe": "./src/safe.ts",
+        "./stream": "./src/stream.ts",
       },
     },
     "packages/storage": {

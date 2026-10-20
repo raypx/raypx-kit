@@ -6,6 +6,8 @@ export default defineConfig({
     index: "src/index.ts",
     context: "src/context.ts",
     pipeline: "src/pipeline.ts",
+    safe: "src/safe.ts",
+    stream: "src/stream.ts",
   },
   dts: true,
   format: ["esm"],

@@ -33,6 +33,14 @@
     "./pipeline": {
       "types": "./dist/pipeline.d.mts",
       "import": "./dist/pipeline.mjs"
+    },
+    "./safe": {
+      "types": "./dist/safe.d.mts",
+      "import": "./dist/safe.mjs"
+    },
+    "./stream": {
+      "types": "./dist/stream.d.mts",
+      "import": "./dist/stream.mjs"
     }
   },
   "publishConfig": {

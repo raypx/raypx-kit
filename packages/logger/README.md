@@ -50,6 +50,8 @@ Importing this package does not initialize logging.
 | `@raypx-kit/logger`          | `initLogger`, `log`, `createLogger`, `createRequestLogger`, `createError`, `EvlogError`, `parseError`, `defineEvlog`, `toLoggerConfig`; their configuration, event, logger, error, sampling and drain types |
 | `@raypx-kit/logger/context`  | `runWithLogger`, `getLogger`, `useLogger` for Node and Bun asynchronous context                                                                                                                             |
 | `@raypx-kit/logger/pipeline` | `createDrainPipeline`, `DrainPipelineOptions`, `PipelineDrainFn`                                                                                                                                            |
+| `@raypx-kit/logger/safe`     | `withEventPolicy`, `createEventPolicy`, `safeError`, `DEFAULT_SENSITIVE_KEYS` and their types; no Node APIs, so it also runs on Workers                                                                     |
+| `@raypx-kit/logger/stream`   | `createStreamDrain` for ordered JSON lines on stderr or another Node writable                                                                                                                               |
 
 Core functions retain evlog's native types and behavior. `defineEvlog` describes
 shared configuration; pass `toLoggerConfig(config)` to `initLogger` when using a
@@ -129,6 +131,47 @@ for the next operation.
 For individual messages, use structured objects, for example
 `log.info({ action: 'worker.started' })`. This keeps events on the same drain and
 redaction path. evlog's pretty string/tag form bypasses that path.
+
+## Allowed fields and redaction
+
+Applications that must never log credentials, personal data or file contents can
+wrap their drain with an explicit field policy. Only the envelope (`timestamp`,
+`level`, `service`, `environment`) and the listed fields leave the process:
+
+```ts
+import { initLogger } from "@raypx-kit/logger";
+import { withEventPolicy } from "@raypx-kit/logger/safe";
+import { createStreamDrain } from "@raypx-kit/logger/stream";
+
+const output = createStreamDrain(); // JSON lines on stderr
+initLogger({
+  env: { service: "cli", environment: "production" },
+  silent: true,
+  drain: withEventPolicy(output, {
+    fields: ["operation", "requestId", "status", "durationMs", "error", "rpc"],
+    shapes: { rpc: ["system", "method"] },
+  }),
+});
+
+// Before exit:
+await output.close();
+```
+
+- Values of sensitive keys (passwords, tokens, cookies, headers, bodies, messages,
+  stacks, paths, commands, URLs, e-mail addresses and similar) are replaced at any
+  depth; strings are shortened and URLs, bearer tokens, JWTs and e-mail addresses
+  inside them are masked. Pass `sensitiveKeys` to replace the default pattern.
+- `error` keeps only a standard error name and a machine `code`; messages, causes
+  and stacks never leave the process.
+- `shapes` keeps selected string properties of framework objects.
+- Each event is limited to `maxEventBytes` (16 KiB by default); fields beyond the
+  limit are dropped in the order they are listed. Getters, `toJSON`, cycles and
+  hostile proxies are never invoked or followed.
+- Request metadata and headers in the drain context are not forwarded.
+
+`createStreamDrain` writes in order, never ends a stream it did not create, drops
+events beyond `maxPending` (1024) and reports write or serialization failures once
+from `flush()` or `close()`, never from the code that emitted the event.
 
 ## Drains, batching and shutdown
 
