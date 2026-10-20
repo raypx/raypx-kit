@@ -1,0 +1,72 @@
+.github/workflows/release.yml
+  s_adafa49206c7d6::t_2f1b3f3adc5366 27-28,50,52,54-55,70-71,79,81,83-84,102-103,125,127,129-130
+docs/architecture/README.md
+  s_adafa49206c7d6::t_806253d37bba2e 208-211
+.github/actions/setup-toolchain/action.yml
+  s_adafa49206c7d6::t_867a6b28ac25c1 1-34
+.github/workflows/ci.yml
+  s_adafa49206c7d6::t_2f1b3f3adc5366 26-27,62-67,82-83,102,104,106-107,131-132,139,141,143-144
+  s_adafa49206c7d6::t_6d940b81b98cab 54,57,60,145-163,166-178
+  s_adafa49206c7d6::t_806253d37bba2e 53,58,164-165
+  s_adafa49206c7d6::t_8d9f59beaefac0 138
+docs/vite.config.ts
+  s_adafa49206c7d6::t_a4d6993a4c607b 23
+  s_adafa49206c7d6::t_e9b253d5164686 21,26-27
+  s_adafa49206c7d6::t_2a4d2f0157c33c 28,30
+  s_adafa49206c7d6::t_dbd8082eb2df3e 29
+  s_adafa49206c7d6::t_546ace6a61e63a 31,67,72
+packages/devkit/tests/toolchain.test.ts
+  s_adafa49206c7d6::t_9ca78d3565eaaf 524
+  s_adafa49206c7d6::t_81ae1115127df1 29-39,440-523,525
+.github/actions/report-diagnostics/action.yml
+  s_adafa49206c7d6::t_867a6b28ac25c1 1-33
+.gitignore
+  s_adafa49206c7d6::t_6d940b81b98cab 4
+docs/src/routes/api/search.ts
+  s_adafa49206c7d6::t_e9b253d5164686 9
+package.json
+  s_adafa49206c7d6::t_6c1daae2a7023f 45-46,60-61
+docs/AGENTS.md
+  s_adafa49206c7d6::t_806253d37bba2e 36,49
+  s_adafa49206c7d6::t_5a4f84cbf29042 37-38
+docs/src/components/search.tsx
+  s_adafa49206c7d6::t_e9b253d5164686 1,31
+docs/package.json
+  s_adafa49206c7d6::t_5a4f84cbf29042 12,14
+packages/devkit/src/toolchain.ts
+  s_adafa49206c7d6::t_08004cbae9fe8f 143-153
+  s_adafa49206c7d6::t_e2a96f78dcd57f 154-156,178-196,198-199,269
+AGENTS.md
+  s_adafa49206c7d6::t_5a4f84cbf29042 115-117
+wrangler.jsonc
+  s_adafa49206c7d6::t_6d940b81b98cab 1-3,5,9,11,15
+  s_adafa49206c7d6::t_e9b253d5164686 4,6-8,10,12-14
+bun.lock
+  s_adafa49206c7d6::t_e91de98e192480 20,242-257,362-415,620-625,694-697,952-953,994-995,1046-1047,1190-1191,1342-1343,1390-1391,1480-1481,1512-1513,1624-1627,1646-1649,1678-1681,1710-1713,1720-1721,1842-1893
+.changeset/check-composite-toolchains.md
+  s_adafa49206c7d6::t_992acb58b948e6 1-5
+docs/development/README.md
+  s_adafa49206c7d6::t_5a4f84cbf29042 80-82
+  s_adafa49206c7d6::t_992acb58b948e6 154-165,181-184
+  s_adafa49206c7d6::t_51ee64c2ea1daa 185
+  s_adafa49206c7d6::t_6d940b81b98cab 290-291,304-311,316-334,337-338
+  s_adafa49206c7d6::t_806253d37bba2e 83,286,292-303,312-315,335-336
+packages/devkit/README.md
+  s_adafa49206c7d6::t_992acb58b948e6 141-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7ed0701ff5645830d4ff9813ad6cf1657683a159",
+  "prompts": {},
+  "sessions": {
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": null
+    }
+  }
+}
