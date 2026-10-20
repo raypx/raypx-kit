@@ -1,0 +1,20 @@
+docs/development/changesets.md
+  h_f0766e80fd3864 21-25
+scripts/release/commands.ts
+  h_f0766e80fd3864 10,87-88,129-143,147-158
+scripts/release/tags.ts
+  h_f0766e80fd3864 1-12
+tests/scripts/release/tags.test.ts
+  h_f0766e80fd3864 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "86447a90dbcc624526330717261fc2c0feef3689",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
