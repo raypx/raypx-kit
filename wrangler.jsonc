@@ -2,6 +2,11 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "raypx-kit-docs",
   "main": "./docs/.output/server/index.mjs",
+  "build": {
+    // Prerendering previews use built output; Workers Builds has its own build step.
+    "command": "if [ \"$WRANGLER_COMMAND\" != \"dev\" ] && [ \"$WORKERS_CI\" != \"1\" ]; then bun run docs:build; fi",
+    "watch_dir": "./docs/.output/server",
+  },
   "compatibility_date": "2026-10-20",
   "compatibility_flags": ["nodejs_compat"],
   "no_bundle": true,

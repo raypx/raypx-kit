@@ -311,6 +311,13 @@ Git integration. Configure the Worker's **Settings → Builds** with:
 | Build command     | `bun run docs:build`  |
 | Deploy command    | `bun run docs:deploy` |
 
+Root `wrangler.jsonc` also declares a custom build command for direct Wrangler
+deployments. It runs `bun run docs:build`, while skipping `wrangler dev` previews
+to avoid recursive builds during prerendering. It also skips custom builds when
+`WORKERS_CI=1`, since Workers Builds already runs the configured build command.
+Keep both commands in the Cloudflare Builds settings; its build configuration
+is managed separately from Wrangler's custom build hook.
+
 Cloudflare manages the deployment credentials. GitHub Actions runs source,
 test, documentation build, archive, compatibility and PostgreSQL integration
 checks without uploading or deploying the documentation output. It needs no
@@ -319,10 +326,10 @@ deployments run independently of these GitHub checks.
 
 A custom domain can be configured in the Worker's Cloudflare settings.
 
-For a local deployment, authenticate with `bunx wrangler login`, then run:
+For a local deployment, authenticate with `bunx wrangler login`, then run the
+deployment command. Wrangler builds the site before uploading:
 
 ```sh
-bun run docs:build
 bun run docs:deploy
 ```
 
@@ -334,7 +341,9 @@ bun run docs:deploy --dry-run --outdir .artifacts/docs-deploy
 
 See Nitro's [Cloudflare deployment guide](https://nitro.build/deploy/providers/cloudflare),
 Cloudflare's [static assets routing guide](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
-and [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/).
+and [custom build hooks](https://developers.cloudflare.com/workers/wrangler/custom-builds/).
+The [Workers Builds settings](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
+are configured in the Cloudflare dashboard.
 
 ## Adding a package
 
