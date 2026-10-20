@@ -14,6 +14,8 @@ Initial Raypx Kit prerelease.
 - Accept complete workspace metadata maps for explicit, typed repository
   configuration while retaining manifest metadata compatibility and synchronous,
   non-executing discovery.
+- Check Node and Bun version-file declarations in local composite actions under
+  `.github/actions/`, including nested action directories and both YAML filename extensions.
 - Include Node/Bun toolchain checks, static catalog reading, Markdown link checks,
   dotenv-aware process and Turbo helpers, and relocated artifact staging and probes.
 - Preserve independent entry points and consumer-owned repository policy.
