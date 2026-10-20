@@ -1,0 +1,14 @@
+packages/devkit/CHANGELOG.md
+  h_f0766e80fd3864 17-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b6f95ec5a484d4a7af7e7e2af15f41259bd899df",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
