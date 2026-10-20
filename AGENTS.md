@@ -103,7 +103,10 @@ repository's installed dependency checks from `scripts/checks/dependencies.ts`.
 Retain the existing process and output helpers. These internal maintenance tools
 do not change published package APIs.
 
-Bun owns installation and repository scripts. Turbo owns task orchestration.
+Bun owns installation and repository scripts. Turbo owns task orchestration and
+uses loose environment mode so tasks inherit parent variables without passthrough
+allowlists. Declare variables that affect cached outputs in `env`/`globalEnv` so
+their values participate in cache keys.
 Vite+ owns formatting, linting, tests and the documentation application's Vite
 commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl and Logger, including
 their declarations, from each package's `tsdown.config.ts`; its dependency range

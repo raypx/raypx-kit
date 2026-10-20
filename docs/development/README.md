@@ -75,6 +75,12 @@ tsdown builds the six ESM packages and their declarations. Drizzle Kit copies
 upstream artifacts through its extractor; TSConfig publishes its JSON presets
 directly.
 
+Root `turbo.json` sets `envMode` to `loose`, so workspace tasks inherit the
+parent environment without `passThroughEnv` allowlists. Variables that affect
+cached outputs must still be declared in `env`/`globalEnv` so their values enter
+the cache keys. Turbo does not load `.env` files itself; environment loading
+remains the responsibility of the invoking runtime or framework.
+
 Package scripts invoke `turbo`, `tsdown`, `changeset`, `knip`, `vp check` and
 `vp fmt` directly. Tests retain `bun --bun vp` because workers use Bun-specific
 flags and the Intl jsdom preload. The documentation development server also uses
