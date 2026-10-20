@@ -2,6 +2,10 @@
   "name": "raypx-kit",
   "private": true,
   "license": "Apache-2.0",
+  "author": {
+    "name": "Zack",
+    "email": "heyloyep@gmail.com"
+  },
   "workspaces": [
     "docs",
     "packages/*"

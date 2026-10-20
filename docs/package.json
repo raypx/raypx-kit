@@ -2,6 +2,10 @@
   "name": "docs",
   "version": "0.0.0",
   "private": true,
+  "author": {
+    "name": "Zack",
+    "email": "heyloyep@gmail.com"
+  },
   "type": "module",
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",

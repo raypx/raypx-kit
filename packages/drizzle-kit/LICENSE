@@ -1,9 +1,11 @@
 MIT License
 
-This package redistributes files from the drizzle-kit npm package, published by
-Drizzle Team (https://github.com/drizzle-team/drizzle-orm) under the MIT license
-declared in its package.json. The extraction script and documentation in this
-package are released under the same license.
+Copyright 2026 Zack <heyloyep@gmail.com>
+
+The copyright above applies to this package's packaging scripts and documentation.
+This package also redistributes unchanged files from drizzle-kit by Drizzle Team
+(https://github.com/drizzle-team/drizzle-orm), whose package declares the MIT
+license in its published package metadata. Upstream ownership is unchanged.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

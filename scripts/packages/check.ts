@@ -59,6 +59,8 @@ async function assertArchive(
   const packed = JSON.parse(readArchived(archive, "package.json")) as Manifest;
   assert.equal(packed.name, manifest.name);
   assert.equal(packed.version, manifest.version);
+  assert.equal(packed.license, manifest.license, `${packed.name}: license metadata changed`);
+  assert.deepEqual(packed.author, manifest.author, `${packed.name}: author metadata changed`);
   assert.deepEqual(
     packed.peerDependenciesMeta,
     manifest.peerDependenciesMeta,
@@ -68,13 +70,17 @@ async function assertArchive(
     assert.ok(entries.has(`package/${file}`), `${packed.name}: missing ${file}`);
   for (const directory of ["node_modules", "third-party"])
     assert.ok(![...entries].some((entry) => entry.startsWith(`package/${directory}/`)));
-  if (manifest.files?.includes("NOTICE.md")) {
-    for (const file of ["NOTICE.md", "LICENSE"])
-      assert.equal(
-        readArchived(archive, file),
-        await readFile(join(packageDirectory, file), "utf8"),
-        `${packed.name}: incomplete ${file}`,
-      );
+  const legalFiles = [
+    "LICENSE",
+    ...["NOTICE.md", "THIRD_PARTY_LICENSES.txt"].filter((file) => manifest.files?.includes(file)),
+  ];
+  for (const file of legalFiles) {
+    assert.ok(entries.has(`package/${file}`), `${packed.name}: missing ${file}`);
+    assert.equal(
+      readArchived(archive, file),
+      await readFile(join(packageDirectory, file), "utf8"),
+      `${packed.name}: incomplete ${file}`,
+    );
   }
   for (const target of exportTargets(packed.exports))
     assert.ok(entries.has(`package/${target.slice(2)}`), `${packed.name}: missing ${target}`);

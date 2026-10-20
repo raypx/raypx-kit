@@ -10,6 +10,8 @@ export type Dependencies = Record<string, string>;
 export interface Manifest {
   name: string;
   version: string;
+  license?: string;
+  author?: unknown;
   private?: boolean;
   files?: string[];
   exports: Record<string, unknown>;

@@ -4,6 +4,10 @@
   "description": "Explicit source migration runner and CLI scaffold for Raypx Kit.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/codemods",
   "license": "Apache-2.0",
+  "author": {
+    "name": "Zack",
+    "email": "heyloyep@gmail.com"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/raypx/raypx-kit.git",

@@ -38,6 +38,9 @@ has no separate NOTICE file.
 
 ## Original Toolkit modules and maintenance
 
+`Copyright 2026 Zack <heyloyep@gmail.com>` applies to original Raypx toolkit
+modules and Raypx modifications to the adapted modules.
+
 Result unwrapping and sanitized plan summarization are original Raypx toolkit
 code, distributed under the package Apache-2.0 license. No PEV2 code is included.
 
