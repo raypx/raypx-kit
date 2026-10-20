@@ -1,0 +1,23 @@
+docs/development/README.md
+  s_adafa49206c7d6::t_480fd5c1162438 78-83
+AGENTS.md
+  s_adafa49206c7d6::t_480fd5c1162438 106-109
+turbo.json
+  s_adafa49206c7d6::t_480fd5c1162438 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "53da7ce8da9f88d2e5676c79de2e20ca7fe0ee15",
+  "prompts": {},
+  "sessions": {
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
