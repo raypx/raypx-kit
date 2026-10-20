@@ -26,8 +26,8 @@ export default defineConfig(({ command }) => ({
       preset: command === "serve" ? "bun" : "cloudflare_module",
       cloudflare: { deployConfig: false },
       commands: {
-        preview:
-          "node ../node_modules/wrangler/bin/wrangler.js dev --config ../wrangler.jsonc --local",
+        // Wraps Wrangler so a slow start or failed prerender cannot orphan workerd.
+        preview: "node scripts/preview.ts",
       },
       serverDir: false,
       serverEntry: false,

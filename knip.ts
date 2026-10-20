@@ -75,7 +75,9 @@ const config: KnipConfig = {
       typescript: true,
     },
     docs: {
-      project: ["src/**/*.{ts,tsx,css,mdx}", "tests/**/*.ts"],
+      // Nitro spawns the prerender preview wrapper by path from vite.config.ts.
+      entry: ["scripts/preview.ts"],
+      project: ["scripts/**/*.ts", "src/**/*.{ts,tsx,css,mdx}", "tests/**/*.ts"],
       includeEntryExports: true,
       // Fumadocs' macro replaces the conventional source.config.ts in this application.
       fumadocs: { entry: ["src/lib/source.ts"] },
