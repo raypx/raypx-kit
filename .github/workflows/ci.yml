@@ -50,15 +50,6 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
-      - name: Share verified documentation Worker and assets
-        if: github.ref == 'refs/heads/canary' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        uses: actions/upload-artifact@v7
-        with:
-          name: docs-site
-          path: docs/.output
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 7
       - name: Report verification diagnostics
         if: always()
         uses: ./.github/actions/report-diagnostics
@@ -142,37 +133,3 @@ jobs:
         with:
           job-status: ${{ job.status }}
           artifact-name: drizzle-integration-diagnostics
-
-  deploy-docs:
-    name: Deploy documentation to Cloudflare
-    needs: [verify, compatibility, drizzle-integration]
-    if: github.ref == 'refs/heads/canary' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    environment: cloudflare-docs
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - name: Set up repository toolchain
-        uses: ./.github/actions/setup-toolchain
-      - name: Verify development toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
-      - uses: actions/download-artifact@v8
-        with:
-          name: docs-site
-          path: docs/.output
-      - name: Deploy verified documentation Worker and assets
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          : "${CLOUDFLARE_ACCOUNT_ID:?Configure the CLOUDFLARE_ACCOUNT_ID Actions secret}"
-          : "${CLOUDFLARE_API_TOKEN:?Configure the CLOUDFLARE_API_TOKEN Actions secret}"
-          bun scripts/ci/diagnostics.ts run deploy-docs bun run docs:deploy
-      - name: Report documentation deployment diagnostics
-        if: always()
-        uses: ./.github/actions/report-diagnostics
-        with:
-          job-status: ${{ job.status }}
-          artifact-name: docs-deployment-diagnostics

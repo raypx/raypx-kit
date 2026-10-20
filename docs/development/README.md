@@ -300,24 +300,24 @@ The TanStack Start file route `docs/src/routes/api/search.ts` handles
 `useFetchSearch` to fetch results instead of downloading the complete index.
 The search endpoint is not prerendered and needs no static response header override.
 
-The CI workflow uploads the verified Worker and static assets on `canary` pushes and manual
-`canary` runs. Its `deploy-docs` job waits for verification, every compatibility
-matrix cell and PostgreSQL integration to succeed, then downloads that same
-run's `docs-site` artifact and runs `bun run docs:deploy` without rebuilding.
-Pull requests and manual runs on other branches do not deploy.
+Cloudflare Workers Builds owns automatic deployment through the repository's
+Git integration. Configure the Worker's **Settings → Builds** with:
 
-Before the first deployment, configure these GitHub Actions secrets at repository
-level or in the `cloudflare-docs` environment:
+| Setting           | Value                 |
+| ----------------- | --------------------- |
+| Worker name       | `raypx-kit-docs`      |
+| Root directory    | `/`                   |
+| Production branch | `canary`              |
+| Build command     | `bun run docs:build`  |
+| Deploy command    | `bun run docs:deploy` |
 
-| Secret                  | Value                                                       |
-| ----------------------- | ----------------------------------------------------------- |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account that will own the documentation Worker   |
-| `CLOUDFLARE_API_TOKEN`  | An **Edit Cloudflare Workers** token scoped to that account |
+Cloudflare manages the deployment credentials. GitHub Actions runs source,
+test, documentation build, archive, compatibility and PostgreSQL integration
+checks without uploading or deploying the documentation output. It needs no
+Cloudflare Actions secrets or deployment environment. Cloudflare builds and
+deployments run independently of these GitHub checks.
 
-Missing credentials fail the deployment job with a setup message. The deployment
-uses the `cloudflare-docs` GitHub environment and retains sanitized failure
-diagnostics through the shared reporting action. Wrangler prints the deployment
-URL; a custom domain can be configured in the Worker's Cloudflare settings.
+A custom domain can be configured in the Worker's Cloudflare settings.
 
 For a local deployment, authenticate with `bunx wrangler login`, then run:
 
@@ -334,7 +334,7 @@ bun run docs:deploy --dry-run --outdir .artifacts/docs-deploy
 
 See Nitro's [Cloudflare deployment guide](https://nitro.build/deploy/providers/cloudflare),
 Cloudflare's [static assets routing guide](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
-and [GitHub Actions authentication](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
+and [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/).
 
 ## Adding a package
 
