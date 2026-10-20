@@ -1,0 +1,21 @@
+wrangler.jsonc
+  s_adafa49206c7d6::t_29393230797fd6 5-9
+docs/development/README.md
+  s_adafa49206c7d6::t_29393230797fd6 314-320,329-330,344-346
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0e48da30b74e53db7a591e1eacd30a5d8ea04f42",
+  "prompts": {},
+  "sessions": {
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
