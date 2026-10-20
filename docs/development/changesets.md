@@ -18,9 +18,11 @@ changesets and advances versions.
 
 In pre mode, versioning produces the next `alpha.N` prerelease for changed
 packages only. Until a package has a stable release, `latest` follows its newest
-prerelease: npm assigns `latest` at first publication, and Changesets publishes
-later prereleases there too. After the first stable release, prereleases use only
-`alpha`. Consumers pin exact prerelease versions.
+prerelease: npm assigns `latest` at first publication, and the release scripts
+publish later prereleases there too. Changesets alone would stop doing so once npm's
+staged publishing leaves its `0.0.0-stage` placeholder version, so `release:pack`
+derives the dist-tag from the published versions (`scripts/release/tags.ts`).
+After the first stable release, prereleases use only `alpha`. Consumers pin exact prerelease versions.
 
 Exiting the current pre mode graduates every package to stable `0.0.0`. Do this
 only for an explicitly approved first stable release, following the

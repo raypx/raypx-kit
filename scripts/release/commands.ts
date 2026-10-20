@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertReleasePackage, releaseScope, snapshotPackageNames } from "./scope.js";
+import { prereleaseDistTag } from "./tags.js";
 
 /** One entry of Changesets' publish plan; packing adds the tarball. */
 interface PlanEntry {
@@ -83,8 +84,8 @@ async function expectedTag(stable: boolean): Promise<string> {
 }
 
 /**
- * Changesets keeps `latest` on a package's newest prerelease until it has a stable
- * release, so pre mode accepts either dist-tag but only `-<tag>.N` versions.
+ * Until a package has a stable release, `latest` follows its newest prerelease
+ * (see prereleaseDistTag), so pre mode accepts either dist-tag but only `-<tag>.N` versions.
  */
 function assertDistTag(entry: PlanEntry, tag: string): void {
   const release = `${entry.name}@${entry.version}`;
@@ -125,9 +126,36 @@ async function integrityOf(archive: string): Promise<string> {
     .digest("base64")}`;
 }
 
+/** Published versions of a package, or none when it is not on the registry yet. */
+function publishedVersions(name: string): string[] {
+  const result = spawnSync("npm", ["view", name, "versions", "--json"], {
+    cwd: root,
+    env: npmEnvironment,
+    encoding: "utf8",
+  });
+  if (result.status !== 0) {
+    assert.match(result.stdout + result.stderr, /E404/, `${name}: npm view failed`);
+    return [];
+  }
+  const versions = JSON.parse(result.stdout) as string | string[];
+  return Array.isArray(versions) ? versions : [versions];
+}
+
 async function createPlan(file: string, stable: boolean): Promise<PlanEntry[]> {
   const tag = await expectedTag(stable);
   changeset(["publish-plan", "-o", file]);
+  if (tag !== "latest") {
+    // `publish --from-pack-dir` uses these tags; see prereleaseDistTag for why.
+    const document = await readJson<PlanDocument>(file);
+    document.plan = document.plan.map((group) =>
+      group.map((entry) =>
+        entry.kind === "publish" && entry.tag === tag
+          ? { ...entry, tag: prereleaseDistTag(publishedVersions(entry.name), tag) }
+          : entry,
+      ),
+    );
+    await writeFile(file, `${JSON.stringify(document, null, 2)}\n`);
+  }
   const entries = await publications(file);
   for (const entry of entries) {
     assertReleasePackage(entry.name);
