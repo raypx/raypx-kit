@@ -1,0 +1,28 @@
+devkit.config.ts
+  h_f0766e80fd3864 83-84
+packages/logger/README.md
+  h_f0766e80fd3864 53-54,135-175
+packages/logger/package.json
+  h_f0766e80fd3864 36-43
+packages/logger/src/safe.ts
+  h_f0766e80fd3864 1-238
+packages/logger/src/stream.ts
+  h_f0766e80fd3864 1-83
+packages/logger/tests/safe.test.ts
+  h_f0766e80fd3864 1-141
+packages/logger/tests/stream.test.ts
+  h_f0766e80fd3864 1-56
+packages/logger/tsdown.config.ts
+  h_f0766e80fd3864 9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c5885ede436f9239b6e7ee3660b20e94e5dde314",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
