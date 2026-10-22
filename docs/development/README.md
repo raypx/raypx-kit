@@ -119,7 +119,7 @@ findings.
 ## Repository check configuration
 
 [devkit.config.ts](../../devkit.config.ts) is the typed source of repository
-checking policy. Its `workspaces` map contains all nine workspace paths, with
+checking policy. Its `workspaces` map contains every workspace path, with
 their kind, platform, per-entry platform overrides, explicit source entries for
 generated exports and bundled dependency exceptions. Keys are repository-relative
 paths such as `packages/env`, without `./` or a trailing slash. Its `toolchain`
@@ -242,7 +242,7 @@ consumer directories for diagnosis. Archive checks do not publish packages.
 
 ## Consumer compatibility matrix
 
-The verification job prepares eight archives from its completed build and records
+The verification job prepares all public package archives from its completed build and records
 their SHA-256 digests and dependency profiles. The compatibility jobs download
 those archives and verify the digests before installing them outside the
 workspace. They retain the pinned development runtimes for orchestration and

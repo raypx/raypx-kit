@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { withTempDirectory, writeFileAtomic } from "../shared/fs.js";
 import {
   assertPackageInventory,
   compatibilityMatrix,
@@ -128,7 +128,7 @@ async function prepare(): Promise<CompatibilityIndex> {
     entry.manifest = archived;
     entry.sha256 = digest(await readFile(archive));
   }
-  await writeFile(indexFile, `${JSON.stringify(index, null, 2)}\n`);
+  await writeFileAtomic(indexFile, `${JSON.stringify(index, null, 2)}\n`);
   console.log(`Prepared ${index.packages.length} built package archives at ${artifacts}`);
   return index;
 }
@@ -156,8 +156,7 @@ async function check(): Promise<void> {
   }).trim();
   assert.equal(actual, expectedNode, "Consumer Node binary does not match its matrix target");
   const packages = packagesForNode(index, expectedNode);
-  const temporary = await mkdtemp(join(tmpdir(), "raypx-kit-compatibility-"));
-  try {
+  await withTempDirectory("raypx-kit-compatibility-", async (temporary) => {
     for (const entry of packages) {
       assert.equal(
         basename(entry.archive),
@@ -196,9 +195,7 @@ async function check(): Promise<void> {
         `${entry.manifest.name}: Node ${expectedNode}, ${peers} peers, runtime and types passed`,
       );
     }
-  } finally {
-    await rm(temporary, { recursive: true, force: true });
-  }
+  });
 }
 
 if (command === "prepare") await prepare();

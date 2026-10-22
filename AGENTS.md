@@ -47,9 +47,9 @@ the shared configuration from root `tests/config.ts`.
 
 Keep the internal CLI at `scripts/cli.ts`. Group maintenance modules by their
 responsibility under `scripts/checks/`, `scripts/packages/`, `scripts/release/`
-and `scripts/ci/`; use the directory for context instead of repeating that context
-in every filename. Keep public package entry filenames and framework-recognized
-configuration names stable.
+and `scripts/ci/`; keep helpers shared by these scripts in `scripts/shared/`.
+Use the directory for context instead of repeating that context in every filename.
+Keep public package entry filenames and framework-recognized configuration names stable.
 
 Prefer public TypeScript entry files directly under `src/`; keep supporting
 implementation modules in subdirectories when useful.
@@ -110,9 +110,9 @@ uses loose environment mode so tasks inherit parent variables without passthroug
 allowlists. Declare variables that affect cached outputs in `env`/`globalEnv` so
 their values participate in cache keys.
 Vite+ owns formatting, linting, tests and the documentation application's Vite
-commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl and Logger, including
-their declarations, from each package's `tsdown.config.ts`; its dependency range
-starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
+commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl, Analytics,
+Logger and Storage, including their declarations, from each package's
+`tsdown.config.ts`; its dependency range starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
 exports its JSON presets directly. Package scripts invoke local `turbo`,
 `tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
 follow their Node shebangs. Keep `bun --bun vp` for tests because their workers

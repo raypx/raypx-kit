@@ -1,6 +1,6 @@
 # Raypx Kit Documentation
 
-Raypx Kit contains ten independently released TypeScript packages. Start with
+Raypx Kit contains independently released TypeScript packages. Start with
 a package guide to use an API, the architecture guide to understand the repository,
 or the development guide to contribute.
 

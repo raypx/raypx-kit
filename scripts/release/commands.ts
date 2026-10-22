@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { withTempDirectory } from "../shared/fs.js";
 import { assertReleasePackage, releaseScope, snapshotPackageNames } from "./scope.js";
 import { prereleaseDistTag } from "./tags.js";
 
@@ -186,15 +186,12 @@ async function workspaceDirectories(): Promise<Map<string, string>> {
 
 /** Read-only preview; it never replaces a packed release plan. */
 export async function plan(stable = false): Promise<void> {
-  const directory = await mkdtemp(join(tmpdir(), "raypx-kit-plan-"));
-  try {
+  await withTempDirectory("raypx-kit-plan-", async (directory) => {
     describe(
       "Planned publications:",
       await createPlan(join(directory, "publish-plan.json"), stable),
     );
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
+  });
   const pending = await pendingChangesets();
   if (pending.length > 0)
     console.log(`\nUnreleased changesets: ${pending.join(", ")}. Run bun run version-packages.`);

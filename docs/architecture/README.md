@@ -1,6 +1,6 @@
 # Architecture
 
-Raypx Kit publishes ten independently versioned packages. It separates reusable
+Raypx Kit publishes independently versioned packages. It separates reusable
 library behavior from application policy, repository maintenance and the internal
 documentation application. Published interfaces come from each package's
 `package.json` exports and README; research inventories do not expand them.
@@ -27,6 +27,7 @@ scripts/
   packages/     Archives, isolated consumers and compatibility matrix
   release/      Release commands, scope checks and validation
   ci/           CI diagnostics and consumer runtime setup
+  shared/       Internal helpers for temporary directories and atomic file writes
 tests/
   scripts/      Maintenance tests grouped by the same responsibilities
   setup/        Shared test preloads
@@ -38,6 +39,10 @@ implementation modules may live beneath them. Tests belong to the owning
 workspace's `tests/` directory; they are not library build entries.
 Internal maintenance filenames use their containing directory for context; public
 package entries and framework-recognized configuration filenames remain stable.
+
+Shared filesystem helpers live in `scripts/shared/fs.ts`, with tests in
+`tests/scripts/shared/`. They support the internal release and compatibility
+scripts and are not published as library APIs.
 
 ## Package responsibilities
 
@@ -61,7 +66,7 @@ schemas, authorization, accounting and other domain rules stay in those applicat
 
 Subpaths below are relative to their package names. The manifests remain the
 authoritative export list.
-All public packages declare Node `>=22.14`; the six tsdown builds target the
+All public packages declare Node `>=22.14`; the tsdown builds target the
 same runtime floor. The development runtime pin remains separate.
 
 | Package     | Public entries                                                                                             | Dependency boundary                                                                                                                              |
@@ -104,13 +109,13 @@ do not import the Node context entry.
 
 ## From source to installable artifacts
 
-| Packages                                     | Build path                                                                 | Published result                                                                                                                                              |
-| -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codemods, Devkit, Drizzle, Env, Intl, Logger | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
-| Drizzle Kit                                  | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
-| TSConfig                                     | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
+| Packages                                                         | Build path                                                                 | Published result                                                                                                                                              |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codemods, Devkit, Drizzle, Env, Intl, Analytics, Logger, Storage | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
+| Drizzle Kit                                                      | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
+| TSConfig                                                         | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
 
-The six tsdown configurations explicitly preserve output extensions and their
+The tsdown configurations explicitly preserve output extensions and their
 consumer runtime targets. Those targets are independent of the repository's
 development runtime pins. Drizzle Kit preserves both ESM and CommonJS exports;
 its omitted programmatic API and payload bundles are not recreated locally.
@@ -142,7 +147,7 @@ include it so policy changes invalidate cached workspace tasks. The TSConfig
 workspace supplies compiler presets during repository development.
 
 Bun owns installation, native type checks, repository TypeScript scripts and
-archive packing. Turbo orders workspace tasks; tsdown builds the six ESM packages.
+archive packing. Turbo orders workspace tasks; tsdown builds the ESM libraries.
 Vite+ supplies formatting, linting, tests and the documentation application's
 Vite commands. Knip treats the declared library entries as public roots while
 checking unused implementation code and dependencies. Independent Changesets
