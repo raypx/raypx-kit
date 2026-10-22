@@ -1,0 +1,45 @@
+packages/analytics/package.json
+  s_de2d79b0b75518::t_556b8312f66048 50
+packages/codemods/package.json
+  s_de2d79b0b75518::t_d93caa5240974e 45
+packages/devkit/package.json
+  s_de2d79b0b75518::t_f44b77a48524c5 66
+packages/drizzle-kit/package.json
+  s_de2d79b0b75518::t_4ffc6cba59cab5 50
+packages/drizzle/package.json
+  s_de2d79b0b75518::t_662d349118626a 59
+packages/env/package.json
+  s_de2d79b0b75518::t_bf0dfe78f24aa8 46
+packages/intl/package.json
+  s_de2d79b0b75518::t_60c816dd054eb0 62
+packages/logger/package.json
+  s_de2d79b0b75518::t_3f135b73cced1a 58
+packages/storage/package.json
+  s_de2d79b0b75518::t_4007589e491f0c 58
+packages/tsconfig/package.json
+  s_de2d79b0b75518::t_4037bc970bfea0 44
+scripts/packages/check.ts
+  s_de2d79b0b75518::t_e80cb9dd321525 120
+scripts/packages/compatibility.ts
+  s_de2d79b0b75518::t_60f1910f6e6a3b 118
+scripts/release/check.ts
+  s_de2d79b0b75518::t_25982bb1a89e35 57
+scripts/release/commands.ts
+  s_de2d79b0b75518::t_fa2f50f1eba8c5 235,369
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f49db7c835ebac43fdc0f776415a357d983c458a",
+  "prompts": {},
+  "sessions": {
+    "s_de2d79b0b75518": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a124a7-0652-7013-8865-d328de672376",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
