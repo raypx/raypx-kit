@@ -117,11 +117,7 @@ try {
     if (releaseArchives && !releaseArchives.has(manifest.name)) continue;
     const archive = releaseArchives?.get(manifest.name) ?? join(temporary, `${directory.name}.tgz`);
     if (!releaseArchives)
-      run(
-        process.execPath,
-        ["pm", "pack", "--ignore-scripts", "--filename", archive],
-        packageDirectory,
-      );
+      run(process.execPath, ["pm", "pack", "--filename", archive], packageDirectory);
     const packed = await assertArchive(archive, manifest, packageDirectory);
     const options = {
       bunBinary: process.execPath,

@@ -54,7 +54,7 @@ async function fixture(versions: Readonly<Record<string, string>>, pre?: { tag: 
   }
   // @manypkg identifies Bun workspaces by their lockfile. Generate a real one
   // rather than using an empty placeholder or a different workspace format.
-  run(process.execPath, ["install", "--ignore-scripts"]);
+  run(process.execPath, ["install"]);
   run("git", ["init", "-b", "canary"]);
   run("git", ["config", "user.name", "Toolkit release fixture"]);
   run("git", ["config", "user.email", "toolkit-fixture@example.invalid"]);

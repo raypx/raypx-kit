@@ -59,7 +59,7 @@
     "test:coverage": "bun --bun vp test --run --passWithNoTests --coverage --coverage.reporter=text --coverage.reporter=json --coverage.reporter=lcov",
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "pack:check": "bun pm pack --dry-run --ignore-scripts"
+    "pack:check": "bun pm pack --dry-run"
   },
   "devDependencies": {
     "@formatjs/icu-messageformat-parser": "^3.5.21",

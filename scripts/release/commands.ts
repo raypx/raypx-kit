@@ -232,7 +232,7 @@ export async function pack(stable = false): Promise<void> {
     assert.ok(directory, `${entry.name}: no workspace under packages/`);
     const path = `packages/${entry.name.slice(1).replace("/", "-")}-${entry.version}.tgz`;
     const archive = join(packDirectory, path);
-    execFileSync(process.execPath, ["pm", "pack", "--ignore-scripts", "--filename", archive], {
+    execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
       cwd: directory,
       stdio: "pipe",
     });
@@ -366,7 +366,7 @@ export async function snapshot(
       await writeFile(file, `${JSON.stringify({ ...manifest, version }, null, 2)}\n`);
       const path = `packages/${name.slice(1).replace("/", "-")}-${version}.tgz`;
       const archive = join(snapshotDirectory, path);
-      execFileSync(process.execPath, ["pm", "pack", "--ignore-scripts", "--filename", archive], {
+      execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
         cwd: directory,
         stdio: "pipe",
       });

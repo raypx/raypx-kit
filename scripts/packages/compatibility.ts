@@ -115,7 +115,7 @@ async function prepare(): Promise<CompatibilityIndex> {
   await mkdir(artifacts, { recursive: true });
   for (const entry of index.packages) {
     const archive = join(artifacts, entry.archive);
-    execFileSync(process.execPath, ["pm", "pack", "--ignore-scripts", "--filename", archive], {
+    execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
       cwd: join(root, "packages", entry.directory),
       stdio: "pipe",
     });

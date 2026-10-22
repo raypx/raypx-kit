@@ -55,7 +55,7 @@
     "test:coverage": "bun --bun vp test --run --passWithNoTests --coverage --coverage.reporter=text --coverage.reporter=json --coverage.reporter=lcov",
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "pack:check": "bun pm pack --dry-run --ignore-scripts"
+    "pack:check": "bun pm pack --dry-run"
   },
   "dependencies": {
     "aws4fetch": "^1.0.20"
