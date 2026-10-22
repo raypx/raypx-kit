@@ -1,0 +1,80 @@
+packages/analytics/README.md
+  s_8dc12600293846::t_af5a5cbc99c708 1-100
+packages/analytics/tests/sdk.test.ts
+  s_8dc12600293846::t_b22516658d6cbb 1-145
+  s_8dc12600293846::t_415a31baabd9b6 146-158
+packages/analytics/AGENTS.md
+  s_8dc12600293846::t_af5a5cbc99c708 1-13
+packages/analytics/src/browser.ts
+  s_8dc12600293846::t_550a67e7ad8e8c 1-290
+packages/analytics/tests/browser.test.ts
+  s_8dc12600293846::t_d397f0fb1c0857 1-188
+AGENTS.md
+  s_8dc12600293846::t_10a05d1a34a1db 20,92
+README.md
+  s_8dc12600293846::t_469a5322a57ae0 17
+bun.lock
+  s_8dc12600293846::t_374423efc7900e 51-72,658-663,666-667,856-857,1044-1045,1078-1079,1146,1454-1457,1468-1469,1614,1670-1673,1740-1741,1762-1763
+devkit.config.ts
+  s_8dc12600293846::t_30d8ea7273d056 76-86
+docs/README.md
+  s_8dc12600293846::t_bc005fd4b7e0ab 3,30
+docs/architecture/README.md
+  s_8dc12600293846::t_448975fdf7c1c8 3,21,52,130
+docs/src/lib/pages.ts
+  s_8dc12600293846::t_c613d2edd75dd2 84-89,148,165
+docs/src/lib/source.ts
+  s_8dc12600293846::t_4cf12ae25a710c 26
+knip.ts
+  s_8dc12600293846::t_d2a53544356efd 48
+packages/analytics/CHANGELOG.md
+  s_8dc12600293846::t_a931ce86aaf65f 1-7
+packages/analytics/LICENSE
+  s_8dc12600293846::t_e07795b4978d5f 1-201
+packages/analytics/package.json
+  s_8dc12600293846::t_2e62dd499a917e 1-75
+packages/analytics/src/index.ts
+  s_8dc12600293846::t_4a8f08b29ca786 1-86
+packages/analytics/src/react.tsx
+  s_8dc12600293846::t_198df095d16051 1-30
+packages/analytics/tests/fixtures/consumer/package.json
+  s_8dc12600293846::t_6e681633827550 1-8
+packages/analytics/tests/fixtures/consumer/runtime.mjs
+  s_8dc12600293846::t_42ca17e81c709a 1-17
+packages/analytics/tests/fixtures/consumer/tsconfig.json
+  s_8dc12600293846::t_0dc15bdcb4204b 1-14
+packages/analytics/tests/fixtures/consumer/types.ts
+  s_8dc12600293846::t_4d7766243978b3 1-13
+packages/analytics/tests/fixtures/consumer/without-optional-peers/runtime.mjs
+  s_8dc12600293846::t_c5e2634f9ca07a 1-11
+packages/analytics/tests/fixtures/consumer/without-optional-peers/types.ts
+  s_8dc12600293846::t_ff4bd45041dea3 1-3
+packages/analytics/tests/react.test.tsx
+  s_8dc12600293846::t_510fdb3716a81d 1-25
+packages/analytics/tsconfig.build.json
+  s_8dc12600293846::t_f77b235554d79e 1-5
+packages/analytics/tsconfig.json
+  s_8dc12600293846::t_f026095551f068 1-16
+packages/analytics/tsdown.config.ts
+  s_8dc12600293846::t_2ec1a68399d651 1-11
+packages/analytics/vitest.config.ts
+  s_8dc12600293846::t_4e2d9acca40c26 1-17
+tests/scripts/release/scope.test.ts
+  s_8dc12600293846::t_8c1ac703ff6e9c 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7bd3c0fc1e04912fc3d8cb6a854f1173d526bf52",
+  "prompts": {},
+  "sessions": {
+    "s_8dc12600293846": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15a0b-3409-7190-9985-c657812904ed",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
