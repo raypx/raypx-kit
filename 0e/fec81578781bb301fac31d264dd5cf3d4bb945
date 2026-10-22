@@ -1,0 +1,21 @@
+skills/raypx-kit/references/codemods.md
+  s_de2d79b0b75518::t_79377004c85ec6 1-12
+skills/raypx-kit/references/internationalization.md
+  s_de2d79b0b75518::t_30a036e0dacf7d 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0efec81578781bb301fac31d264dd5cf3d4bb945",
+  "prompts": {},
+  "sessions": {
+    "s_de2d79b0b75518": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a124a7-0652-7013-8865-d328de672376",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
