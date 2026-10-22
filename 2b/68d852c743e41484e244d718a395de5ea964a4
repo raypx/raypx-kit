@@ -1,0 +1,35 @@
+AGENTS.md
+  s_adafa49206c7d6::t_9ca8e01cc86435 113
+  s_adafa49206c7d6::t_dbceef70ab6c4b 50-52,114-115
+scripts/packages/compatibility.ts
+  s_adafa49206c7d6::t_7f16738c167c82 5,9,131,159,198
+docs/README.md
+  s_adafa49206c7d6::t_9ca8e01cc86435 3
+docs/development/README.md
+  s_adafa49206c7d6::t_9ca8e01cc86435 122,245
+scripts/release/commands.ts
+  s_adafa49206c7d6::t_7f16738c167c82 5,8,189,194
+docs/architecture/README.md
+  s_adafa49206c7d6::t_9ca8e01cc86435 3,30,43-46,69,112-116
+  s_adafa49206c7d6::t_8b451a40f751cb 118,150
+scripts/shared/fs.ts
+  s_adafa49206c7d6::t_95448e11769c42 1-59
+tests/scripts/shared/fs.test.ts
+  s_adafa49206c7d6::t_836fba7a78b5ae 1-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2b68d852c743e41484e244d718a395de5ea964a4",
+  "prompts": {},
+  "sessions": {
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
