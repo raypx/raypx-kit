@@ -40,7 +40,10 @@ describe("runCodemod", () => {
   it("deduplicates resolved paths and writes each changed file once", async () => {
     const path = join(cwd, "source.ts");
     await writeFile(path, "before\n");
-    const transform = vi.fn(rename.transform);
+    // Call through the object so the migration keeps its receiver.
+    const transform = vi.fn((file: Parameters<typeof rename.transform>[0]) =>
+      rename.transform(file),
+    );
 
     expect(
       await runCodemod({ ...rename, transform }, ["source.ts", "./source.ts", path], {
