@@ -34,7 +34,7 @@
     "compatibility:check": "bun scripts/packages/compatibility.ts",
     "release:check": "bun scripts/release/check.ts",
     "changeset": "changeset",
-    "version-packages": "bun run changeset version && bun install --ignore-scripts && bun run format",
+    "version-packages": "bun run changeset version && bun install && bun run format",
     "release:plan": "bun run raypx-kit-dev release plan",
     "release:pack": "bun run raypx-kit-dev release pack",
     "release:publish": "bun run raypx-kit-dev release publish",

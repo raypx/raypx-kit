@@ -7,7 +7,7 @@ them merely to match the development install. Internal dependencies use
 `workspace:*`.
 
 The committed `bun.lock` records the tested resolution. CI installs it with
-`bun install --frozen-lockfile --ignore-scripts`. Changing a range does not
+`bun install --frozen-lockfile`. Changing a range does not
 authorize silently replacing copied source or changing bundled dependency
 provenance.
 

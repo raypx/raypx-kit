@@ -17,15 +17,15 @@ files and must not add a second set of versions under `[tools]`.
 ```sh
 mise trust && mise install
 eval "$(mise activate zsh)" # use the matching activation command for your shell
-bun install --frozen-lockfile --ignore-scripts
-bun run prepare                     # install the Vite+ pre-commit hook
+bun install --frozen-lockfile
 bun run doctor
 bun run toolchain:check
 ```
 
-`prepare` sets `core.hooksPath` to the Vite+ dispatcher in `.vite-hooks/_`. The
-pre-commit hook runs `vp staged`: formatting and lint fixes on staged files only.
-`VP_GIT_HOOKS=0` skips it; `verify` still owns type checks, tests and artifacts.
+Installation runs the root `prepare` script, which sets `core.hooksPath` to the
+Vite+ dispatcher in `.vite-hooks/_`. The pre-commit hook runs `vp staged`:
+formatting and lint fixes on staged files only. `VP_GIT_HOOKS=0` skips it (CI sets
+it); `verify` still owns type checks, tests and artifacts.
 
 Activate mise in your shell configuration, or prefix commands with
 `mise exec --`. Other version managers work when they select the same pins.
@@ -172,7 +172,7 @@ The setup action caches Bun downloads under the runner's temporary directory and
 sets `BUN_INSTALL_CACHE_DIR` for the rest of the job, including isolated consumer
 installations. Cache keys include the OS, architecture, Bun version and lockfile
 hash; a fallback reuses downloads from the same Bun version. Every job still runs
-`bun install --frozen-lockfile --ignore-scripts`, including on a cache hit.
+`bun install --frozen-lockfile`, including on a cache hit.
 
 ## CI diagnostics
 

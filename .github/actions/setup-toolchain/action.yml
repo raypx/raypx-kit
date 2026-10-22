@@ -31,4 +31,7 @@ runs:
           bun-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.bun.outputs.bun-version }}-
     - name: Install locked dependencies
       shell: bash
-      run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile --ignore-scripts
+      # CI needs no Git hooks; the root prepare script skips them with this flag.
+      env:
+        VP_GIT_HOOKS: "0"
+      run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile

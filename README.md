@@ -32,7 +32,7 @@ Use Bun **1.4.3** and Node **24.22.0**, pinned in the root `packageManager` and
 
 ```sh
 mise trust && mise install
-mise exec -- bun install --frozen-lockfile --ignore-scripts
+mise exec -- bun install --frozen-lockfile
 mise exec -- bun run verify
 ```
 
