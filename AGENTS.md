@@ -17,6 +17,7 @@ validation and reusable presets; `packages/intl` owns generic internationalizati
 `packages/drizzle-kit` owns the slim upstream CLI distribution;
 `packages/logger` owns evlog-based structured logging, wide events and Node
 request context.
+`packages/analytics` owns consent-controlled PostHog browser analytics and optional React bindings.
 `packages/storage` owns object storage drivers and signed upload and download URLs.
 Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
@@ -88,7 +89,7 @@ script runs `bun scripts/cli.ts` using citty. Keep `doctor`,
 `release:snapshot` as aliases.
 `architecture:check` runs `raypx-kit-dev architecture check` against workspace
 source entries without requiring built output. Root `devkit.config.ts` owns all
-nine workspaces' platform targets, source-entry mappings and bundled dependency
+workspaces' platform targets, source-entry mappings and bundled dependency
 exceptions, plus toolchain document and Turbo dependency check lists. Keep it
 typed with the existing Devkit interfaces and include it in root type checking
 and Turbo global dependencies. Maintenance scripts explicitly import this trusted

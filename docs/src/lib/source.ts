@@ -23,6 +23,7 @@ export const docs = defineDocs({
       "packages/drizzle-kit/README.md",
       "packages/env/README.md",
       "packages/intl/README.md",
+      "packages/analytics/README.md",
       "packages/logger/README.md",
       "packages/storage/README.md",
       "packages/tsconfig/README.md",

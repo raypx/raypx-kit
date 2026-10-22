@@ -1,6 +1,6 @@
 # Raypx Kit Documentation
 
-Raypx Kit contains eight independently released TypeScript packages. Start with
+Raypx Kit contains ten independently released TypeScript packages. Start with
 a package guide to use an API, the architecture guide to understand the repository,
 or the development guide to contribute.
 
@@ -27,6 +27,7 @@ compatibility and consumer installation. They are also included in npm archives.
 | Drizzle Kit | [Slim upstream CLI and config distribution](../packages/drizzle-kit/README.md)          |
 | Env         | [Validation, nested presets and client access](../packages/env/README.md)               |
 | Intl        | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)  |
+| Analytics   | [Consent-controlled browser analytics and errors](../packages/analytics/README.md)      |
 | Logger      | [Structured logging, wide events and request context](../packages/logger/README.md)     |
 | Storage     | [Drivers, policies and signed URLs](../packages/storage/README.md)                      |
 | TSConfig    | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)        |

@@ -45,6 +45,7 @@ const config: KnipConfig = {
     "packages/intl": {
       ...library,
     },
+    "packages/analytics": { ...library, project: [...libraryProject, "src/**/*.tsx"] },
     "packages/logger": {
       ...library,
     },

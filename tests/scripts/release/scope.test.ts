@@ -18,6 +18,7 @@ const packages = readdirSync(join(root, "packages"), { withFileTypes: true })
 describe("release package scope", () => {
   it("accepts every public workspace under its migrated identity", () => {
     expect(packages.map(({ directory }) => directory).sort()).toEqual([
+      "analytics",
       "codemods",
       "devkit",
       "drizzle",

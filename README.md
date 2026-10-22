@@ -14,6 +14,7 @@ own their schemas, secrets, business rules and runtime configuration.
 | [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md) | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                       |
 | [@raypx-kit/env](packages/env/README.md)                 | Zod environment validation, nested presets, defaults and guarded client access        |
 | [@raypx-kit/intl](packages/intl/README.md)               | Locale negotiation, ICU translation, formatting and controlled React providers        |
+| [@raypx-kit/analytics](packages/analytics/README.md)     | Consent-controlled PostHog product events and sanitized browser errors                |
 | [@raypx-kit/logger](packages/logger/README.md)           | evlog structured logging, wide events and Node request context                        |
 | [@raypx-kit/storage](packages/storage/README.md)         | Object storage for S3-compatible services, the filesystem and memory with signed URLs |
 | [@raypx-kit/tsconfig](packages/tsconfig/README.md)       | Strict TypeScript presets for libraries, browsers and Node                            |

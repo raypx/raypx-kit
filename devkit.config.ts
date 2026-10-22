@@ -73,6 +73,17 @@ export default {
       },
       bundledDependencies: ["use-intl", "@formatjs/icu-messageformat-parser"],
     },
+    "packages/analytics": {
+      kind: "library",
+      target: "universal",
+      entryTargets: { "./browser": "browser", "./react": "browser" },
+      sourceTargets: { "src/browser.ts": "browser", "src/react.tsx": "browser" },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./browser": "./src/browser.ts",
+        "./react": "./src/react.tsx",
+      },
+    },
     "packages/logger": {
       kind: "library",
       target: "node",

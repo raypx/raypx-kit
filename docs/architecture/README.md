@@ -1,6 +1,6 @@
 # Architecture
 
-Raypx Kit publishes eight independently versioned packages. It separates reusable
+Raypx Kit publishes ten independently versioned packages. It separates reusable
 library behavior from application policy, repository maintenance and the internal
 documentation application. Published interfaces come from each package's
 `package.json` exports and README; research inventories do not expand them.
@@ -18,6 +18,7 @@ packages/
   drizzle-kit/  Extracted upstream CLI distribution
   env/          Consumer-owned schema validation
   intl/         Locale, translation and controlled React integration
+  analytics/    consent-controlled PostHog browser events and sanitized errors
   logger/       evlog facade and asynchronous logger context
   tsconfig/     Published compiler presets
 scripts/
@@ -48,6 +49,7 @@ package entries and framework-recognized configuration filenames remain stable.
 | [Drizzle Kit](../../packages/drizzle-kit/README.md) | Retain upstream CLI commands and `defineConfig` in a smaller distribution                                                                    | Schema/configuration files, a compatible ORM, database access and migration decisions                 |
 | [Env](../../packages/env/README.md)                 | Compose Zod schemas and presets, normalize inputs, validate values and guard client access                                                   | Variable names, secrets, environment loading, application presets and browser-safe value injection    |
 | [Intl](../../packages/intl/README.md)               | Immutable locale configuration, negotiation, typed ICU translation, formatting, controlled providers and catalog validation                  | Catalogs, loading, preference state, persistence and consistent SSR/hydration snapshots               |
+| [Analytics](../../packages/analytics/README.md)     | Consent-gated browser events, sanitized errors and optional React bindings                                                                   | Product schemas, identity, preferences, configuration and release uploads                             |
 | [Logger](../../packages/logger/README.md)           | Expose evlog events, errors and drain pipelines; bind an existing logger to asynchronous context                                             | Startup configuration, event fields, redaction policy, emission, drain delivery and shutdown          |
 | [TSConfig](../../packages/tsconfig/README.md)       | Shared strict compiler behavior and module-resolution presets                                                                                | Project layout, aliases, references, output directories and runtime-specific ambient types            |
 
@@ -125,7 +127,7 @@ licenses, and extracted upstream code retains its source bytes and license.
 
 The internal root owns shared development tools and composes repository policy
 through `scripts/` and [devkit.config.ts](../../devkit.config.ts). That typed
-configuration contains all nine workspaces' architecture rules and the toolchain
+configuration contains all workspaces' architecture rules and the toolchain
 document and Turbo dependency check lists. The scripts explicitly import it and
 pass plain data to Devkit; scanning another repository never executes its
 configuration. Workspace metadata maps must cover the discovered workspace paths

@@ -82,6 +82,12 @@ export const documentationPages = [
     description: "Runtime ownership, typed messages, platform preferences and alpha migration.",
   },
   {
+    slug: "analytics/index",
+    sourcePath: "packages/analytics/README.md",
+    title: "Analytics",
+    description: "Consent-controlled PostHog events, sanitized errors and optional React bindings.",
+  },
+  {
     slug: "logger/index",
     sourcePath: "packages/logger/README.md",
     title: "Logger",
@@ -139,6 +145,7 @@ export const navigationMetadata = {
       "drizzle-kit",
       "env",
       "intl",
+      "analytics",
       "logger",
       "storage",
       "tsconfig",
@@ -155,6 +162,7 @@ export const navigationMetadata = {
   "drizzle-kit/meta.json": { title: "Drizzle Kit", pages: ["index"] },
   "env/meta.json": { title: "Env", pages: ["index"] },
   "intl/meta.json": { title: "Intl", pages: ["index", "migration"] },
+  "analytics/meta.json": { title: "Analytics", pages: ["index"] },
   "logger/meta.json": { title: "Logger", pages: ["index"] },
   "storage/meta.json": { title: "Storage", pages: ["index"] },
   "tsconfig/meta.json": { title: "TSConfig", pages: ["index"] },
