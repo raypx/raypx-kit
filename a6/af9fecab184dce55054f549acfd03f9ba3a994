@@ -1,0 +1,573 @@
+README.md
+  s_3479c97f207758::t_458057050ee42b 15
+  s_3479c97f207758::t_e10208a70ffa2a 30-32
+  s_3479c97f207758::t_9a84decb488eac 9-14,16-24
+scripts/packages/consumers.ts
+  s_3479c97f207758::t_39f0bbdc9b1dd2 33-34,84,103-105,110-112,116-120,125,235
+packages/email-preview/examples/welcome.tsx
+  s_3479c97f207758::t_cd37f04e52211a 1-30
+  s_3479c97f207758::t_339972a0bdf2d6 31-64
+packages/ui/tests/fixtures/consumer/package.json
+  s_3479c97f207758::t_c79d183dbfa35b 1-12
+packages/themes/src/config.ts
+  s_3479c97f207758::t_99fe64e90174bb 1-38
+packages/email-preview/src/app/styles.css
+  s_3479c97f207758::t_b3b34f89b02725 27-59,61-84,108-110,112-119,121-126,128-140,143-152,154-169,171-173,175-183,187-190,192-205,207-216,218-226,228-230,233-234,237-252,254,256-261,263-265,267-269,271-277,279-290,292-299,301-306,322-329,331-344,346-350,352-362,364-368,370-375,377-381,383-384,387-401,403,406-408,410-412,415-416,418-424,426-438,440-442,444-445,448-449,451-460,462-476,478-485,487-503,506-509,532-536,538-539,541-572,574-586,588-595,597-604,606,608-612,614-630,633-661,665-685,703-721,727-756,765-778,782-788
+  s_3479c97f207758::t_2c9606452cca9b 4-5,18-20,23-26,85-103,106-107,111,300,686,700-702,779-781,789
+  s_3479c97f207758::t_8c5c660f686b71 1-3,6-17,21-22,60,104-105,120,127,141-142,153,170,174,184-186,191,206,217,227,231-232,235-236,253,255,262,266,270,278,291,307-321,330,345,351,363,369,376,382,385-386,402,404-405,409,413-414,417,425,439,443,446-447,450,461,477,486,504-505,525-527,530,537,540,573,587,596,605,607,613,631-632,662-664,687-699,722-726
+  s_3479c97f207758::t_4f1851cac92338 510-524,528-529,531,757-764
+packages/ui/README.md
+  s_3479c97f207758::t_b9a326ff8f7019 1-59,71-82,90-130
+  s_3479c97f207758::t_63e5b85c83db64 60-70,83-89,131-146
+  s_3479c97f207758::t_42ab08625736b7 147-159
+packages/themes/tests/fixtures/consumer/tsconfig.json
+  s_3479c97f207758::t_28093c99737f3e 1-4
+  s_3479c97f207758::t_229e7249a28396 5-14
+tests/scripts/packages/licenses.test.ts
+  s_3479c97f207758::t_90b2503e427f96 1-165
+  s_3479c97f207758::t_a8c612767f8e98 166
+packages/email-preview/tests/http.test.ts
+  s_3479c97f207758::t_4181d3818fa52a 1-57
+  s_3479c97f207758::t_c8d88380e566ce 58-66
+packages/ui/NOTICE.md
+  s_3479c97f207758::t_b9a326ff8f7019 1-44
+packages/themes/tests/fixtures/consumer/without-optional-peers/types.ts
+  s_3479c97f207758::t_28093c99737f3e 1-8
+packages/ui/THIRD_PARTY_LICENSES.txt
+  s_3479c97f207758::t_b9a326ff8f7019 1-24
+packages/email-preview/src/app/lib/preview.ts
+  s_3479c97f207758::t_9e0839cb9cd856 1,3-22,24-44,50-51
+  s_3479c97f207758::t_48b51537fc27fb 2,23,45-49
+packages/themes/tests/fixtures/consumer/runtime.mjs
+  s_3479c97f207758::t_28093c99737f3e 1-21
+  s_3479c97f207758::t_c4ba2d50d149a3 22-39
+packages/email-preview/tests/fixtures/consumer/package.json
+  s_3479c97f207758::t_b8fd0a090943be 1-9
+packages/email-preview/tests/runtime.test.ts
+  s_3479c97f207758::t_2cbcf4f871a805 1-11,13-15,17-19,25,41-49,53-65,69-71,103-105,109-113,116-117,125-128,144-148,156-157,161-178,182-186
+  s_3479c97f207758::t_db195db3cb2a3b 12,16,92-96,98-102
+  s_3479c97f207758::t_5a3d027c4d784b 118,129-130,143
+  s_3479c97f207758::t_181bf1ef89324a 20-24,26-40,50-52,66-68,72-91,97,106-108,114-115,119-124,131-142,149-155,158-160,179-181
+packages/email-preview/examples/_components/footer.tsx
+  s_3479c97f207758::t_0d44bf82309b0b 8
+  s_3479c97f207758::t_cd37f04e52211a 1-7,9-12
+packages/ui/tsdown.config.ts
+  s_3479c97f207758::t_a9ce39900876ea 1-26
+  s_3479c97f207758::t_e232134e31c17f 27-34
+packages/security/tests/fixtures/consumer/package.json
+  s_3479c97f207758::t_5489e219903dfe 1-4
+.gitignore
+  s_3479c97f207758::t_458057050ee42b 10
+packages/security/tests/fixtures/consumer/runtime.mjs
+  s_3479c97f207758::t_5489e219903dfe 1-83
+  s_3479c97f207758::t_fbefb1613c0a09 84-86
+packages/ui/package.json
+  s_3479c97f207758::t_6a7e2ae4b87902 1-6,25,33,70-71,75-91,93-100,106,110
+  s_3479c97f207758::t_e8049b8adbad87 7-24,26-32,34-69,72-74,92,101-105,107-109
+packages/email-preview/src/app/components/preview-workspace.tsx
+  s_3479c97f207758::t_d4265cbc45b562 1-2,4,11,110,112,140-141,147,157,159,177-178,184,188-198,200-201,203-228,230-250,252-294
+  s_3479c97f207758::t_4f1851cac92338 9,309-312,314-315
+  s_3479c97f207758::t_83469a4b5017b8 72-76
+  s_3479c97f207758::t_48b51537fc27fb 165-167,300-308,322
+  s_3479c97f207758::t_1d5988e148d3a2 3,5-8,10,12-71,77-109,113-118,131-135,139,146,148-152,156,160-164,168-171,175-176,183,185-187,199,202,229,251,295-299,313,316-321,323-332,342-365
+  s_3479c97f207758::t_b3b34f89b02725 111,119-130,136-138,142-145,153-155,158,172-174,179-182,333-341
+packages/themes/src/script.ts
+  s_3479c97f207758::t_99fe64e90174bb 1-60
+  s_3479c97f207758::t_cee793ec84c9ba 61-64
+docs/src/lib/source.ts
+  s_3479c97f207758::t_9a84decb488eac 29,31,33
+  s_3479c97f207758::t_458057050ee42b 24
+packages/email-preview/src/types.ts
+  s_3479c97f207758::t_ee524669171a9c 1-23,25-26
+  s_3479c97f207758::t_181bf1ef89324a 24
+tests/scripts/release/scope.test.ts
+  s_3479c97f207758::t_458057050ee42b 26
+  s_3479c97f207758::t_90b2503e427f96 30,32,34
+packages/email-preview/src/http/entry.ts
+  s_3479c97f207758::t_c1528affc74493 1-2,4-5
+  s_3479c97f207758::t_6d5f3b910f754b 3
+packages/email-preview/tests/ui.test.ts
+  s_3479c97f207758::t_48b51537fc27fb 9-13,18-20,40-43,49-56,58-60,65-67,73-93
+  s_3479c97f207758::t_83469a4b5017b8 1-8,14-17,21-39,44-48,57,61-64,68-72,94-95
+packages/email-preview/src/server/worker.ts
+  s_3479c97f207758::t_ee2cd8e02e9eff 10-11
+  s_3479c97f207758::t_fcb1a14a2f5bc6 1-4,6-9,12-15,17-18,29-34,39-44,47-51,59-67,81-82,92-93,106-121
+  s_3479c97f207758::t_181bf1ef89324a 5,16,19-28,35-38,45-46,52-58,68-80,83-91,94-105
+packages/ui/shadcn-components.json
+  s_3479c97f207758::t_a9ce39900876ea 1
+scripts/packages/licenses.ts
+  s_3479c97f207758::t_90b2503e427f96 1-155
+knip.ts
+  s_3479c97f207758::t_90b2503e427f96 77-79
+  s_3479c97f207758::t_39f0bbdc9b1dd2 106-111,115
+  s_3479c97f207758::t_c55dcac54cf3fc 46-49,52-54,67-68
+  s_3479c97f207758::t_1ce369c55abb0d 59
+  s_3479c97f207758::t_b639d320a83386 50-51,58,112-114
+  s_3479c97f207758::t_458057050ee42b 45,55-57,60-66,69
+packages/email-preview/examples/account/password-reset.jsx
+  s_3479c97f207758::t_cd37f04e52211a 1-28
+  s_3479c97f207758::t_0b286370a05659 29-58
+packages/email-preview/src/app/components/html-source.tsx
+  s_3479c97f207758::t_4f1851cac92338 1-58
+packages/themes/tests/fixtures/consumer/package.json
+  s_3479c97f207758::t_28093c99737f3e 1-5
+  s_3479c97f207758::t_e191c6a3193992 6-9
+packages/email-preview/src/app/routes/api/templates.ts
+  s_3479c97f207758::t_6d5f3b910f754b 2
+  s_3479c97f207758::t_aeaab3e8f419f6 1,3-6
+docs/README.md
+  s_3479c97f207758::t_9a84decb488eac 22-27,29-37
+  s_3479c97f207758::t_458057050ee42b 28
+packages/email-preview/src/http/runtime.ts
+  s_3479c97f207758::t_6d5f3b910f754b 1-12
+packages/email-preview/src/app/lib/highlight-html.ts
+  s_3479c97f207758::t_4f1851cac92338 1-8,18-20,22-32
+  s_3479c97f207758::t_3eba443c2dded2 9-17,21
+packages/themes/package.json
+  s_3479c97f207758::t_34eaefaf8312b5 1-40
+  s_3479c97f207758::t_190c429886120b 41-76
+packages/email-preview/AGENTS.md
+  s_3479c97f207758::t_cd37f04e52211a 1-13,17-23,29-43
+  s_3479c97f207758::t_bdf36802500a0c 14-16,24-28
+packages/themes/tests/fixtures/consumer/without-optional-peers/runtime.mjs
+  s_3479c97f207758::t_28093c99737f3e 1-8
+packages/email-preview/components.json
+  s_3479c97f207758::t_b639d320a83386 16
+  s_3479c97f207758::t_d228902dfef740 1-15,17-21
+scripts/packages/check.ts
+  s_3479c97f207758::t_e3b0e24bb7de72 112-117,130-137,145
+  s_3479c97f207758::t_7b000010ce4b09 75-77,147,152
+packages/email-preview/build/licenses/README.md
+  s_3479c97f207758::t_a4d603c3af8005 1-13
+packages/themes/vitest.config.ts
+  s_3479c97f207758::t_34eaefaf8312b5 1-13
+  s_3479c97f207758::t_95df7fd44d15cb 14-18
+packages/themes/src/provider.tsx
+  s_3479c97f207758::t_99fe64e90174bb 1-207
+  s_3479c97f207758::t_827c38a9e63b8f 208-209
+docs/development/README.md
+  s_3479c97f207758::t_e10208a70ffa2a 279-283,303
+  s_3479c97f207758::t_bdf36802500a0c 216-237,243-245,247-249,274-275
+packages/security/tests/fixtures/consumer/tsconfig.json
+  s_3479c97f207758::t_5489e219903dfe 1-15
+packages/email-preview/src/app/components/template-library.tsx
+  s_3479c97f207758::t_1d5988e148d3a2 1-106
+  s_3479c97f207758::t_7d83e74b209998 107-126
+packages/themes/tests/config.test.ts
+  s_3479c97f207758::t_d3296588c88282 1-20
+packages/security/tests/arcjet.integration.test.ts
+  s_3479c97f207758::t_8a8664f2c2208d 1-94
+  s_3479c97f207758::t_1e383a1c5183c2 95-100
+packages/security/README.md
+  s_3479c97f207758::t_bfee9d6c582ece 44,110-114,124-131,133-134,169-170,203-208
+  s_3479c97f207758::t_d30d559d467cc3 1-43,45-109,115-123,132,135-168,171-202,209
+packages/themes/tsdown.config.ts
+  s_3479c97f207758::t_34eaefaf8312b5 1-12
+packages/email-preview/tsconfig.json
+  s_3479c97f207758::t_b323bd6a259732 11
+  s_3479c97f207758::t_b639d320a83386 12
+  s_3479c97f207758::t_a19a607248f2d8 18-26
+  s_3479c97f207758::t_ee524669171a9c 1-5,14-17,27-28
+  s_3479c97f207758::t_878c737795ab06 6-9,13
+  s_3479c97f207758::t_1c040f7541b5e0 10
+packages/email-preview/build/license-notices.ts
+  s_3479c97f207758::t_00752ee9f88a8a 40-48,61-62,70-74,94,131-140
+  s_3479c97f207758::t_15e594317db69c 77-83,90,92-93,95
+  s_3479c97f207758::t_d8886a5d7de50b 2,21-24,112,120-127
+  s_3479c97f207758::t_ab640493edb037 103
+  s_3479c97f207758::t_55fd39b7477138 119
+  s_3479c97f207758::t_f8f90c288cff25 32-34
+  s_3479c97f207758::t_9ea16098b6f586 26,63-67,84-89,91,107
+  s_3479c97f207758::t_09a96c31fe540f 1,3-20,25,27-31,35-39,49-60,68-69,75-76,96-102,104-106,108-111,113-118,128-130,141-146
+packages/ui/styles.css
+  s_3479c97f207758::t_a9ce39900876ea 1-4
+packages/themes/NOTICE
+  s_3479c97f207758::t_d3296588c88282 1-19
+packages/email-preview/tests/fixtures/consumer/runtime.mjs
+  s_3479c97f207758::t_55fd39b7477138 34-35
+  s_3479c97f207758::t_4299153e9af030 150-151,153-156
+  s_3479c97f207758::t_cb3cde21a29ff1 17,37-38
+  s_3479c97f207758::t_d2e0ac2ee61ea5 18
+  s_3479c97f207758::t_593185e7e7080a 24-33,36
+  s_3479c97f207758::t_b8fd0a090943be 1-10,14-16,40-48,50-74,78-84,88-124,131-132,141,146-149,157-167,174,183-187,197-206,209-236,240-242,247,252,264,269-270,275-276,285,290-295,299,304,313-316,318-323
+  s_3479c97f207758::t_ab640493edb037 19-23,39
+  s_3479c97f207758::t_15e594317db69c 152
+  s_3479c97f207758::t_1691691230986b 207-208
+  s_3479c97f207758::t_e98fc7b9d69d04 253-263
+  s_3479c97f207758::t_184b886b31f24b 11-13,49,75-77,85-87,125-130,133-140,142-145,168-173,175-182,188-196,237-239,243-246,248-251,265-268,271-274,277-284,286-289,296-298,300-303,305-312,317
+packages/security/tests/fixtures/consumer/types.ts
+  s_3479c97f207758::t_5489e219903dfe 1-64
+packages/email-preview/examples/static/mark.svg
+  s_3479c97f207758::t_cd37f04e52211a 1-5
+packages/email-preview/src/app/lib/utils.ts
+  s_3479c97f207758::t_b639d320a83386 1
+packages/ui/src/components/ui/dialog.tsx
+  s_3479c97f207758::t_afff83804fc028 1-138
+packages/email-preview/tsdown.config.ts
+  s_3479c97f207758::t_ee524669171a9c 1-4,7-12
+  s_3479c97f207758::t_6d5f3b910f754b 5
+  s_3479c97f207758::t_811698c87e395f 6
+packages/email-preview/tests/server-only.ts
+  s_3479c97f207758::t_ee524669171a9c 1-2
+packages/email-preview/tests/html-source.test.ts
+  s_3479c97f207758::t_ee04a3aa305a41 1-27
+packages/email-preview/src/app/components/theme-select.tsx
+  s_3479c97f207758::t_d228902dfef740 1-19
+packages/email-preview/src/cli.ts
+  s_3479c97f207758::t_c1528affc74493 1-60,62-89,95-102,108-112,116-128
+  s_3479c97f207758::t_659a11414d390e 61,90-94,103-107,113-115
+  s_3479c97f207758::t_28f971e08009f2 129-130
+packages/ui/tsconfig.json
+  s_3479c97f207758::t_a9ce39900876ea 1-2,4-6
+  s_3479c97f207758::t_b9a326ff8f7019 3
+  s_3479c97f207758::t_b86bbd521e906e 7-8
+packages/ui/vitest.config.ts
+  s_3479c97f207758::t_a9ce39900876ea 1-19
+  s_3479c97f207758::t_fb8619f811b5f4 20-24
+packages/ui/tsconfig.build.json
+  s_3479c97f207758::t_a9ce39900876ea 1
+packages/email-preview/build/licenses/ufo-1.6.4.txt
+  s_3479c97f207758::t_a4d603c3af8005 1-21
+packages/email-preview/CHANGELOG.md
+  s_3479c97f207758::t_cd37f04e52211a 1-10,13
+  s_3479c97f207758::t_4f1851cac92338 11
+  s_3479c97f207758::t_f8f90c288cff25 12
+packages/email-preview/src/app/router.tsx
+  s_3479c97f207758::t_9e0839cb9cd856 1-12
+packages/email-preview/src/server/discovery.ts
+  s_3479c97f207758::t_5a3d027c4d784b 2,12,14,17-23
+  s_3479c97f207758::t_d61d3ab7a4f538 1,3-11,13,15-16,24-72
+  s_3479c97f207758::t_146a4f75a0915a 73-78
+.changeset/raise-node-consumer-floor.md
+  s_3479c97f207758::t_e10208a70ffa2a 1-17
+scripts/packages/compatibility.ts
+  s_3479c97f207758::t_39f0bbdc9b1dd2 187
+  s_3479c97f207758::t_fc2308540ffaad 159-176
+packages/email-preview/src/app/lib/use-preview-data.ts
+  s_3479c97f207758::t_48b51537fc27fb 1,10,18-20,22,76,84-90,95-101,105,114
+  s_3479c97f207758::t_1d5988e148d3a2 2-9,11-17,21,23-75,77-83,91-94,102-104,106-113,115-119
+packages/email-preview/src/app/routes/api/events.ts
+  s_3479c97f207758::t_6d5f3b910f754b 2
+  s_3479c97f207758::t_aeaab3e8f419f6 1,3-6
+packages/ui/CHANGELOG.md
+  s_3479c97f207758::t_a9ce39900876ea 1-8
+packages/ui/src/index.ts
+  s_3479c97f207758::t_a9ce39900876ea 1-21
+  s_3479c97f207758::t_ea8337a1ac883b 22-31
+vite.config.ts
+  s_3479c97f207758::t_6d5f3b910f754b 4
+  s_3479c97f207758::t_0a3b6814336c19 5-9,25
+packages/email-preview/src/app/routes/index.tsx
+  s_3479c97f207758::t_9e0839cb9cd856 1-21
+packages/email-preview/src/server/static.ts
+  s_3479c97f207758::t_d61d3ab7a4f538 1-36
+packages/email-preview/src/server/runtime.ts
+  s_3479c97f207758::t_5d9850884fd5ce 2,42,45-49
+  s_3479c97f207758::t_5a3d027c4d784b 4,43-44,50-53
+  s_3479c97f207758::t_d0466c808c517e 1,3,5-38,40-41,54-156
+  s_3479c97f207758::t_ee2cd8e02e9eff 39
+  s_3479c97f207758::t_6a65c451361e5f 157-191
+packages/themes/tsconfig.json
+  s_3479c97f207758::t_34eaefaf8312b5 1-6
+  s_3479c97f207758::t_90983d3d1da2e5 7-14
+packages/email-preview/README.md
+  s_3479c97f207758::t_4f1851cac92338 94-96
+  s_3479c97f207758::t_cd37f04e52211a 1-91,93,98-101,106-128
+  s_3479c97f207758::t_f8f90c288cff25 92,97
+  s_3479c97f207758::t_63e5b85c83db64 129-145
+  s_3479c97f207758::t_f4b3145fe0a8e6 102-105
+  s_3479c97f207758::t_b50183b6ff5971 146-152
+packages/themes/scripts/generate-theme.ts
+  s_3479c97f207758::t_7da5fb9d78d8cb 1
+  s_3479c97f207758::t_99fe64e90174bb 2-26
+  s_3479c97f207758::t_db816c13692d69 27-31
+packages/email-preview/src/http/handlers.ts
+  s_3479c97f207758::t_6d5f3b910f754b 48,67
+  s_3479c97f207758::t_aeaab3e8f419f6 1-47,49-66,68-83
+  s_3479c97f207758::t_e88cf5faf999c6 84-111
+packages/themes/tsconfig.build.json
+  s_3479c97f207758::t_34eaefaf8312b5 1-5
+packages/themes/README.md
+  s_3479c97f207758::t_d3296588c88282 1-35,39-47,51-98,110
+  s_3479c97f207758::t_63e5b85c83db64 36-38,48-50,99-109,111-112
+  s_3479c97f207758::t_8366a28e9f27ec 113-117
+packages/themes/tests/provider.test.tsx
+  s_3479c97f207758::t_7da5fb9d78d8cb 27,29
+  s_3479c97f207758::t_28093c99737f3e 1-26,28,30-92
+  s_3479c97f207758::t_6a1262f30b01c8 93-134
+packages/ui/tests/primitives.test.tsx
+  s_3479c97f207758::t_c79d183dbfa35b 1-74,76-116
+  s_3479c97f207758::t_9059774b91002e 75
+  s_3479c97f207758::t_5c003294d9346a 117-136
+packages/email-preview/vitest.config.ts
+  s_3479c97f207758::t_ee524669171a9c 1-12
+  s_3479c97f207758::t_30f044027f20ae 13-14
+packages/security/src/arcjet.ts
+  s_3479c97f207758::t_3f4109ae57bbf7 31-32,37-40,42-46,55-57,114-115,156-157,163
+  s_3479c97f207758::t_07d6795d9acbd8 78-82,95,98-101,158,160-162,167-179,181
+  s_3479c97f207758::t_408529c7db6693 165
+  s_3479c97f207758::t_2d91539d5e5b12 1-30,33-36,41,47-54,58-77,83-94,96-97,102-113,116-154,166,180,182-202
+  s_3479c97f207758::t_91982aa34dd2e9 155,159,164
+packages/security/AGENTS.md
+  s_3479c97f207758::t_e10208a70ffa2a 1-22
+docs/src/lib/pages.ts
+  s_3479c97f207758::t_9a84decb488eac 71,102-108,116-127,171,176,178,180,192,197,199
+  s_3479c97f207758::t_458057050ee42b 72-76
+  s_3479c97f207758::t_803e718176c25d 200
+packages/themes/tests/script.test.ts
+  s_3479c97f207758::t_d3296588c88282 1-16,18,20-53
+  s_3479c97f207758::t_7da5fb9d78d8cb 17,19
+  s_3479c97f207758::t_4666d191bbbbf5 54-64
+devkit.config.ts
+  s_3479c97f207758::t_54508d8e376c97 55
+  s_3479c97f207758::t_458057050ee42b 49-54,56-57,69
+  s_3479c97f207758::t_39f0bbdc9b1dd2 66-67,150-181
+  s_3479c97f207758::t_90b2503e427f96 119-128
+  s_adafa49206c7d6::t_7f16738c167c82 182
+  s_3479c97f207758::t_b8fd0a090943be 58-64,68
+  s_3479c97f207758::t_4f1851cac92338 65
+packages/ui/tests/fixtures/consumer/tsconfig.json
+  s_3479c97f207758::t_c79d183dbfa35b 1-15
+packages/email-preview/src/app/routes/__root.tsx
+  s_3479c97f207758::t_d228902dfef740 2-3,23-27,37,39,46,49,52-54
+  s_3479c97f207758::t_83469a4b5017b8 4,36
+  s_3479c97f207758::t_9e0839cb9cd856 1,5-22,28-35,38,40-45,47-48,50-51,55-59
+packages/ui/tests/fixtures/consumer/types.tsx
+  s_3479c97f207758::t_c79d183dbfa35b 1-40
+  s_3479c97f207758::t_6922436e6c5b1a 41-56
+packages/email-preview/src/server/compiler.ts
+  s_3479c97f207758::t_fcb1a14a2f5bc6 1-2,4-25,29-33,37-39,43-45,47-48,58-64,69-76,78-84,92-105,116,118-125,129-134,140-149
+  s_3479c97f207758::t_181bf1ef89324a 26-28,34-36,40-42,49-57,65-68,77,85-91,106-115,117,126-128,138-139
+  s_3479c97f207758::t_2cbcf4f871a805 3
+  s_3479c97f207758::t_d0466c808c517e 46,135-137
+packages/ui/AGENTS.md
+  s_3479c97f207758::t_a9ce39900876ea 1-31
+packages/email-preview/package.json
+  s_3479c97f207758::t_c1528affc74493 56
+  s_3479c97f207758::t_aeaab3e8f419f6 42
+  s_3479c97f207758::t_d228902dfef740 28-31
+  s_3479c97f207758::t_ee524669171a9c 1-6,26,39-41,43-52,54,57-65,67,69-72,76-77
+  s_3479c97f207758::t_2dd8aeabec96fb 7-25,27,32-38,53,55,66,68,73-75
+  s_3479c97f207758::t_5d3e82b1f237b6 78
+packages/email-preview/src/server/errors.ts
+  s_3479c97f207758::t_d61d3ab7a4f538 1-15
+packages/email-preview/tsconfig.build.json
+  s_3479c97f207758::t_ee524669171a9c 1-2,4-5
+  s_3479c97f207758::t_6d5f3b910f754b 3
+packages/themes/CHANGELOG.md
+  s_3479c97f207758::t_d3296588c88282 1-7
+packages/themes/tests/fixtures/consumer/types.ts
+  s_3479c97f207758::t_28093c99737f3e 1-16
+packages/email-preview/src/app/routes/api/preview.ts
+  s_3479c97f207758::t_aeaab3e8f419f6 1,3-6
+  s_3479c97f207758::t_6d5f3b910f754b 2
+packages/ui/components.json
+  s_3479c97f207758::t_a9ce39900876ea 1-10
+  s_3479c97f207758::t_90602e3235f715 11-15
+packages/themes/AGENTS.md
+  s_3479c97f207758::t_d3296588c88282 1-15
+skills/raypx-kit/SKILL.md
+  s_3479c97f207758::t_e10208a70ffa2a 21-22
+packages/security/tests/arcjet.test.ts
+  s_3479c97f207758::t_07d6795d9acbd8 8,180-206
+  s_3479c97f207758::t_3f4109ae57bbf7 52-56,85,99-122,240-241
+  s_3479c97f207758::t_2d91539d5e5b12 1-7,9-51,57-84,86-98,123-179,207-239,242-243
+packages/email-preview/PRODUCT.md
+  s_3479c97f207758::t_cd37f04e52211a 1-33
+packages/email-preview/tests/license-notices.test.ts
+  s_3479c97f207758::t_d8886a5d7de50b 40-42,76
+  s_3479c97f207758::t_b55141cdef2acd 35-39,43-45,55-58,63,109-112,114-119
+  s_3479c97f207758::t_f4b3145fe0a8e6 13-14,22-25,31,46-54,59-62,68-69,87-90,92-98
+  s_3479c97f207758::t_3570b50e777946 33,73-75
+  s_3479c97f207758::t_09a96c31fe540f 1-12,15-21,64-67,71,99-108,113,120-124
+  s_3479c97f207758::t_2fe63e43512ffb 32,72,77-86,91
+  s_3479c97f207758::t_55fd39b7477138 34,70
+  s_3479c97f207758::t_87b182178d99e4 26-30
+  s_3479c97f207758::t_78ebb7a9a7e804 125-126
+packages/themes/src/index.ts
+  s_3479c97f207758::t_99fe64e90174bb 1-2,5-10
+  s_3479c97f207758::t_7da5fb9d78d8cb 3-4
+  s_3479c97f207758::t_3e39988107e8f3 11-17
+packages/themes/src/tokens.ts
+  s_3479c97f207758::t_99fe64e90174bb 1-99
+tests/scripts/packages/matrix.test.ts
+  s_3479c97f207758::t_e9466df26677fa 13,36,43,46-47,57,64-82,104,111,130
+packages/email-preview/vite.config.ts
+  s_3479c97f207758::t_d8886a5d7de50b 11-15
+  s_3479c97f207758::t_811698c87e395f 22-28
+  s_3479c97f207758::t_c1528affc74493 1-2,4-6,8,18-19,29-35,44-49,51-52
+  s_3479c97f207758::t_0e6c42c6aff2a8 7,17,20,37
+  s_3479c97f207758::t_6d5f3b910f754b 36,38-43,50
+  s_3479c97f207758::t_2dd8aeabec96fb 3,9-10,16,21
+AGENTS.md
+  s_3479c97f207758::t_bdf36802500a0c 24-25,31-33,110-111,136-137,210-218
+  s_3479c97f207758::t_e10208a70ffa2a 84-85,87
+  s_3479c97f207758::t_0e6c42c6aff2a8 23,133-135
+  s_3479c97f207758::t_9a84decb488eac 21,124,208-209
+packages/ui/tests/fixtures/consumer/runtime.mjs
+  s_3479c97f207758::t_c79d183dbfa35b 1-40
+  s_3479c97f207758::t_10a8dff3af7afe 41-52
+packages/email-preview/tests/discovery.test.ts
+  s_3479c97f207758::t_5a3d027c4d784b 1,11,35,39-40
+  s_3479c97f207758::t_2cbcf4f871a805 2-10,12-34,36-38,41-66
+  s_3479c97f207758::t_578bf42c102311 67-87
+docs/architecture/README.md
+  s_3479c97f207758::t_bdf36802500a0c 25-26,28,54-64,66-73,83-91,93-96,149-156,161,163-168,227-228,235-236
+  s_3479c97f207758::t_e10208a70ffa2a 65,79-81,92,127-129,133-134,136-139
+  s_3479c97f207758::t_458057050ee42b 19,145-148
+  s_3479c97f207758::t_9a84decb488eac 24,125-126,130,135,162
+  s_3479c97f207758::t_026d0ba985093e 82
+packages/email-preview/src/app/routes/static/$.ts
+  s_3479c97f207758::t_aeaab3e8f419f6 1,3-6
+  s_3479c97f207758::t_6d5f3b910f754b 2
+.changeset/preview-internal-workspace-bundles.md
+  s_3479c97f207758::t_22707347a20b9e 1-5
+bun.lock
+  s_3479c97f207758::t_42859be465ea19 131-165,205-220,231-248,256-283,289-320,369-370,419-424,813-814,821-822,825-826,829-872,907-908,1167-1168,1217,1253-1254,1271-1276,1279-1280,1293,1391-1392,1395-1398,1453-1454,1487,1495-1496,1625-1626,1653-1654,1659-1660,1679-1680,1749-1750,1827-1828,1965-1966,1969,1971-1973,1987-1991,1997-1998,2013-2014,2019-2020,2023-2074
+package.json
+  s_3479c97f207758::t_68876fa2095556 29,47-49
+packages/analytics/README.md
+  s_3479c97f207758::t_abdd595c9366b0 4
+packages/analytics/package.json
+  s_3479c97f207758::t_7d6b9f8b895491 73
+packages/analytics/tsdown.config.ts
+  s_3479c97f207758::t_f49eb7da533cb5 9
+packages/codemods/README.md
+  s_3479c97f207758::t_c8a7891202cd7d 7
+packages/codemods/package.json
+  s_3479c97f207758::t_636fd60c832fc2 51
+packages/codemods/tsdown.config.ts
+  s_3479c97f207758::t_8f6e3e4ffdcf0a 10
+packages/devkit/AGENTS.md
+  s_3479c97f207758::t_3cdba2325c0dde 39-41
+packages/devkit/README.md
+  s_3479c97f207758::t_04734b2202fafe 11,85-89
+packages/devkit/package.json
+  s_3479c97f207758::t_78ed13fd1ad032 77
+packages/devkit/src/architecture.ts
+  s_3479c97f207758::t_8f72ccb7c41da1 70-77,248-251,371-372
+packages/devkit/src/workspaces.ts
+  s_3479c97f207758::t_f27209062d5180 17
+packages/devkit/tests/architecture.test.ts
+  s_3479c97f207758::t_429e34d8fead44 354-400
+packages/devkit/tsdown.config.ts
+  s_3479c97f207758::t_9bff4ab46de1ed 18
+packages/drizzle-kit/README.md
+  s_3479c97f207758::t_0964ce839c18e2 7
+packages/drizzle-kit/package.json
+  s_3479c97f207758::t_d34ca4bf773252 67
+packages/drizzle/README.md
+  s_3479c97f207758::t_634eb2e7eebd88 6
+packages/drizzle/package.json
+  s_3479c97f207758::t_90df8eee368363 75
+packages/drizzle/tsdown.config.ts
+  s_3479c97f207758::t_02846097a526b3 16
+packages/email-preview/LICENSE
+  s_3479c97f207758::t_db87fe28d9036d 1-201
+packages/email-preview/src/app/routeTree.gen.ts
+  s_3479c97f207758::t_6d29f5fa8a735d 1-147
+packages/env/README.md
+  s_3479c97f207758::t_f0eb60d3346f5b 13
+packages/env/package.json
+  s_3479c97f207758::t_06c2818267a055 56
+packages/env/tsdown.config.ts
+  s_3479c97f207758::t_4556a7da233c7f 10
+packages/intl/README.md
+  s_3479c97f207758::t_b7d20b0f598794 10
+packages/intl/package.json
+  s_3479c97f207758::t_0ff96ce4bbf009 79
+packages/intl/tsdown.config.ts
+  s_3479c97f207758::t_73d87391931c4e 17
+packages/logger/README.md
+  s_3479c97f207758::t_00b87536dfd050 14
+packages/logger/package.json
+  s_3479c97f207758::t_efeb07a2179071 67
+packages/logger/tsdown.config.ts
+  s_3479c97f207758::t_92a1dc3031ca27 16
+packages/security/CHANGELOG.md
+  s_3479c97f207758::t_307965cb626cd2 1-7
+packages/security/LICENSE
+  s_3479c97f207758::t_52edeb96aef051 1-201
+packages/security/package.json
+  s_3479c97f207758::t_97ddfdcfcde23b 1-62
+packages/security/src/headers.ts
+  s_3479c97f207758::t_37b34186843849 1-38
+packages/security/src/index.ts
+  s_3479c97f207758::t_4d7a7f22de8fcc 1-5
+packages/security/tests/fixtures/consumer/without-optional-peers/runtime.mjs
+  s_3479c97f207758::t_69c47d58365154 1-42
+packages/security/tests/fixtures/consumer/without-optional-peers/types.ts
+  s_3479c97f207758::t_ccda937f561851 1-22
+packages/security/tests/headers.test.ts
+  s_3479c97f207758::t_4ca236b9ecf357 1-184
+packages/security/tsconfig.build.json
+  s_3479c97f207758::t_a3009d7fd2be99 1-5
+packages/security/tsconfig.json
+  s_3479c97f207758::t_c4864a4da1c9ee 1-8
+packages/security/tsdown.config.ts
+  s_3479c97f207758::t_0c61a662eb6862 1-12
+packages/security/vitest.config.ts
+  s_3479c97f207758::t_e78d296281461a 1-3
+packages/storage/README.md
+  s_3479c97f207758::t_bbe392dc895eec 12
+packages/storage/package.json
+  s_3479c97f207758::t_11ec8734d232f5 67
+packages/storage/tsdown.config.ts
+  s_3479c97f207758::t_61b77659e5452b 16
+packages/themes/LICENSE
+  s_3479c97f207758::t_a4b2b7319d5d81 1-201
+packages/themes/styles.css
+  s_3479c97f207758::t_15907e96b9653c 1-147
+packages/themes/tailwind.css
+  s_3479c97f207758::t_563e065a5718ba 1-54
+packages/tsconfig/README.md
+  s_3479c97f207758::t_7bff6547731142 6
+packages/tsconfig/package.json
+  s_3479c97f207758::t_692b48db208141 50
+packages/ui/LICENSE
+  s_3479c97f207758::t_5c45d840c68cc5 1-201
+packages/ui/src/components/ui/badge.tsx
+  s_3479c97f207758::t_95b7ed4f29a1c3 1-49
+packages/ui/src/components/ui/button.tsx
+  s_3479c97f207758::t_bcc3013556ac5b 1-63
+packages/ui/src/components/ui/input.tsx
+  s_3479c97f207758::t_3494401260bb94 1-22
+packages/ui/src/components/ui/native-select.tsx
+  s_3479c97f207758::t_ff7030f5921a2b 1-56
+packages/ui/src/components/ui/skeleton.tsx
+  s_3479c97f207758::t_985a55e290a179 1-16
+packages/ui/src/components/ui/tabs.tsx
+  s_3479c97f207758::t_854d18cf202c08 1-75
+packages/ui/src/lib/utils.ts
+  s_3479c97f207758::t_ae348a497f2226 1
+scripts/cli.ts
+  s_3479c97f207758::t_91f346fc676df3 94-116
+scripts/packages/matrix.ts
+  s_3479c97f207758::t_6f2a4c88486349 47
+tests/scripts/packages/consumers.test.ts
+  s_3479c97f207758::t_1ebfe3f02e1f48 1-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a6af9fecab184dce55054f549acfd03f9ba3a994",
+  "prompts": {},
+  "sessions": {
+    "s_3479c97f207758": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16463-0d07-7e82-ad3d-bf48e311d55b",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
