@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { copyFile, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vite-plus/test";
@@ -30,13 +30,9 @@ it("starts a relocated server output, waits for health and runs the check", asyn
   const root = await mkdtemp(join(tmpdir(), "devkit-probe-test-"));
   roots.push(root);
   await mkdir(join(root, "output/server"), { recursive: true });
-  await writeFile(
+  await copyFile(
+    new URL("./fixtures/artifact/server.mjs", import.meta.url),
     join(root, "output/server/index.mjs"),
-    `import { createServer } from "node:http";
-createServer((request, response) => {
-  response.statusCode = request.url === "/health" ? 200 : 404;
-  response.end(process.env.GREETING ?? "");
-}).listen(Number(process.env.PORT), process.env.HOST);`,
   );
   const seen: string[] = [];
   await probeArtifact({

@@ -209,7 +209,7 @@ bundled portions of the code.
 
 - use-intl 4.14.9 (MIT)
 - intl-messageformat 11.2.15 (BSD-3-Clause)
-- @formatjs/icu-messageformat-parser 3.5.18 and 3.5.21 (MIT)
+- @formatjs/icu-messageformat-parser 3.5.18 and 3.5.22 (MIT)
 - @formatjs/icu-skeleton-parser 2.1.11 and 2.1.12 (MIT)
 - @formatjs/fast-memoize 3.1.7 (MIT)
 - @schummar/icu-type-parser 1.21.5, type declarations only (MIT)

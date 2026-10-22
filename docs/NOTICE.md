@@ -4,7 +4,7 @@ The Fumadocs and TanStack Start integration is adapted from the official
 [TanStack Start examples](https://github.com/fuma-nama/fumadocs/tree/639cae4269870df2c09af4bef0fd1e4bcdf76731/examples/tanstack-start-spa)
 at Fumadocs commit `639cae4269870df2c09af4bef0fd1e4bcdf76731`.
 The internal documentation application uses Fumadocs Base UI/Core 16.17.7 and
-Fumadocs MDX 15.4.8, with application-specific content generation and navigation.
+Fumadocs MDX 15.4.9, with application-specific content generation and navigation.
 
 The examples' original MIT license follows. Documentation and Raypx-authored
 application code otherwise follow the repository's Apache-2.0 license.

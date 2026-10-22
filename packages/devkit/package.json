@@ -66,7 +66,7 @@
     "pack:check": "bun pm pack --dry-run"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^2.38.0",
+    "@dotenvx/dotenvx": "^2.38.2",
     "confbox": "^0.3.1",
     "oxc-parser": "^0.155.0"
   },
