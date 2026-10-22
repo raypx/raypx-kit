@@ -2,6 +2,11 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   fmt: { ignorePatterns: ["docs/src/routeTree.gen.ts"] },
+  staged: {
+    "*.{ts,tsx,mts,json,md,mdx,css,toml}": "vp fmt --write",
+    // oxlint only reads scripts and fails when a commit stages none.
+    "*.{ts,tsx,mts}": "vp lint --fix",
+  },
   lint: {
     ignorePatterns: [
       "packages/*/dist/**",

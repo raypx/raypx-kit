@@ -12,6 +12,7 @@
   ],
   "type": "module",
   "scripts": {
+    "prepare": "vp config --hooks --no-agent",
     "raypx-kit-dev": "bun scripts/cli.ts",
     "doctor": "bun run raypx-kit-dev doctor",
     "toolchain:check": "bun run raypx-kit-dev toolchain check",

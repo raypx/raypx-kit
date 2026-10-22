@@ -18,9 +18,14 @@ files and must not add a second set of versions under `[tools]`.
 mise trust && mise install
 eval "$(mise activate zsh)" # use the matching activation command for your shell
 bun install --frozen-lockfile --ignore-scripts
+bun run prepare                     # install the Vite+ pre-commit hook
 bun run doctor
 bun run toolchain:check
 ```
+
+`prepare` sets `core.hooksPath` to the Vite+ dispatcher in `.vite-hooks/_`. The
+pre-commit hook runs `vp staged`: formatting and lint fixes on staged files only.
+`VP_GIT_HOOKS=0` skips it; `verify` still owns type checks, tests and artifacts.
 
 Activate mise in your shell configuration, or prefix commands with
 `mise exec --`. Other version managers work when they select the same pins.
