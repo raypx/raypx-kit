@@ -10,7 +10,7 @@ import {
   type CompatibilityPackage,
 } from "../../../scripts/packages/matrix.js";
 
-function library(name: string, engines = ">=22.14"): CompatibilityPackage {
+function library(name: string, engines = ">=22.21"): CompatibilityPackage {
   return {
     directory: name,
     manifest: {
@@ -33,18 +33,18 @@ function index(): CompatibilityIndex {
     version: 1,
     developmentNode: "24.22.0",
     compilerDependencies: { typescript: "7.0.2" },
-    packages: [library("env"), library("devkit", ">=22.14")],
+    packages: [library("env"), library("devkit", ">=22.21")],
   };
 }
 
 describe("consumer compatibility matrix", () => {
   it("derives exact engine floors instead of testing the newest patch in a major", () => {
     expect(minimumVersion(">=20", "node")).toBe("20.0.0");
-    expect(minimumVersion(">=22.14", "node")).toBe("22.14.0");
+    expect(minimumVersion(">=22.21", "node")).toBe("22.21.0");
     expect(compatibilityMatrix(index())).toEqual({
       include: [
-        { node: "22.14.0", peers: "minimum" },
-        { node: "22.14.0", peers: "current" },
+        { node: "22.21.0", peers: "minimum" },
+        { node: "22.21.0", peers: "current" },
         { node: "24.22.0", peers: "minimum" },
         { node: "24.22.0", peers: "current" },
       ],
@@ -54,11 +54,30 @@ describe("consumer compatibility matrix", () => {
   it("checks each package at its own floor and every package at the development pin", () => {
     const value = index();
     value.packages[1] = library("devkit", ">=24.22");
-    expect(packagesForNode(value, "22.14.0").map((entry) => entry.directory)).toEqual(["env"]);
+    expect(packagesForNode(value, "22.21.0").map((entry) => entry.directory)).toEqual(["env"]);
     expect(packagesForNode(value, "24.22.0")).toHaveLength(2);
     expect(() => packagesForNode(index(), "22.22.0")).toThrow(
       "not a declared compatibility target",
     );
+  });
+
+  it("uses the lowest supported branch of a disjoint SDK engine range", () => {
+    const value = index();
+    value.packages.push(library("security", ">=22.21.0 <23 || >=24.5.0"));
+    expect(value.packages[2]!.minimumNode).toBe("22.21.0");
+    expect(compatibilityMatrix(value)).toEqual(compatibilityMatrix(index()));
+    expect(packagesForNode(value, "22.21.0").map((entry) => entry.directory)).toEqual([
+      "env",
+      "devkit",
+      "security",
+    ]);
+  });
+
+  it.each(["23.0.0", "24.4.0"])("rejects unsupported SDK runtime gaps at Node %s", (node) => {
+    const value = index();
+    value.developmentNode = node;
+    value.packages = [library("security", ">=22.21.0 <23 || >=24.5.0")];
+    expect(() => compatibilityMatrix(value)).toThrow("development Node is outside");
   });
 
   it("rejects missing, duplicated or changed public packages in a prepared artifact", () => {
@@ -82,14 +101,14 @@ describe("consumer compatibility matrix", () => {
 
   it("deduplicates identical development and minimum engine targets", () => {
     const value = index();
-    value.developmentNode = "22.14.0";
+    value.developmentNode = "22.21.0";
     value.packages = [library("env")];
     expect(compatibilityMatrix(value).include).toHaveLength(2);
   });
 
   it("does not silently skip packages that no longer support the development runtime", () => {
     const value = index();
-    value.packages = [library("env", ">=22.14 <24")];
+    value.packages = [library("env", ">=22.21 <24")];
     expect(() => compatibilityMatrix(value)).toThrow("development Node is outside");
   });
 
@@ -108,7 +127,7 @@ describe("consumer compatibility matrix", () => {
       version: "0.0.0-alpha.0",
       exports: { "./base.json": "./base.json" },
     };
-    expect(minimumNode(manifest)).toBe("22.14.0");
+    expect(minimumNode(manifest)).toBe("22.21.0");
     expect(() => minimumNode({ ...manifest, exports: { ".": "./index.mjs" } })).toThrow(
       "must declare engines.node",
     );

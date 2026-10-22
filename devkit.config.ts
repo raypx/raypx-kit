@@ -46,6 +46,27 @@ export default {
         ".": "./src/extract.ts",
       },
     },
+    "packages/email-preview": {
+      kind: "tooling",
+      target: "node",
+      sourceTargets: {
+        "src/app/**": "browser",
+        "src/app/routes/api/**": "node",
+        "src/app/routes/static/**": "node",
+      },
+      // The preview application is built into the published CLI's UI payload.
+      bundledDependencies: [
+        "@tanstack/react-router",
+        "@tanstack/react-start",
+        "react",
+        "react-dom",
+        "nitro",
+        "srvx",
+        "shiki",
+        "@raypx-kit/ui",
+        "@raypx-kit/themes",
+      ],
+    },
     "packages/env": {
       kind: "library",
       target: "universal",
@@ -95,6 +116,16 @@ export default {
         "./stream": "./src/stream.ts",
       },
     },
+    "packages/security": {
+      kind: "library",
+      target: "universal",
+      entryTargets: { "./arcjet": "node" },
+      sourceTargets: { "src/arcjet.ts": "node" },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./arcjet": "./src/arcjet.ts",
+      },
+    },
     "packages/storage": {
       kind: "library",
       target: "universal",
@@ -115,6 +146,39 @@ export default {
     "packages/tsconfig": {
       kind: "tooling",
       target: "universal",
+    },
+    "packages/themes": {
+      kind: "library",
+      target: "browser",
+      entryTargets: { "./config": "universal", "./script": "universal" },
+      sourceTargets: {
+        "src/config.ts": "universal",
+        "src/tokens.ts": "universal",
+        "src/script.ts": "universal",
+        "scripts/**": "node",
+      },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./config": "./src/config.ts",
+        "./script": "./src/script.ts",
+      },
+    },
+    "packages/ui": {
+      kind: "library",
+      target: "browser",
+      entryTargets: { "./lib/utils": "universal" },
+      sourceTargets: { "src/lib/utils.ts": "universal" },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./components/ui/button": "./src/components/ui/button.tsx",
+        "./components/ui/input": "./src/components/ui/input.tsx",
+        "./components/ui/tabs": "./src/components/ui/tabs.tsx",
+        "./components/ui/badge": "./src/components/ui/badge.tsx",
+        "./components/ui/dialog": "./src/components/ui/dialog.tsx",
+        "./components/ui/skeleton": "./src/components/ui/skeleton.tsx",
+        "./components/ui/native-select": "./src/components/ui/native-select.tsx",
+        "./lib/utils": "./src/lib/utils.ts",
+      },
     },
   },
   toolchain: {

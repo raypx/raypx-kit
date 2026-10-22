@@ -19,18 +19,22 @@ or the development guide to contribute.
 These READMEs are the canonical references for current exports, examples,
 compatibility and consumer installation. They are also included in npm archives.
 
-| Package     | Guide                                                                                   |
-| ----------- | --------------------------------------------------------------------------------------- |
-| Codemods    | [Migration runner, CLI and adding transformations](../packages/codemods/README.md)      |
-| Devkit      | [Workspace, architecture, toolchain and maintenance APIs](../packages/devkit/README.md) |
-| Drizzle     | [PostgreSQL expressions, results and diagnostics](../packages/drizzle/README.md)        |
-| Drizzle Kit | [Slim upstream CLI and config distribution](../packages/drizzle-kit/README.md)          |
-| Env         | [Validation, nested presets and client access](../packages/env/README.md)               |
-| Intl        | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)  |
-| Analytics   | [Consent-controlled browser analytics and errors](../packages/analytics/README.md)      |
-| Logger      | [Structured logging, wide events and request context](../packages/logger/README.md)     |
-| Storage     | [Drivers, policies and signed URLs](../packages/storage/README.md)                      |
-| TSConfig    | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)        |
+| Package       | Guide                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| Codemods      | [Migration runner, CLI and adding transformations](../packages/codemods/README.md)                |
+| Devkit        | [Workspace, architecture, toolchain and maintenance APIs](../packages/devkit/README.md)           |
+| Drizzle       | [PostgreSQL expressions, results and diagnostics](../packages/drizzle/README.md)                  |
+| Drizzle Kit   | [Slim upstream CLI and config distribution](../packages/drizzle-kit/README.md)                    |
+| Email Preview | [Local template previews, live updates and HTML/text output](../packages/email-preview/README.md) |
+| Env           | [Validation, nested presets and client access](../packages/env/README.md)                         |
+| Intl          | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)            |
+| Analytics     | [Consent-controlled browser analytics and errors](../packages/analytics/README.md)                |
+| Logger        | [Structured logging, wide events and request context](../packages/logger/README.md)               |
+| Security      | [Security headers and optional Arcjet request protection](../packages/security/README.md)         |
+| Storage       | [Drivers, policies and signed URLs](../packages/storage/README.md)                                |
+| TSConfig      | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)                  |
+| Themes        | [Shared tokens, initialization and optional React theme state](../packages/themes/README.md)      |
+| UI            | [Base UI primitives, shared styles and shadcn configuration](../packages/ui/README.md)            |
 
 Packages remain in Changesets alpha mode until the first approved stable release.
 Consumers pin exact prerelease versions; each manifest supplies its own version.

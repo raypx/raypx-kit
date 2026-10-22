@@ -1,0 +1,62 @@
+{
+  "name": "@raypx-kit/security",
+  "version": "0.0.0-alpha.0",
+  "description": "Security response headers and optional Arcjet request protection for Fetch applications.",
+  "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/security",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Zack",
+    "email": "heyloyep@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raypx/raypx-kit.git",
+    "directory": "packages/security"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./arcjet": {
+      "types": "./dist/arcjet.d.mts",
+      "import": "./dist/arcjet.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "check": "bun --check --tsconfig-override tsconfig.json",
+    "test": "bun --bun vp test --run",
+    "test:unit": "bun --bun vp test --run",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "pack:check": "bun pm pack --dry-run"
+  },
+  "dependencies": {
+    "nosecone": "^1.14.1"
+  },
+  "devDependencies": {
+    "@arcjet/node": "^1.14.1"
+  },
+  "peerDependencies": {
+    "@arcjet/node": "^1.14.1"
+  },
+  "peerDependenciesMeta": {
+    "@arcjet/node": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.21.0 <23 || >=24.5.0"
+  }
+}

@@ -3,7 +3,7 @@
 Drizzle extensions for PostgreSQL with postgres.js, maintained in
 [Raypx Kit](https://github.com/raypx/raypx-kit).
 Each package has its own version and changelog.
-The package supports Node 22.14+ and Bun.
+The package supports Node 22.21+ and Bun.
 
 This initial package implements a small, tested base. The complete inventories
 below include every upstream capability, including features not yet implemented.

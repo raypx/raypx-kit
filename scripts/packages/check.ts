@@ -72,7 +72,9 @@ async function assertArchive(
     assert.ok(![...entries].some((entry) => entry.startsWith(`package/${directory}/`)));
   const legalFiles = [
     "LICENSE",
-    ...["NOTICE.md", "THIRD_PARTY_LICENSES.txt"].filter((file) => manifest.files?.includes(file)),
+    ...["NOTICE", "NOTICE.md", "THIRD_PARTY_LICENSES.txt"].filter((file) =>
+      manifest.files?.includes(file),
+    ),
   ];
   for (const file of legalFiles) {
     assert.ok(entries.has(`package/${file}`), `${packed.name}: missing ${file}`);
@@ -107,6 +109,12 @@ async function assertArchive(
 
 try {
   let checked = 0;
+  const packages: {
+    directory: string;
+    packageDirectory: string;
+    archive: string;
+    packed: Manifest;
+  }[] = [];
   for (const directory of await readdir(join(root, "packages"), { withFileTypes: true })) {
     if (!directory.isDirectory()) continue;
     const packageDirectory = join(root, "packages", directory.name);
@@ -119,6 +127,14 @@ try {
     if (!releaseArchives)
       run(process.execPath, ["pm", "pack", "--filename", archive], packageDirectory);
     const packed = await assertArchive(archive, manifest, packageDirectory);
+    packages.push({ directory: directory.name, packageDirectory, archive, packed });
+  }
+  // Install internal dependencies from the same archives, including new packages
+  // that have not been published to the registry yet.
+  const packageArchives = Object.fromEntries(
+    packages.map(({ packed, archive }) => [packed.name, archive]),
+  );
+  for (const { directory, packageDirectory, archive, packed } of packages) {
     const options = {
       bunBinary: process.execPath,
       nodeBinary: node,
@@ -126,19 +142,14 @@ try {
         typescript: rootManifest.devDependencies!.typescript!,
         "@types/node": rootManifest.devDependencies!["@types/node"]!,
       },
+      packageArchives,
     };
-    await checkConsumer(
-      archive,
-      packed,
-      join(temporary, directory.name),
-      packageDirectory,
-      options,
-    );
+    await checkConsumer(archive, packed, join(temporary, directory), packageDirectory, options);
     console.log(`${packed.name}@${packed.version}: tarball, Bun and Node consumers passed`);
     await checkWithoutOptionalPeers(
       archive,
       packed,
-      join(temporary, `${directory.name}-without-optional-peers`),
+      join(temporary, `${directory}-without-optional-peers`),
       packageDirectory,
       options,
     );

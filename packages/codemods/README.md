@@ -4,7 +4,7 @@ A small source migration runner and CLI scaffold for Raypx Kit. **No built-in
 migrations are registered yet.** The package provides the execution and test
 structure for future API migrations; installing or importing it changes no files.
 
-ESM; Node 22.14+ or Bun. No runtime dependencies. Node TypeScript consumers need
+ESM; Node 22.21+ or Bun. No runtime dependencies. Node TypeScript consumers need
 Node types for the runtime environment.
 
 ## Install and inspect

@@ -7,7 +7,7 @@ application-owned locale configuration and catalogs.
 bun add @raypx-kit/intl react@^19.3.1
 ```
 
-ESM and declarations support Node 22.14+ and Bun. React 19 is the only external
+ESM and declarations support Node 22.21+ and Bun. React 19 is the only external
 peer, including for synchronous root/server usage. `use-intl` 4.14.9 and its
 FormatJS dependencies are bundled into `dist/`, declarations included, through
 their public `use-intl/core` and `use-intl/react` APIs. Import translation, formatting and

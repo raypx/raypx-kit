@@ -1,7 +1,7 @@
 # @raypx-kit/analytics
 
 Consent-controlled product analytics and sanitized browser errors backed by PostHog.
-ESM; Node 22.14+ for imports and Bun consumers. Browser delivery requires a browser.
+ESM; Node 22.21+ for imports and Bun consumers. Browser delivery requires a browser.
 The external `posthog-js` dependency uses its no-external entry, so the SDK never
 loads recorder, survey or other scripts from a CDN. React 19 is an optional peer.
 

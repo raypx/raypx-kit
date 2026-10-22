@@ -1,0 +1,78 @@
+{
+  "name": "@raypx-kit/email-preview",
+  "version": "0.0.0-alpha.0",
+  "description": "A local React Email preview workspace built with TanStack Start.",
+  "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/email-preview",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Zack",
+    "email": "heyloyep@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raypx/raypx-kit.git",
+    "directory": "packages/email-preview"
+  },
+  "bin": {
+    "raypx-email": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "imports": {
+    "#preview-runtime": "./dist/runtime.mjs",
+    "#components/*": "./src/app/components/*.tsx",
+    "#lib/*": "./src/app/lib/*.ts",
+    "#hooks/*": "./src/app/hooks/*.ts"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "check": "bun --check --tsconfig-override tsconfig.json",
+    "build": "tsdown && vp build",
+    "dev": "bun run build && node dist/cli.mjs dev --dir examples",
+    "test": "bun --bun vp test --run",
+    "test:unit": "bun --bun vp test --run",
+    "pack:check": "bun pm pack --dry-run"
+  },
+  "dependencies": {
+    "@react-email/render": "^2.1.1",
+    "chokidar": "^5.0.0",
+    "esbuild": "^0.28.2"
+  },
+  "devDependencies": {
+    "@raypx-kit/themes": "workspace:*",
+    "@raypx-kit/tsconfig": "workspace:*",
+    "@raypx-kit/ui": "workspace:*",
+    "@react-email/components": "^1.0.12",
+    "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/react-router": "^1.170.45",
+    "@tanstack/react-start": "^1.169.3",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "nitro": "~3.0.260903-beta",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "shiki": "^4.5.0",
+    "srvx": "^1.0.3",
+    "tailwindcss": "^4.3.3",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.3.0",
+    "vite-plus": "^1.3.0"
+  },
+  "engines": {
+    "node": ">=22.21"
+  }
+}

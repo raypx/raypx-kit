@@ -8,7 +8,7 @@ artifacts.
 bun add -d @raypx-kit/devkit
 ```
 
-ESM only, for Node 22.14+ and Bun. Each entry is independent, so a consumer loads
+ESM only, for Node 22.21+ and Bun. Each entry is independent, so a consumer loads
 only the dependencies it uses. The package reads files and spawns processes; it
 contains no product rules, so repositories compose their own policy from it.
 
@@ -82,10 +82,11 @@ within its workspace and correspond to an actual export. Without a mapping,
 the check follows the declared export targets directly. Package-root JSON
 configuration exports therefore need no source mapping.
 
-`bundledDependencies` lists external development dependencies deliberately bundled
-into the published runtime. Each name must be declared in `devDependencies`, and
-the package build must bundle it. This option permits those source imports; it
-does not exempt workspace boundaries or platform checks. Ordinary runtime
+`bundledDependencies` lists development dependencies deliberately bundled into
+runtime by the package build. Each name must also be declared in
+`devDependencies`. Internal workspace bundles are allowed only for apps and
+tooling. Public export boundaries, platform compatibility, application and
+tooling restrictions, and dependency cycle checks still apply. Ordinary runtime
 dependencies and peers remain in their respective manifest fields.
 
 Without an explicit `metadata` map, discovery retains the manifest interface.

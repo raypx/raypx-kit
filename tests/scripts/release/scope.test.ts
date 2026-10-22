@@ -23,11 +23,15 @@ describe("release package scope", () => {
       "devkit",
       "drizzle",
       "drizzle-kit",
+      "email-preview",
       "env",
       "intl",
       "logger",
+      "security",
       "storage",
+      "themes",
       "tsconfig",
+      "ui",
     ]);
     for (const { name } of packages) expect(() => assertReleasePackage(name)).not.toThrow();
   });

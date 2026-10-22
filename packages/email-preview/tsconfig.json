@@ -1,0 +1,28 @@
+{
+  "extends": "@raypx-kit/tsconfig/node.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "#preview-runtime": ["./src/http/runtime.ts"],
+      "@raypx-kit/themes": ["../themes/src/index.ts"],
+      "@raypx-kit/themes/config": ["../themes/src/config.ts"],
+      "@raypx-kit/ui/lib/utils": ["../ui/src/lib/utils.ts"],
+      "@raypx-kit/ui/components/ui": ["../ui/src/components/ui"],
+      "@raypx-kit/ui/components/ui/*": ["../ui/src/components/ui/*"]
+    },
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "examples/**/*.tsx",
+    "build/**/*.ts",
+    "*.config.ts"
+  ],
+  "exclude": ["dist", "tests/fixtures/consumer/**"]
+}

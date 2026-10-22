@@ -14,7 +14,7 @@ export interface Metadata {
   sourceTargets?: Record<string, Target>;
   /** Maintained source behind an export whose published target is generated. */
   sourceEntries?: Record<string, string>;
-  /** Development dependencies explicitly bundled into the published runtime. */
+  /** Development dependencies explicitly bundled into runtime; internal workspaces require app/tooling. */
   bundledDependencies?: string[];
 }
 export interface Manifest {

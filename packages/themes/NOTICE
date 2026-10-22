@@ -1,0 +1,19 @@
+@raypx-kit/themes
+
+Adapted from Raypx (https://github.com/raypx/raypx), commit
+b6f4ca1e72b7a8f7ccd5962f75ce32f2d5dd7738, licensed under Apache License 2.0.
+The complete upstream license is included as LICENSE.
+
+Source paths:
+  packages/ui/src/themes/tokens.ts
+  packages/ui/src/themes/config.ts
+  packages/ui/src/themes/script.ts
+  packages/ui/src/themes/provider.tsx
+  packages/ui/src/themes/index.ts
+  packages/ui/scripts/generate-theme.ts
+
+Changes in this package: independent ESM publication; explicit React-free entry
+points; removal of the product picker and arbitrary JavaScript initial-theme
+expressions; nonce support and escaped first-paint configuration; encoded cookie
+keys; system CSS fallback and generated Tailwind 4 mappings; focused tests and
+isolated consumer verification. Original Neutral token values are preserved.

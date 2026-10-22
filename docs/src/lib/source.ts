@@ -21,12 +21,16 @@ export const docs = defineDocs({
       "packages/drizzle/README.md",
       "packages/drizzle/NOTICE.md",
       "packages/drizzle-kit/README.md",
+      "packages/email-preview/README.md",
       "packages/env/README.md",
       "packages/intl/README.md",
       "packages/analytics/README.md",
       "packages/logger/README.md",
+      "packages/security/README.md",
       "packages/storage/README.md",
+      "packages/themes/README.md",
       "packages/tsconfig/README.md",
+      "packages/ui/README.md",
     ],
     schema: ({ path }) =>
       z.object({}).transform(() => {

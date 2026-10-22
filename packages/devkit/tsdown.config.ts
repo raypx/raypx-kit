@@ -15,5 +15,5 @@ export default defineConfig({
   format: ["esm"],
   sourcemap: true,
   fixedExtension: true,
-  target: "node22.14.0",
+  target: "node22.21.0",
 });

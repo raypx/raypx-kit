@@ -351,6 +351,53 @@ describe("workspace architecture", () => {
     expect(findings).toContain("undeclared runtime dependency @raypx/internal");
   });
 
+  it.each(["app", "tooling"] as const)(
+    "allows explicit internal development bundles only for %s runtime",
+    (kind) => {
+      const root = fixture();
+      member(root, "ui", { metadata: { kind: "library", target: "browser" } });
+      member(root, "unlisted");
+      member(root, "bundled", {
+        metadata: { kind, target: "browser", bundledDependencies: ["@raypx/ui"] },
+        extra: {
+          devDependencies: { "@raypx/ui": "workspace:*", "@raypx/unlisted": "workspace:*" },
+        },
+        source: 'import "@raypx/ui"; import "@raypx/unlisted";',
+      });
+      expect(checkArchitecture(discover(root))).toEqual([
+        "packages/bundled/src/index.ts: undeclared runtime dependency @raypx/unlisted",
+      ]);
+    },
+  );
+
+  it("keeps platforms, public exports, applications and cycles enforced for internal bundles", () => {
+    const root = fixture();
+    member(root, "ui", {
+      metadata: { kind: "library", target: "browser" },
+      extra: { devDependencies: { "@raypx/bundled": "workspace:*" } },
+    });
+    member(root, "app", { metadata: { kind: "app", target: "node" } });
+    member(root, "bundled", {
+      metadata: {
+        kind: "tooling",
+        target: "node",
+        bundledDependencies: ["@raypx/ui", "@raypx/app", "@raypx/missing"],
+      },
+      extra: { devDependencies: { "@raypx/ui": "workspace:*", "@raypx/app": "workspace:*" } },
+      source:
+        'import "@raypx/ui"; import "@raypx/ui/src/index"; import "@raypx/app"; import "@raypx/missing";',
+    });
+    const findings = checkArchitecture(discover(root)).join("\n");
+    expect(findings).toContain("node entry cannot import browser entry @raypx/ui");
+    expect(findings).toContain("internal cross-workspace import @raypx/ui/src/index");
+    expect(findings).toContain("application source cannot be imported: @raypx/app");
+    expect(findings).toContain("workspace dependency cycle:");
+    expect(findings).toContain(
+      "bundled dependency must be an external development dependency: @raypx/missing",
+    );
+    expect(findings).toContain("undeclared runtime dependency @raypx/missing");
+  });
+
   it("recognizes DefinitelyTyped packages for type imports without allowing runtime imports", () => {
     const root = fixture();
     member(root, "typed", {

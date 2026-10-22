@@ -44,7 +44,7 @@ export function minimumNode(manifest: Manifest): string {
     `${manifest.name}: JavaScript packages must declare engines.node`,
   );
   // Configuration-only packages also load at the oldest library runtime floor.
-  return "22.14.0";
+  return "22.21.0";
 }
 
 /** Never resolve a range to a newly published release in the current profile. */

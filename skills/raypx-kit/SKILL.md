@@ -18,7 +18,8 @@ prereleases can change public APIs between alphas.
 bun add @raypx-kit/env@0.0.0-alpha.0 zod@^4.6.7
 ```
 
-All packages are ESM-only and support Node 22.14+ and Bun. Check `npm view
+All packages are ESM-only and require Node 22.21+ or Bun. Security follows
+Arcjet's `>=22.21.0 <23 || >=24.5.0` Node range. Check `npm view
 @raypx-kit/<name> dist-tags` for the current version before pinning.
 
 ## Packages

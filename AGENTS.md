@@ -18,13 +18,19 @@ validation and reusable presets; `packages/intl` owns generic internationalizati
 `packages/logger` owns evlog-based structured logging, wide events and Node
 request context.
 `packages/analytics` owns consent-controlled PostHog browser analytics and optional React bindings.
+`packages/security` owns Nosecone security headers and optional Arcjet request protection; applications supply keys and rules.
 `packages/storage` owns object storage drivers and signed upload and download URLs.
+`packages/email-preview` owns the local React Email preview CLI, template runtime and embedded TanStack Start application.
+`packages/themes` owns shared theme tokens, CSS, initialization and optional React theme state.
+`packages/ui` owns reusable shadcn-style Base UI primitives and class utilities.
 Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
 and have explicit ESM exports, a README, license, independent version and tests.
 Configuration packages export their package-root files directly instead of `dist/`.
 `pack:check` installs every public archive in isolated Bun and Node consumers and
-loads each export; package behavior and public types belong in unit tests.
+loads JavaScript/JSON exports and resolves and reads exported CSS assets. Internal
+runtime dependencies install from archives in the same verification batch;
+package behavior and public types belong in unit tests.
 Optional `packages/<name>/tests/fixtures/consumer` declaration contracts are copied into
 the isolated archive consumer by `pack:check`. Their own tsconfig checks public
 types against the installed tarball; they are excluded from source lint resolution.
@@ -75,8 +81,10 @@ authoritative Node pin; the root `packageManager` is the authoritative Bun pin.
 Keep `engines`, `devEngines`, CI setup and documented versions consistent with
 those sources through `bun run toolchain:check`. Public package Node compatibility
 ranges are independent of the repository development pin.
-All public packages declare Node `>=22.14`; library builds target `node22.14.0`.
+Public packages declare Node `>=22.21`; Security follows its SDK range
+`>=22.21.0 <23 || >=24.5.0`. Library builds target `node22.21.0`.
 Consumer compatibility runs at that exact floor and at the development Node pin.
+Security does not promise Node 23 or Node 24 releases before 24.5.0.
 
 mise is the recommended version manager. Its configuration only enables reading
 the two pins and must not add `[tools]` versions. Run `mise trust && mise install`,
@@ -99,6 +107,8 @@ complete: missing or unknown workspace paths fail, and manifest metadata is not
 a fallback. Keep package manifests free of this repository's `devkit` policy;
 exports and dependencies remain authoritative there. Bundled dependency exceptions
 must be explicit and limited to dependencies actually bundled by the package build.
+Internal bundles require app/tooling ownership and declared development dependencies;
+all export, platform and cycle constraints still apply.
 Toolchain declaration checks come from `packages/devkit` (which parses TOML and
 YAML with confbox). `scripts/checks/toolchain.ts` composes those checks with this
 repository's installed dependency checks from `scripts/checks/dependencies.ts`.
@@ -111,7 +121,7 @@ allowlists. Declare variables that affect cached outputs in `env`/`globalEnv` so
 their values participate in cache keys.
 Vite+ owns formatting, linting, tests and the documentation application's Vite
 commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl, Analytics,
-Logger and Storage, including their declarations, from each package's
+Logger, Security, Storage, Themes and UI, including their declarations, from each package's
 `tsdown.config.ts`; its dependency range starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
 exports its JSON presets directly. Package scripts invoke local `turbo`,
 `tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
@@ -120,6 +130,11 @@ use Bun-specific flags and the Intl jsdom preload. The internal documentation
 site retains `bun --bun vp` for its Bun development server. Its build and preview
 commands invoke `vp` directly so Wrangler runs with Node. Nitro builds a
 `cloudflare_module` Worker for deployment.
+Email Preview builds its CLI and private runtime with tsdown, then its embedded
+TanStack Start app with Vite+ and Nitro's Node middleware preset. Its development
+command runs the prebuilt CLI against examples; consumers never build the app.
+Themes generates package-root styles and Tailwind mappings from its token source.
+UI exports component subpaths and CSS that scans its published distribution.
 Repository TypeScript maintenance scripts, native type checking and archive
 packing continue to use Bun explicitly. Node and npm 10.9+ are also needed for
 packaged consumer checks and registry publication.
@@ -190,8 +205,17 @@ that approval. New packages start at `0.0.0-alpha.0`; first publication uses tha
 manifest version without running `version-packages`. Initial work belongs in the initial
 changelog; changesets increment versions for subsequent releases. Include a
 changeset for user-visible changes after initial release preparation. Retain full upstream
-licenses and pinned source provenance for copied or adapted code. Update package
-docs when exports or compatibility guarantees change.
+licenses and pinned source provenance for copied or adapted code. UI, Themes,
+Email Preview and Security keep their own Apache license in `LICENSE`. Their READMEs contain
+generated indexes of direct runtime and peer dependencies, recording installed
+versions and license links. Maintain these indexes with `bun run licenses:update`;
+`licenses:check` rejects drift before source verification. Ordinary external
+dependencies carry their own full license texts; do not copy them into package
+licenses. Preserve UI's complete shadcn MIT license and source notice, and Themes'
+source notice. Email Preview generates complete notices for actually bundled
+third-party modules in `dist/THIRD_PARTY_LICENSES.txt`; keep this build output out
+of Git and include it in the published archive. Update package docs when exports
+or compatibility guarantees change.
 
 Do not publish to npm without direct authorization. `pack:check` builds local
 tarballs and installs them in a disposable directory; it does not publish.

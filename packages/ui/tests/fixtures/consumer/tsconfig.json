@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "NodeNext",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "types": [],
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "jsx": "react-jsx"
+  },
+  "include": ["*.tsx"]
+}

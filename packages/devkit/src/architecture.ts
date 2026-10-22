@@ -67,6 +67,14 @@ const testFile =
 const codeFile = /\.[cm]?[jt]sx?$/;
 const runtimeFile = /\/(?:src|server|native|app)\//;
 
+function bundledWorkspace(workspace: Workspace, name: string): boolean {
+  return (
+    (workspace.metadata?.kind === "app" || workspace.metadata?.kind === "tooling") &&
+    workspace.metadata.bundledDependencies?.includes(name) === true &&
+    !!workspace.manifest.devDependencies?.[name]
+  );
+}
+
 function children(node: Node): Node[] {
   const record = node as unknown as Record<string, unknown>;
   return (visitorKeys[node.type] ?? []).flatMap((key) =>
@@ -237,7 +245,10 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
         findings.push(`${path}: invalid sourceEntries override ${entry}: ${source}`);
     }
     for (const name of metadata.bundledDependencies ?? []) {
-      if (!manifest.devDependencies?.[name] || index.byName.has(name))
+      if (
+        !manifest.devDependencies?.[name] ||
+        (index.byName.has(name) && !bundledWorkspace(workspace, name))
+      )
         findings.push(
           `${path}: bundled dependency must be an external development dependency: ${name}`,
         );
@@ -357,7 +368,8 @@ export function checkArchitecture(index: WorkspaceIndex): string[] {
         findings.push(`${file}: application source cannot be imported: ${request}`);
       const declared =
         workspace.manifest.dependencies?.[to.manifest.name] ||
-        workspace.manifest.peerDependencies?.[to.manifest.name];
+        workspace.manifest.peerDependencies?.[to.manifest.name] ||
+        bundledWorkspace(workspace, to.manifest.name);
       if (!declared && !(typesOnly && workspace.manifest.devDependencies?.[to.manifest.name]))
         findings.push(
           `${file}: undeclared ${typesOnly ? "type" : "runtime"} dependency ${request}`,

@@ -36,6 +36,9 @@ The README documents the complete shipped API.
 - Use Node APIs only; `turbo` alone requires Bun at call time.
 - Do not import other Raypx Kit packages. Keep entries independent so each loads
   only its own dependencies.
+- Allow internal bundled runtime imports only for app/tooling workspaces with both
+  explicit `bundledDependencies` metadata and a development dependency declaration.
+  Preserve export, platform, application, tooling and dependency cycle constraints.
 - Keep findings as stable `path: message` strings; consumers and tests match them.
 - Raypx Kit's own maintenance scripts import this package's source directly.
 - Keep package tests under `tests/`; `src/` contains production code only.

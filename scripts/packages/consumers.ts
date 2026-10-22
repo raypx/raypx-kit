@@ -30,6 +30,8 @@ export interface ConsumerOptions {
   compilerDependencies: Dependencies;
   dependencies?: Dependencies;
   fixtureDevDependencies?: Dependencies;
+  /** Archives from this verification batch replace internal registry dependencies. */
+  packageArchives?: Dependencies;
 }
 
 function run(binary: string, args: string[], cwd: string): string {
@@ -79,6 +81,7 @@ export async function checkConsumer(
         ...fixtureManifest.devDependencies,
         ...options.fixtureDevDependencies,
       },
+      overrides: options.packageArchives ?? {},
     }),
   );
   run(options.bunBinary, ["install", "--ignore-scripts"], consumer);
@@ -97,21 +100,29 @@ export async function checkConsumer(
   }
 
   const specifiers = Object.keys(packed.exports).map((key) => packed.name + key.slice(1));
-  const modules = specifiers.filter((specifier) => !specifier.endsWith(".json"));
+  const modules = specifiers.filter(
+    (specifier) => !specifier.endsWith(".json") && !specifier.endsWith(".css"),
+  );
   // JSON presets load through both their ESM and CommonJS package exports.
   const imports = specifiers.map((specifier) =>
     specifier.endsWith(".json")
       ? `createRequire(import.meta.url)(${JSON.stringify(specifier)});\nawait import(${JSON.stringify(specifier)}, { with: { type: "json" } });`
-      : `import ${JSON.stringify(specifier)};`,
+      : specifier.endsWith(".css")
+        ? `if (!(await readFile(new URL(import.meta.resolve(${JSON.stringify(specifier)})), "utf8")).trim()) throw new Error("Empty stylesheet export: " + ${JSON.stringify(specifier)});`
+        : `import ${JSON.stringify(specifier)};`,
   );
   await writeFile(
     join(consumer, "exports.mjs"),
-    ['import { createRequire } from "node:module";', ...imports].join("\n"),
+    [
+      'import { createRequire } from "node:module";',
+      'import { readFile } from "node:fs/promises";',
+      ...imports,
+    ].join("\n"),
   );
   run(options.bunBinary, ["exports.mjs"], consumer);
   run(options.nodeBinary, ["exports.mjs"], consumer);
   const requireSpecifiers = Object.entries(packed.exports)
-    .filter(([, target]) => hasRequireCondition(target))
+    .filter(([key, target]) => !key.endsWith(".css") && hasRequireCondition(target))
     .map(([key]) => packed.name + key.slice(1));
   if (requireSpecifiers.length > 0) {
     await writeFile(
@@ -221,6 +232,7 @@ export async function checkWithoutOptionalPeers(
       devDependencies: {
         ...options.compilerDependencies,
       },
+      overrides: options.packageArchives ?? {},
     }),
   );
   run(options.bunBinary, ["install", "--ignore-scripts"], consumer);

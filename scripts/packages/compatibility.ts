@@ -156,19 +156,27 @@ async function check(): Promise<void> {
   }).trim();
   assert.equal(actual, expectedNode, "Consumer Node binary does not match its matrix target");
   const packages = packagesForNode(index, expectedNode);
+  // Every override is a verified artifact, including dependencies whose own
+  // engine floor excludes them from this particular runtime's direct checks.
+  for (const entry of index.packages) {
+    assert.equal(
+      basename(entry.archive),
+      entry.archive,
+      "Archive must stay inside the artifact directory",
+    );
+    const archive = join(artifacts, entry.archive);
+    assert.equal(
+      digest(await readFile(archive)),
+      entry.sha256,
+      `${entry.manifest.name}: archive digest changed`,
+    );
+  }
+  const packageArchives = Object.fromEntries(
+    index.packages.map((entry) => [entry.manifest.name, join(artifacts, entry.archive)]),
+  );
   await withTempDirectory("raypx-kit-compatibility-", async (temporary) => {
     for (const entry of packages) {
-      assert.equal(
-        basename(entry.archive),
-        entry.archive,
-        "Archive must stay inside the artifact directory",
-      );
       const archive = join(artifacts, entry.archive);
-      assert.equal(
-        digest(await readFile(archive)),
-        entry.sha256,
-        `${entry.manifest.name}: archive digest changed`,
-      );
       const packageDirectory = join(root, "packages", entry.directory);
       const consumerOptions = {
         bunBinary: process.execPath,
@@ -176,6 +184,7 @@ async function check(): Promise<void> {
         compilerDependencies: index.compilerDependencies,
         dependencies: entry.profiles[peers as PeerProfile],
         fixtureDevDependencies: entry.fixtureDevDependencies,
+        packageArchives,
       };
       await checkConsumer(
         archive,

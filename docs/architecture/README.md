@@ -16,11 +16,16 @@ packages/
   devkit/       Repository maintenance library
   drizzle/      PostgreSQL expressions and result helpers
   drizzle-kit/  Extracted upstream CLI distribution
+  email-preview/ Local React Email preview CLI and embedded TanStack Start application
   env/          Consumer-owned schema validation
   intl/         Locale, translation and controlled React integration
   analytics/    consent-controlled PostHog browser events and sanitized errors
   logger/       evlog facade and asynchronous logger context
+  security/     Security headers and optional Arcjet request protection
+  storage/      Object storage drivers and signed URLs
+  themes/       Shared tokens, CSS and optional React theme state
   tsconfig/     Published compiler presets
+  ui/           shadcn-style Base UI primitives and class utilities
 scripts/
   cli.ts        Internal maintenance command entry
   checks/       Source architecture, dependencies and toolchain policy
@@ -46,39 +51,49 @@ scripts and are not published as library APIs.
 
 ## Package responsibilities
 
-| Package                                             | Library responsibility                                                                                                                       | Consumer responsibility                                                                               |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [Codemods](../../packages/codemods/README.md)       | Run transformations over explicit files, preview changes and write only when requested                                                       | Migration semantics, file selection, review and rollback                                              |
-| [Devkit](../../packages/devkit/README.md)           | Workspace discovery, metadata and import checks; toolchain declarations; static catalogs; documentation links; process and artifact helpers  | Repository policy, paths, expected runtime pins, cache trust and application health probes            |
-| [Drizzle](../../packages/drizzle/README.md)         | Typed projections, explicit UPSERT mappings, JSONB expressions, uniqueness classification, result unwrapping and sanitized EXPLAIN summaries | PostgreSQL schemas, postgres.js clients, transactions, migrations, query execution and business rules |
-| [Drizzle Kit](../../packages/drizzle-kit/README.md) | Retain upstream CLI commands and `defineConfig` in a smaller distribution                                                                    | Schema/configuration files, a compatible ORM, database access and migration decisions                 |
-| [Env](../../packages/env/README.md)                 | Compose Zod schemas and presets, normalize inputs, validate values and guard client access                                                   | Variable names, secrets, environment loading, application presets and browser-safe value injection    |
-| [Intl](../../packages/intl/README.md)               | Immutable locale configuration, negotiation, typed ICU translation, formatting, controlled providers and catalog validation                  | Catalogs, loading, preference state, persistence and consistent SSR/hydration snapshots               |
-| [Analytics](../../packages/analytics/README.md)     | Consent-gated browser events, sanitized errors and optional React bindings                                                                   | Product schemas, identity, preferences, configuration and release uploads                             |
-| [Logger](../../packages/logger/README.md)           | Expose evlog events, errors and drain pipelines; bind an existing logger to asynchronous context                                             | Startup configuration, event fields, redaction policy, emission, drain delivery and shutdown          |
-| [TSConfig](../../packages/tsconfig/README.md)       | Shared strict compiler behavior and module-resolution presets                                                                                | Project layout, aliases, references, output directories and runtime-specific ambient types            |
+| Package                                                 | Library responsibility                                                                                                                       | Consumer responsibility                                                                               |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [Codemods](../../packages/codemods/README.md)           | Run transformations over explicit files, preview changes and write only when requested                                                       | Migration semantics, file selection, review and rollback                                              |
+| [Devkit](../../packages/devkit/README.md)               | Workspace discovery, metadata and import checks; toolchain declarations; static catalogs; documentation links; process and artifact helpers  | Repository policy, paths, expected runtime pins, cache trust and application health probes            |
+| [Drizzle](../../packages/drizzle/README.md)             | Typed projections, explicit UPSERT mappings, JSONB expressions, uniqueness classification, result unwrapping and sanitized EXPLAIN summaries | PostgreSQL schemas, postgres.js clients, transactions, migrations, query execution and business rules |
+| [Drizzle Kit](../../packages/drizzle-kit/README.md)     | Retain upstream CLI commands and `defineConfig` in a smaller distribution                                                                    | Schema/configuration files, a compatible ORM, database access and migration decisions                 |
+| [Email Preview](../../packages/email-preview/README.md) | Discover templates, render HTML/text and serve an embedded TanStack Start preview UI                                                         | Trusted React Email templates, preview props, dependencies and local assets                           |
+| [Env](../../packages/env/README.md)                     | Compose Zod schemas and presets, normalize inputs, validate values and guard client access                                                   | Variable names, secrets, environment loading, application presets and browser-safe value injection    |
+| [Intl](../../packages/intl/README.md)                   | Immutable locale configuration, negotiation, typed ICU translation, formatting, controlled providers and catalog validation                  | Catalogs, loading, preference state, persistence and consistent SSR/hydration snapshots               |
+| [Analytics](../../packages/analytics/README.md)         | Consent-gated browser events, sanitized errors and optional React bindings                                                                   | Product schemas, identity, preferences, configuration and release uploads                             |
+| [Logger](../../packages/logger/README.md)               | Expose evlog events, errors and drain pipelines; bind an existing logger to asynchronous context                                             | Startup configuration, event fields, redaction policy, emission, drain delivery and shutdown          |
+| [Security](../../packages/security/README.md)           | Compose Nosecone headers and adapt Fetch requests to optional Arcjet protection                                                              | Header policy, Arcjet keys and rules, request identity and enforcement decisions                      |
+| [TSConfig](../../packages/tsconfig/README.md)           | Shared strict compiler behavior and module-resolution presets                                                                                | Project layout, aliases, references, output directories and runtime-specific ambient types            |
+| [Themes](../../packages/themes/README.md)               | Theme tokens, generated CSS, initialization script and optional React state                                                                  | Initial theme, persistence key, document integration and product preferences                          |
+| [UI](../../packages/ui/README.md)                       | Base UI primitives, shadcn conventions and shared component styles                                                                           | Tailwind compilation, application layout, copy and component composition                              |
 
-None of the published packages has a runtime dependency on another Raypx Kit
-package or on the Raypx product repository. Applications compose the packages;
-schemas, authorization, accounting and other domain rules stay in those applications.
+Published packages never depend on the Raypx product repository. UI depends on
+Themes for its shared CSS tokens; Email Preview bundles both packages into its
+prebuilt application. Applications retain schemas, authorization, accounting and
+other domain rules.
 
 ## Public entries and dependency boundaries
 
 Subpaths below are relative to their package names. The manifests remain the
 authoritative export list.
-All public packages declare Node `>=22.14`; the tsdown builds target the
-same runtime floor. The development runtime pin remains separate.
+Public packages declare Node `>=22.21`; Security follows Arcjet's narrower
+`>=22.21.0 <23 || >=24.5.0` range. The tsdown builds target Node 22.21.0.
+The development runtime pin remains separate.
 
-| Package     | Public entries                                                                                             | Dependency boundary                                                                                                                              |
-| ----------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Codemods    | Root runner API; `raypx-kit-codemod` executable                                                            | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                      |
-| Devkit      | `/workspaces`, `/architecture`, `/toolchain`, `/catalogs`, `/docs`, `/process`, `/artifact`; no root entry | Node APIs and external parser/configuration dependencies; its Turbo helper runs under Bun                                                        |
-| Drizzle     | Root, `/postgres`, `/errors`, `/results`, `/diagnostics`                                                   | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                               |
-| Drizzle Kit | Root `defineConfig` for ESM and CommonJS; `drizzle-kit` executable                                         | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                    |
-| Env         | Root, `/runtime`                                                                                           | Zod is a required external peer, preserving schema runtime identity                                                                              |
-| Intl        | Root, `/client`, `/browser`, `/server`, `/types`, `/testing`                                               | React is a required external peer; `use-intl` and the explicitly allowed FormatJS-related dependencies are bundled, including their declarations |
-| Logger      | Root, `/context`, `/pipeline`                                                                              | evlog is an external runtime dependency, not a peer or bundled copy; `/context` uses its Node asynchronous storage                               |
-| TSConfig    | `/base.json`, `/node.json`, `/browser.json`, `/library.json`, `/react-library.json`; no root entry         | JSON presets extend sibling presets; consumers install the compiler and ambient type packages they need                                          |
+| Package       | Public entries                                                                                             | Dependency boundary                                                                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Codemods      | Root runner API; `raypx-kit-codemod` executable                                                            | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                      |
+| Devkit        | `/workspaces`, `/architecture`, `/toolchain`, `/catalogs`, `/docs`, `/process`, `/artifact`; no root entry | Node APIs and external parser/configuration dependencies; its Turbo helper runs under Bun                                                        |
+| Drizzle       | Root, `/postgres`, `/errors`, `/results`, `/diagnostics`                                                   | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                               |
+| Drizzle Kit   | Root `defineConfig` for ESM and CommonJS; `drizzle-kit` executable                                         | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                    |
+| Env           | Root, `/runtime`                                                                                           | Zod is a required external peer, preserving schema runtime identity                                                                              |
+| Intl          | Root, `/client`, `/browser`, `/server`, `/types`, `/testing`                                               | React is a required external peer; `use-intl` and the explicitly allowed FormatJS-related dependencies are bundled, including their declarations |
+| Logger        | Root, `/context`, `/pipeline`                                                                              | evlog is an external runtime dependency, not a peer or bundled copy; `/context` uses its Node asynchronous storage                               |
+| Security      | Root, `/arcjet`                                                                                            | Universal headers use external Nosecone; the Node-only Arcjet entry uses an optional external SDK peer                                           |
+| TSConfig      | `/base.json`, `/node.json`, `/browser.json`, `/library.json`, `/react-library.json`; no root entry         | JSON presets extend sibling presets; consumers install the compiler and ambient type packages they need                                          |
+| Email Preview | `/package.json`; `raypx-email` executable                                                                  | Prebuilt app bundles UI/Themes; template dependencies and React resolve from the consumer project                                                |
+| Themes        | Root, `/config`, `/script`, `/styles.css`, `/tailwind.css`                                                 | Root React APIs use an optional peer; config, script and CSS work independently                                                                  |
+| UI            | Root, `/components/ui/*` (explicit exports), `/lib/utils`, `/styles.css`                                   | Base UI primitives, Themes CSS and external React/React DOM/Tailwind peers                                                                       |
 
 Codemods provides a runner, not a set of automatic project upgrades. Callers pass
 a transformation and explicit file paths to `runCodemod`; previews are the default
@@ -107,26 +122,50 @@ preserve synchronous or asynchronous return values and restore nested scopes.
 They neither emit events nor merge parent fields. The root and pipeline entries
 do not import the Node context entry.
 
+Security keeps header construction independent of Arcjet and frameworks. Only
+the optional `/arcjet` entry uses the Node SDK; applications provide the key and
+rules and decide how to enforce each result. Its SDK runtime range excludes
+Node 23 and Node 24 releases before 24.5.0; the package does not promise support
+for those runtimes.
+
 ## From source to installable artifacts
 
-| Packages                                                         | Build path                                                                 | Published result                                                                                                                                              |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codemods, Devkit, Drizzle, Env, Intl, Analytics, Logger, Storage | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
-| Drizzle Kit                                                      | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
-| TSConfig                                                         | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
+| Packages                                                                       | Build path                                                                 | Published result                                                                                                                                              |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codemods, Devkit, Drizzle, Env, Intl, Analytics, Logger, Security, Storage, UI | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
+| Drizzle Kit                                                                    | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
+| Email Preview                                                                  | CLI → tsdown; TanStack Start and Nitro → prebuilt server and assets        | `dist/cli.mjs` and `dist/app/`; consumers run the CLI without building the preview UI                                                                         |
+| TSConfig                                                                       | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
+| Themes                                                                         | Token source → CSS generator; TypeScript entries → tsdown                  | ESM and declarations, package-root `styles.css` and Tailwind mappings                                                                                         |
 
 The tsdown configurations explicitly preserve output extensions and their
 consumer runtime targets. Those targets are independent of the repository's
 development runtime pins. Drizzle Kit preserves both ESM and CommonJS exports;
 its omitted programmatic API and payload bundles are not recreated locally.
+Email Preview is public tooling with an embedded application. Its only package
+export is metadata; the `raypx-email` binary is its supported interface. Templates
+compile at runtime from the consumer project, while the installed UI assets remain
+read-only. The browser receives rendered output and file-change notifications.
+Its build derives complete third-party license notices from the actual bundled
+module graphs and writes `dist/THIRD_PARTY_LICENSES.txt`. The root Turbo `dist/`
+output rule caches these notices with the application. They remain outside Git
+and ship in the archive; package `LICENSE` files are not build outputs.
+UI retains explicit `components/ui/*` exports, a utility entry and package-root
+styles. Consumers compile these styles with Tailwind 4; `@source` includes classes
+from the installed UI distribution. Themes exposes framework-independent config
+and initialization entries alongside its optional React provider.
 Build tasks create the outputs. `pack:check` packs and validates existing outputs;
 it does not build them. The root verification pipeline runs builds first.
 
 Package `exports` select the supported interface, while `files` selects the
-archive payload. Archives retain package documentation, changelogs, full licenses
-and applicable source notices. Research documents, tests and workspace dependencies
-are not copied into published libraries. Bundled third-party code retains its
-licenses, and extracted upstream code retains its source bytes and license.
+archive payload. Archives retain package documentation, changelogs, package licenses
+and applicable source notices. UI, Themes, Email Preview and Security keep their own Apache
+license in `LICENSE` and a generated direct runtime and peer dependency index in
+their READMEs. Ordinary external dependencies carry their own license texts.
+Research documents, tests and workspace dependencies are not copied into published
+libraries. Bundled third-party code retains complete licenses and notices;
+copied or extracted upstream code retains its license and source provenance,
+including UI's shadcn MIT license and notice and Themes' original source notice.
 
 ## Development dependencies and internal orchestration
 
@@ -185,13 +224,16 @@ requiring `dist/`. Missing or unknown workspace paths are errors, and inline
 manifest policy cannot fill gaps in the supplied map. Platform
 overrides describe browser, Node and Bun entries independently. Explicit bundled
 dependency declarations cover source dependencies intentionally included in an
-archive; they do not permit internal cross-workspace access. Drizzle Kit's local
+archive. Apps and tooling may bundle declared internal development dependencies
+through public exports; this preserves platform, application and cycle constraints. Drizzle Kit's local
 extractor is checked as tooling, while its copied upstream payload is verified
 by the archive contracts.
 
 Compatibility jobs consume archives produced with the pinned development
 toolchain. They select packages by their declared Node support and run public
 export, CLI and fixture contracts with a separate consumer Node executable.
+Internal runtime dependencies install from the same batch of verified archives,
+and exported CSS assets are resolved and read without importing them as JavaScript.
 Minimum peer versions and the lockfile's tested peer versions use independent
 installations. These jobs supplement the ordinary Bun/Node archive checks and
 do not require a local database.

@@ -213,14 +213,40 @@ execution. Passing local `verify` does not include that evidence. PostgreSQL 18
 is outside the test matrix; future version-specific features require their own
 verification evidence.
 
+## Dependency license records
+
+UI, Themes and Email Preview keep their own Apache license in `LICENSE`. Each
+package README contains a generated index of its direct runtime and peer
+dependencies, with the dependency name, installed version and license link.
+Ordinary external dependencies carry their full license texts in their own
+packages; these texts are not duplicated in the consuming package's `LICENSE`.
+
+Run `bun run licenses:update` after changing these dependencies or their installed
+versions. `bun run licenses:check` runs at the start of `verify:source` and rejects
+stale README indexes without requiring build output. These commands maintain the
+indexes and never rewrite package `LICENSE` files.
+
+Copied and bundled code retains complete license texts and applicable notices.
+UI preserves the full shadcn MIT license in `THIRD_PARTY_LICENSES.txt` and its
+provenance in `NOTICE.md`; Themes preserves its original source `NOTICE`.
+Email Preview's build generates `dist/THIRD_PARTY_LICENSES.txt` from the actual
+bundled module graphs, including complete upstream license and notice texts.
+This file stays out of Git with the rest of `dist/`, is restored by the normal
+build cache and ships in the published archive. Rebuild before checking or packing
+artifacts after changing bundled dependencies.
+
 ## Archive consumers
 
 `pack:check` does not build packages. Run `bun run build` first when invoking it
 outside `verify`. It packs each public package with `bun pm pack`, checks export
 targets, required license files and resolved dependency protocols, then installs
-the tarball outside the workspace with fresh consumer dependencies.
+the tarball outside the workspace with fresh consumer dependencies. All archives
+are packed first; overrides resolve internal dependencies to the same batch of
+archives, including packages awaiting their first publication.
 
-Consumers load every export with Bun and the pinned Node. The runner also checks
+Consumers load JavaScript and JSON exports with Bun and the pinned Node. CSS
+exports must resolve to readable, nonempty installed assets; package fixtures
+verify their Tailwind integration where applicable. The runner also checks
 declared CommonJS exports and CLI help where present, and uses `tsc` with NodeNext
 resolution for JavaScript exports. The generated declaration smoke check uses
 `skipLibCheck: true`; focused consumer fixtures can enforce stricter public type
@@ -245,14 +271,16 @@ consumer directories for diagnosis. Archive checks do not publish packages.
 The verification job prepares all public package archives from its completed build and records
 their SHA-256 digests and dependency profiles. The compatibility jobs download
 those archives and verify the digests before installing them outside the
-workspace. They retain the pinned development runtimes for orchestration and
+workspace. Internal package overrides use this same verified archive batch.
+They retain the pinned development runtimes for orchestration and
 type checking, and use a separate, checksum-verified Node binary for consumer
 runtime checks. The development `doctor` requirement remains unchanged.
 
-Every public package declares Node `>=22.14` support. Each package runs on the
-exact minimum version (`22.14.0`) and on the development Node pin. The matrix
-therefore contains four cells, with two independent dependency profiles for each
-runtime:
+Public packages declare Node `>=22.21` support. Security uses Arcjet's narrower
+`>=22.21.0 <23 || >=24.5.0` range; Node 23 and earlier Node 24 releases are outside
+its support contract. Each package runs on the exact minimum version (`22.21.0`)
+and on the development Node pin. The matrix therefore contains four cells, with
+two independent dependency profiles for each runtime:
 
 - `minimum` installs exact peer lower bounds, including the admitted Drizzle
   prerelease lower bound.
@@ -272,7 +300,7 @@ and select a separate Node executable:
 bun run compatibility:check prepare --artifacts .artifacts/compatibility
 bun run compatibility:check matrix --artifacts .artifacts/compatibility
 bun run compatibility:check check --artifacts .artifacts/compatibility \
-  --node /path/to/node --expected-node 22.14.0 --peers minimum
+  --node /path/to/node --expected-node 22.21.0 --peers minimum
 ```
 
 The selected binary must match its exact declared matrix version. Compatibility

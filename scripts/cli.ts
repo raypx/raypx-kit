@@ -91,6 +91,29 @@ export const command = defineCommand({
         }),
       },
     }),
+    licenses: defineCommand({
+      meta: {
+        name: "licenses",
+        description: "Refresh or verify direct dependency license indexes in package READMEs",
+      },
+      args: {
+        check: {
+          type: "boolean",
+          default: false,
+          description: "Reject stale README indexes without writing files",
+        },
+      },
+      run: async ({ args }) => {
+        assertArguments(args, ["check"]);
+        const { updatePackageLicenses } = await import("./packages/licenses.js");
+        updatePackageLicenses(root, args.check);
+        console.log(
+          args.check
+            ? "Dependency license indexes are current."
+            : "Dependency license indexes updated.",
+        );
+      },
+    }),
     release: defineCommand({
       meta: {
         name: "release",

@@ -42,11 +42,39 @@ const config: KnipConfig = {
     "packages/env": {
       ...library,
     },
+    "packages/email-preview": {
+      // Nitro and Start load these custom-directory entries; the CLI loads templates.
+      entry: [
+        "src/http/entry.ts",
+        "src/app/router.tsx",
+        // shadcn resolves this utility through components.json when generating components.
+        "src/app/lib/utils.ts",
+        "src/app/routes/**/*.{ts,tsx}",
+        "examples/**/*.{tsx,jsx}",
+      ],
+      project: [
+        ...libraryProject,
+        "src/**/*.tsx",
+        "src/**/*.css",
+        "build/**/*.ts",
+        "examples/**/*.{ts,tsx,jsx}",
+        "!src/app/routeTree.gen.ts",
+      ],
+      vitest: true,
+      tsdown: true,
+      "tanstack-router": true,
+      typescript: { config: ["tsconfig.json", "tsconfig.build.json"] },
+      // Resolved with createRequire and embedded into the consumer template compiler input.
+      ignoreDependencies: ["@react-email/render"],
+    },
     "packages/intl": {
       ...library,
     },
     "packages/analytics": { ...library, project: [...libraryProject, "src/**/*.tsx"] },
     "packages/logger": {
+      ...library,
+    },
+    "packages/security": {
       ...library,
     },
     "packages/drizzle-kit": {
@@ -74,6 +102,16 @@ const config: KnipConfig = {
       project: ["tests/**/*.ts"],
       vitest: true,
       typescript: true,
+    },
+    "packages/themes": {
+      ...library,
+      project: [...libraryProject, "src/**/*.tsx", "scripts/**/*.ts"],
+    },
+    "packages/ui": {
+      ...library,
+      project: [...libraryProject, "src/**/*.tsx"],
+      // Compiled by the installed archive fixture, which has its own dependency environment.
+      ignoreDependencies: ["@tailwindcss/node", "tailwindcss"],
     },
     docs: {
       // Nitro spawns the prerender preview wrapper by path from vite.config.ts.

@@ -26,7 +26,7 @@
     "format": "vp fmt",
     "knip": "knip",
     "verify:toolchain": "bun run doctor && bun run toolchain:check",
-    "verify:source": "bun run architecture:check && bun run lint && bun run check && bun run knip",
+    "verify:source": "bun run licenses:check && bun run architecture:check && bun run lint && bun run check && bun run knip",
     "verify:tests": "bun run test:toolchain && turbo run test build",
     "verify:artifacts": "bun run pack:check && bun run release:check",
     "verify": "bun run verify:toolchain && bun run verify:source && bun run verify:tests && bun run verify:artifacts",
@@ -44,7 +44,9 @@
     "docs:build": "turbo run build --filter=docs",
     "docs:preview": "bun run --cwd docs preview",
     "docs:check": "bun run --cwd docs check",
-    "docs:deploy": "wrangler deploy"
+    "docs:deploy": "wrangler deploy",
+    "licenses:update": "bun run raypx-kit-dev licenses",
+    "licenses:check": "bun run raypx-kit-dev licenses --check"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

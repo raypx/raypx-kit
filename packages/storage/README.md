@@ -9,7 +9,7 @@ application server.
 bun add @raypx-kit/storage
 ```
 
-ESM only, for Node 22.14+, Bun and Cloudflare Workers (every entry except `./fs`). Server-side: drivers hold credentials or
+ESM only, for Node 22.21+, Bun and Cloudflare Workers (every entry except `./fs`). Server-side: drivers hold credentials or
 signing secrets. Nothing reads environment variables or creates clients at import;
 applications pass every option.
 

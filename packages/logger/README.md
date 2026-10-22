@@ -11,7 +11,7 @@ logger through every function.
 bun add @raypx-kit/logger
 ```
 
-ESM; Node 22.14+ or Bun. evlog is an external runtime dependency (`^2.33.1`), not
+ESM; Node 22.21+ or Bun. evlog is an external runtime dependency (`^2.33.1`), not
 bundled or copied. Its framework adapters and their optional peers are not
 required. The Node-only context entry uses `node:async_hooks`; the root and
 pipeline entries do not import it.
