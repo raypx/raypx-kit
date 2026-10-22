@@ -1,0 +1,22 @@
+.github/actions/setup-toolchain/action.yml
+  h_f0766e80fd3864 34-37
+README.md
+  h_f0766e80fd3864 35
+docs/development/README.md
+  h_f0766e80fd3864 20,25-28,175
+docs/development/dependencies.md
+  h_f0766e80fd3864 10
+package.json
+  h_f0766e80fd3864 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4f0467961cc23d6aeb6fef8c07f3acba36a053b9",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
