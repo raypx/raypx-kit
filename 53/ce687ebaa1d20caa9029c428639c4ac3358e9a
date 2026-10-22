@@ -1,0 +1,39 @@
+packages/intl/LICENSE
+  s_adafa49206c7d6::t_c3fe3676954d36 212
+packages/devkit/tests/fixtures/artifact/server.mjs
+  s_adafa49206c7d6::t_c6c381b0d9a97b 1-6
+packages/devkit/tests/artifact.test.ts
+  s_adafa49206c7d6::t_c6c381b0d9a97b 1,33-34
+.changeset/refresh-compatible-dependencies.md
+  s_adafa49206c7d6::t_c3fe3676954d36 1-8
+docs/package.json
+  s_adafa49206c7d6::t_c3fe3676954d36 21
+docs/NOTICE.md
+  s_adafa49206c7d6::t_baeda5df6b0988 7
+bun.lock
+  s_adafa49206c7d6::t_3a2707f9461d63 14,17,20,31,55,87,146,302,306,308,382,658,686,688,690,692,694,696,698,700,702,704,706,708,710,712,714,734,814,816,818,820,822,824,994,1004,1086,1152,1158,1170,1242,1274,1392,1394,1396,1418,1454,1518,1532,1534,1584,1586,1604,1610,1638,1686,1710,1780-1781
+package.json
+  s_adafa49206c7d6::t_b6beb975ef7008 56,59,62
+packages/analytics/package.json
+  s_adafa49206c7d6::t_a1d90a45008f81 53
+packages/devkit/package.json
+  s_adafa49206c7d6::t_59cf42237cec79 69
+packages/intl/package.json
+  s_adafa49206c7d6::t_89ebd0799b39ee 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "53ce687ebaa1d20caa9029c428639c4ac3358e9a",
+  "prompts": {},
+  "sessions": {
+    "s_adafa49206c7d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15727-0890-77e0-a9f5-ce91cd071dd2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
