@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/drizzle-kit",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "drizzle-kit's CLI and defineConfig without the unused prebuilt API and payload bundles.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/drizzle-kit",
   "license": "MIT",

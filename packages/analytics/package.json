@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/analytics",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "Consent-controlled PostHog analytics and sanitized browser error tracking.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/analytics",
   "license": "Apache-2.0",

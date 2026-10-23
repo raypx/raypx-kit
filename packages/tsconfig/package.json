@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/tsconfig",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "Strict TypeScript presets for ESM libraries, browser applications and Node-compatible runtimes.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/tsconfig",
   "license": "Apache-2.0",
