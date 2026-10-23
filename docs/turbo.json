@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/README.md",
+        "$TURBO_ROOT$/.changeset/README.md",
+        "$TURBO_ROOT$/PRODUCT.md",
+        "$TURBO_ROOT$/packages/*/README.md",
+        "$TURBO_ROOT$/packages/*/NOTICE.md",
+        "$TURBO_ROOT$/packages/*/LICENSE"
+      ]
+    }
+  }
+}

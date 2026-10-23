@@ -48,6 +48,8 @@ without a third-party service.
   registered pages use site routes and other repository files link to GitHub.
 - Use lazy content loading and a search API built from canonical content, with no production database,
   authentication, external search provider or application environment dependency.
+- Keep prerendering at two concurrent pages and preview on IPv4 loopback so
+  building documentation does not multiply the workspace test budget or depend on localhost DNS.
 - Keep the UI in English and retain localized message examples in their intended languages.
 - Respect light/dark themes, keyboard access and reduced-motion preferences.
 

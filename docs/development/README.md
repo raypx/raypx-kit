@@ -54,6 +54,7 @@ documented versions and installed dependency combinations.
 | `bun run pack:check`         | Pack current package output and check isolated archive consumers |
 | `bun run release:check`      | Changesets versioning rules in disposable local fixtures         |
 | `bun run verify`             | The complete local gate, also used by CI                         |
+| `bun run verify:quick`       | Toolchain, source checks and unit tests for daily development    |
 
 Start with the affected package's narrow checks:
 
@@ -71,6 +72,34 @@ archive compatibility matrix and an independent Drizzle database integration job
 `verify`, default unit tests, coverage and tarball checks do not require a database;
 the normal gate does not enable coverage. Run a package's `test:coverage` after
 changing its test runtime or coverage provider.
+
+### Daily feedback and machine load
+
+Use `bun run verify:quick` during development. It runs the toolchain and source
+checks, maintenance/documentation tests and workspace unit tests. Dependency
+libraries are built when tests require their public exports. Documentation site
+builds, browser E2E, archive consumers and Changesets fixtures remain in the full
+`bun run verify` gate used before release and by CI.
+
+Turbo runs at most two workspace tasks concurrently and each Vitest runner uses
+one worker. Tests retain per-file isolation; builds and tests can still create
+their own subprocesses. The documentation build prerenders at most two pages
+concurrently and uses an explicit IPv4 loopback preview address. On a busy machine,
+run maintenance tests followed by a
+single workspace or its consumers:
+
+```sh
+bun run test:toolchain
+bunx turbo run test --filter=@raypx-kit/ui --concurrency=1 --summarize
+bunx turbo run test '--filter=...@raypx-kit/ui' --concurrency=1 --summarize
+```
+
+Root `test` and `verify:tests` save task timings and cache results to `.turbo/runs/`.
+Cached test output contains the original test duration; consult the summary for
+the current run. Keep `.turbo/cache` between runs. Documentation content is a
+build input of the documentation workspace rather than a global dependency, so
+editing a guide does not invalidate unrelated library tests. Shared toolchain,
+test setup and TypeScript configuration still invalidate the relevant global cache.
 
 ## Tool and test boundaries
 

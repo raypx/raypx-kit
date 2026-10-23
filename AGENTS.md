@@ -246,6 +246,10 @@ library tarball contents and isolated Bun/Node consumers. `build` runs package
 `verify:toolchain`, `verify:source`, `verify:tests`, `verify:e2e` and `verify:artifacts` are the
 same ordered phases used by local `verify` and the named CI steps. Keep their
 commands in the root manifest rather than duplicating verification policy in YAML.
+`verify:quick` runs toolchain, source and unit tests for daily feedback; the full
+gate retains documentation builds, browser E2E and archive checks. Turbo defaults
+to two concurrent workspace tasks with one Vitest worker per task. Documentation
+content belongs in docs' build inputs, not the global library cache dependencies.
 React workspaces own Playwright scenarios and browser consumer applications in
 `e2e/`. Keep the project inventory and shared fixture server/runner in root
 `e2e/`, with the Playwright configuration at the repository root. The unit

@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "envMode": "loose",
+  "concurrency": "2",
   "tasks": {
     "check": {
       "dependsOn": ["^check"],
@@ -26,13 +27,6 @@
     "scripts/checks/toolchain.ts",
     "packages/devkit/src/toolchain.ts",
     "tests/setup/**",
-    "docs/**",
-    "README.md",
-    ".changeset/README.md",
-    "PRODUCT.md",
-    "packages/*/README.md",
-    "packages/*/NOTICE.md",
-    "packages/*/LICENSE",
     "packages/tsconfig/*.json",
     "tests/config.ts"
   ]

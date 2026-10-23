@@ -20,6 +20,8 @@ type MarkdownNode = {
 
 export default defineConfig(({ command }) => ({
   server: { port: 3100, strictPort: true },
+  // Keep the preview listener and prerender fetches on the same IPv4 loopback.
+  preview: { host: "127.0.0.1" },
   ssr: { noExternal: true },
   plugins: [
     nitro({
@@ -60,6 +62,7 @@ export default defineConfig(({ command }) => ({
     tanstackStart({
       prerender: {
         enabled: true,
+        concurrency: 2,
         autoStaticPathsDiscovery: false,
         crawlLinks: false,
         failOnError: true,

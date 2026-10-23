@@ -5,7 +5,8 @@ export function workspaceTests() {
   return defineConfig({
     test: {
       environment: "node",
-      maxWorkers: 2,
+      // Turbo owns workspace parallelism; keep one worker per active test task.
+      maxWorkers: 1,
       execArgv: ["--no-env-file", "--no-install"],
       include: ["tests/**/*.{test,spec}.{ts,tsx}"],
       exclude: ["**/e2e/**"],
