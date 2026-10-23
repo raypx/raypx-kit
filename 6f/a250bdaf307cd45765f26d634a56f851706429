@@ -1,0 +1,59 @@
+bun.lock
+  s_49f01f37f619d1::t_0856d10887adbc 59,82,92,104,119,176,187,206,257,286
+packages/analytics/CHANGELOG.md
+  s_49f01f37f619d1::t_7e0b38cab88a32 3-16
+packages/analytics/package.json
+  s_49f01f37f619d1::t_d66b8a8d627543 3
+packages/codemods/CHANGELOG.md
+  s_49f01f37f619d1::t_823de710486fd9 3-11
+packages/codemods/package.json
+  s_49f01f37f619d1::t_6fd2d9738b2e11 3
+packages/devkit/CHANGELOG.md
+  s_49f01f37f619d1::t_f91cf8d51464e2 3-17
+packages/devkit/package.json
+  s_49f01f37f619d1::t_d671013ca51a1c 3
+packages/drizzle-kit/CHANGELOG.md
+  s_49f01f37f619d1::t_46ebaa773e9ebc 3-11
+packages/drizzle-kit/package.json
+  s_49f01f37f619d1::t_351119b0cf73b5 3
+packages/drizzle/CHANGELOG.md
+  s_49f01f37f619d1::t_1f2a6ecb2f251d 3-11
+packages/drizzle/package.json
+  s_49f01f37f619d1::t_c302507a78cb56 3
+packages/env/CHANGELOG.md
+  s_49f01f37f619d1::t_5e9270f4acbb02 3-11
+packages/env/package.json
+  s_49f01f37f619d1::t_f00b35ea86f186 3
+packages/intl/CHANGELOG.md
+  s_49f01f37f619d1::t_ed2eee4d545ccf 3-16
+packages/intl/package.json
+  s_49f01f37f619d1::t_ae5a4c85f5bb78 3
+packages/logger/CHANGELOG.md
+  s_49f01f37f619d1::t_5eb22e6130aa58 3-11
+packages/logger/package.json
+  s_49f01f37f619d1::t_dfe8da2a14b485 3
+packages/storage/CHANGELOG.md
+  s_49f01f37f619d1::t_5cafda63271608 3-11
+packages/storage/package.json
+  s_49f01f37f619d1::t_564f4ad3242772 3
+packages/tsconfig/CHANGELOG.md
+  s_49f01f37f619d1::t_a60dcdeadbcbb4 3-11
+packages/tsconfig/package.json
+  s_49f01f37f619d1::t_2c666e13175267 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6fa250bdaf307cd45765f26d634a56f851706429",
+  "prompts": {},
+  "sessions": {
+    "s_49f01f37f619d1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1538b-0c9d-7351-bd78-3f13ed331ac0",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
