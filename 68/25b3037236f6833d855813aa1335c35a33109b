@@ -1,0 +1,35 @@
+package.json
+  s_cf970e05228493::t_35fca2000d1ec9 23,30,33
+AGENTS.md
+  s_cf970e05228493::t_b8f158c6b65792 249-252
+docs/turbo.json
+  s_cf970e05228493::t_b8f158c6b65792 1-16
+tests/config.ts
+  s_cf970e05228493::t_35fca2000d1ec9 8-9
+docs/vite.config.ts
+  s_cf970e05228493::t_b8b83864e66acf 23-24,65
+turbo.json
+  s_cf970e05228493::t_35fca2000d1ec9 4
+docs/AGENTS.md
+  s_cf970e05228493::t_b8b83864e66acf 51-52
+docs/development/README.md
+  s_cf970e05228493::t_b8b83864e66acf 86-88
+  s_cf970e05228493::t_b8f158c6b65792 57,76-85,89-102
+  s_cf970e05228493::t_2a9647df8181ca 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6825b3037236f6833d855813aa1335c35a33109b",
+  "prompts": {},
+  "sessions": {
+    "s_cf970e05228493": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16a88-bc2f-7783-aa2d-04f271fd3b86",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
