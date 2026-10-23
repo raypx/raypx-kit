@@ -53,7 +53,7 @@ without a third-party service.
 
 ## Verification
 
-Keep documentation tests in `tests/`. The root `test:toolchain` command runs
+Keep documentation unit tests in `tests/`. The root `test:toolchain` command runs
 these tests through the shared Vitest configuration.
 The root `knip` command checks this workspace's source files, dependencies and
 internal exports. Treat framework routes and dynamically loaded content as
@@ -69,3 +69,8 @@ bun run verify
 ```
 
 Use `bun run docs:dev` for development at `http://localhost:3100`.
+
+Browser scenarios live in `e2e/` and run through `bun run test:e2e`. They use
+the built Cloudflare application through the existing local preview wrapper,
+with Playwright Chromium and the root shared E2E runner. Keep browser cases out
+of the unit runner; root verification includes their separate post-build gate.

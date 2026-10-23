@@ -6,6 +6,10 @@ layout, form validation and business behavior.
 
 ## Install
 
+> Not yet published to npm. The package is private for now and is bundled into
+> Email Preview's prebuilt interface; the install instructions apply once it is
+> released.
+
 ```sh
 bun add @raypx-kit/ui react react-dom tailwindcss
 ```
@@ -157,3 +161,12 @@ Run `bun run licenses:update` from the repository root after dependency changes;
 | tw-animate-css           | 1.4.0             | MIT        | [LICENSE](https://unpkg.com/tw-animate-css@1.4.0/LICENSE)           |
 
 <!-- END GENERATED DEPENDENCY LICENSE INDEX -->
+
+## Browser E2E
+
+Dialog focus and dismissal, tab keyboard navigation, forms, narrow layouts and reduced motion.
+
+Run `bun run test:e2e:install` once at the repository root, then
+`bun run --cwd packages/ui test:e2e`. The package owns its scenarios in
+`e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
+for project selection, reports and CI behavior.

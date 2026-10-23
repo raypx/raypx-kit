@@ -12,25 +12,25 @@ const packageRoot = dirname(
   fileURLToPath(import.meta.resolve("@raypx-kit/email-preview/package.json")),
 );
 const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8"));
-const cli = join(packageRoot, manifest.bin["raypx-email"]);
-assert.ok((await readFile(cli, "utf8")).startsWith("#!/usr/bin/env node"));
+assert.equal(manifest.bin, undefined, "The preview runs through vite dev, not its own binary");
+const viteRoot = dirname(fileURLToPath(import.meta.resolve("vite/package.json")));
+const viteBin = join(
+  viteRoot,
+  JSON.parse(await readFile(join(viteRoot, "package.json"), "utf8")).bin.vite,
+);
 const notices = await readFile(join(packageRoot, "dist", "THIRD_PARTY_LICENSES.txt"), "utf8");
 const license = await readFile(join(packageRoot, "LICENSE"), "utf8");
 assert.match(license, /Apache License/);
 assert.doesNotMatch(license, /BEGIN GENERATED DEPENDENCY LICENSES/);
 const readme = await readFile(join(packageRoot, "README.md"), "utf8");
-for (const name of ["@react-email/render", "esbuild", "chokidar"])
+for (const name of ["@react-email/render", "prettier", "vite"])
   assert.ok(readme.includes(name), `Missing external dependency in README: ${name}`);
 for (const name of [
   "react",
   "react-dom",
   "@tanstack/react-router",
-  "nitro",
-  "srvx",
-  "ufo",
   "@raypx-kit/ui",
   "@raypx-kit/themes",
-  "@shikijs/core",
   "tailwindcss",
   "tw-animate-css",
 ])
@@ -112,6 +112,8 @@ const timer = setTimeout(() => {
   child?.kill("SIGKILL");
   throw new Error(`Email preview archive contract exceeded 90 seconds.\n${output}`);
 }, 90_000);
+// The plugin's default mount point.
+const prefix = "/__email";
 
 try {
   await Promise.all([
@@ -122,6 +124,16 @@ try {
   ]);
   await Promise.all([
     writeFile(join(project, "package.json"), JSON.stringify({ private: true, type: "module" })),
+    writeFile(
+      join(project, "vite.config.mjs"),
+      `import { emailPreview } from "@raypx-kit/email-preview";
+export default {
+  resolve: { tsconfigPaths: true },
+  server: { host: "127.0.0.1" },
+  plugins: [emailPreview({ dir: "mail templates" })],
+};
+`,
+    ),
     writeFile(
       join(project, "tsconfig.json"),
       JSON.stringify({
@@ -149,7 +161,7 @@ try {
   const origin = `http://127.0.0.1:${port}`;
   const get = async (path) => {
     try {
-      return await fetch(`${origin}${path}`, { signal: AbortSignal.timeout(15_000) });
+      return await fetch(`${origin}${prefix}${path}`, { signal: AbortSignal.timeout(15_000) });
     } catch (error) {
       throw new Error(`GET ${path} failed.\n${output}`, { cause: error });
     }
@@ -160,7 +172,7 @@ try {
     return response.json();
   };
   const preview = () => getJson("/api/preview?template=nested%2Fwelcome.tsx");
-  child = spawn(process.execPath, [cli, "dev", "--dir", emails, "--port", String(port)], {
+  child = spawn(process.execPath, [viteBin, "dev", "--port", String(port), "--strictPort"], {
     cwd: project,
     stdio: ["ignore", "pipe", "pipe"],
     env: { ...process.env, NO_COLOR: "1" },
@@ -185,6 +197,7 @@ try {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /<html/i);
+  assert.match(html, /<base href="\/__email\/" \/>/);
   const assets = [
     ...new Set(
       [...html.matchAll(/(?:href|src)=["']([^"']*\/assets\/[^"']+)["']/g)].map((match) => match[1]),
@@ -195,7 +208,9 @@ try {
     "Packaged UI must reference JavaScript assets",
   );
   for (const asset of assets) {
-    const response = await fetch(new URL(asset, origin), { signal: AbortSignal.timeout(5_000) });
+    const response = await fetch(new URL(asset, `${origin}${prefix}/`), {
+      signal: AbortSignal.timeout(5_000),
+    });
     assert.equal(response.status, 200, `Missing packaged UI asset: ${asset}`);
     assert.ok((await response.text()).length > 0, `Empty packaged UI asset: ${asset}`);
   }
@@ -213,7 +228,7 @@ try {
   assert.match(staticAsset.headers.get("content-type") ?? "", /image\/svg\+xml/);
   assert.match(await staticAsset.text(), /Archive Mark/);
 
-  const stream = await fetch(`${origin}/api/events`, { signal: events.signal });
+  const stream = await fetch(`${origin}${prefix}/api/events`, { signal: events.signal });
   assert.equal(stream.status, 200);
   assert.match(stream.headers.get("content-type") ?? "", /text\/event-stream/);
   const reader = stream.body.getReader();
@@ -294,21 +309,22 @@ try {
   const [code, signal] = await Promise.race([
     closed,
     delay(8_000, undefined, { ref: false }).then(() => {
-      throw new Error(`CLI did not stop after SIGINT.\n${output}`);
+      throw new Error(`vite dev did not stop after SIGINT.\n${output}`);
     }),
   ]);
   assert.ok(
     code === 0 || code === 130 || signal === "SIGINT",
-    `Unexpected CLI exit: ${code} ${signal}\n${output}`,
+    `Unexpected vite dev exit: ${code} ${signal}\n${output}`,
   );
   child = undefined;
   await assert.rejects(() =>
-    fetch(`${origin}/api/templates`, { signal: AbortSignal.timeout(500) }),
+    fetch(`${origin}${prefix}/api/templates`, { signal: AbortSignal.timeout(500) }),
   );
+
   assert.equal(
     await snapshot(packageRoot),
     before,
-    "Running the CLI changed its installed package",
+    "Running vite dev changed the installed package",
   );
 } finally {
   clearTimeout(timer);

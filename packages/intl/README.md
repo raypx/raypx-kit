@@ -299,3 +299,12 @@ source is not vendored. Apache-2.0 applies to this package's implementation.
 
 Package tests live in `tests/`, with React provider and browser adapter tests in `tests/react/`.
 The archive checks run the declaration contracts in `tests/fixtures/consumer`.
+
+## Browser E2E
+
+SSR hydration, ICU translation, locale persistence, cookies and real cross-tab synchronization.
+
+Run `bun run test:e2e:install` once at the repository root, then
+`bun run --cwd packages/intl test:e2e`. The package owns its scenarios in
+`e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
+for project selection, reports and CI behavior.

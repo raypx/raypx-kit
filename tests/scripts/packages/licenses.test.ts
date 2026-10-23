@@ -11,7 +11,7 @@ import {
 
 const start = "<!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->";
 const end = "<!-- END GENERATED DEPENDENCY LICENSE INDEX -->";
-const indexedPackages = ["email-preview", "security", "themes", "ui"];
+const indexedPackages = ["email-preview", "notifications", "security", "themes", "ui"];
 const roots: string[] = [];
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), "toolkit-license-test-"));
@@ -81,6 +81,25 @@ it("links a direct workspace dependency to the adjacent package license", () => 
   symlinkSync(themes, join(root, "node_modules/themes"), "dir");
   expect(dependencyLicenseIndex(ui)).toContain("[LICENSE](../themes/LICENSE)");
   expect(dependencyLicenseIndex(ui)).toMatch(/\| themes\s+\| 1\.0\.0\s+\| Apache-2\.0\s+\|/);
+});
+
+it("links an omitted SDK license to its verified release source without allowing version or metadata drift", () => {
+  const root = fixture();
+  pkg(root, "consumer", { dependencies: { "@knocklabs/react": "^0.14.0" } });
+  const sdk = join(root, "node_modules/@knocklabs/react");
+  pkg(sdk, "@knocklabs/react", { version: "0.14.0" });
+  rmSync(join(sdk, "LICENSE"));
+  expect(dependencyLicenseIndex(root)).toContain(
+    "[LICENSE](https://github.com/knocklabs/javascript/blob/f242ff85143843dd3579e72c2010d16c2c439ad1/LICENSE)",
+  );
+  for (const metadata of [
+    { version: "0.14.1", license: "MIT" },
+    { version: "0.14.0", license: "Apache-2.0" },
+  ]) {
+    pkg(sdk, "@knocklabs/react", metadata);
+    rmSync(join(sdk, "LICENSE"));
+    expect(() => dependencyLicenseIndex(root)).toThrow("Installed package has no license file");
+  }
 });
 
 it("fails on missing dependency installations, missing or empty license files and ambiguous metadata", () => {

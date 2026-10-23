@@ -6,3 +6,4 @@
   Button, Input, Tabs, Badge, Dialog, Skeleton and NativeSelect.
 - Export a typed class merger and Tailwind CSS 4 entry using shared theme tokens.
 - Preserve keyboard access, SSR, reduced motion and React 19 peer dependencies.
+- Respect reduced-motion preferences for dialog and backdrop entrance and exit animations.

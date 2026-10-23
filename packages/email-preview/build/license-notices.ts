@@ -17,7 +17,7 @@ interface BundleEntry {
 
 const licenseFile = /^(?:licen[cs]e|copying|notice|third[-_]party[-_]licenses?)(?:[.\-_]|$)/i;
 
-/** Share one instance between Vite and Nitro so notices cover client, SSR and server code. */
+/** Collects complete notices for third-party code bundled into the static interface. */
 export function licenseNotices(
   outputFile: string,
   assetPackages: { name: string; importer: string }[] = [],
@@ -60,13 +60,13 @@ export function licenseNotices(
     };
     if (!manifest.name || !manifest.version)
       throw new Error(`Missing package identity: ${directory}`);
-    // Nitro's generated modules live below our node_modules cache, but belong to
-    // this package. Reading its dist notices would recursively copy prior builds.
+    // Generated modules can live below this package's own node_modules cache.
+    // Reading its dist notices would recursively copy prior builds.
     if (manifest.name === "@raypx-kit/email-preview") return;
     const identity = `${manifest.name}@${manifest.version}`;
     if (included.has(identity)) return;
     const paths = readdirSync(directory).filter((name) => licenseFile.test(name));
-    // Nitro includes notices for dependencies already bundled into its published files.
+    // Some packages ship notices for dependencies already bundled into their files.
     for (const name of [
       "THIRD-PARTY-LICENSES.md",
       "THIRD-PARTY-LICENSES.md.gz",
@@ -75,22 +75,6 @@ export function licenseNotices(
       if (existsSync(join(directory, "dist", name))) paths.push(`dist/${name}`);
     }
     if (paths.length === 0) {
-      // Nitro's reduced ufo copy omits its license and its bundled-notice file
-      // does not cover ufo. Retain the exact installed upstream version's text.
-      if (manifest.name === "ufo" && manifest.version === "1.6.4") {
-        packages.set(directory, {
-          name: manifest.name,
-          version: manifest.version,
-          files: [
-            {
-              name: "LICENSE (retained from ufo@1.6.4)",
-              text: readFileSync(new URL("./licenses/ufo-1.6.4.txt", import.meta.url), "utf8"),
-            },
-          ],
-        });
-        included.add(identity);
-        return;
-      }
       throw new Error(`Bundled package has no license file: ${manifest.name}`);
     }
     packages.set(directory, {

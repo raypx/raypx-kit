@@ -12,5 +12,5 @@
     "tsdown.config.ts",
     "vitest.config.ts"
   ],
-  "exclude": ["tests/fixtures/**"]
+  "exclude": ["tests/fixtures/**", "e2e/**"]
 }

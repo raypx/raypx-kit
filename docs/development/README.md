@@ -49,6 +49,7 @@ documented versions and installed dependency combinations.
 | `bun run codemod list`       | List built-in migrations; the initial registry is empty          |
 | `bun run test:toolchain`     | Root maintenance tests and documentation tests                   |
 | `bun run test`               | Maintenance/documentation tests, then workspace tests            |
+| `bun run test:e2e`           | Build and run package-owned Chromium browser flows               |
 | `bun run build`              | Workspace checks and builds, including the documentation site    |
 | `bun run pack:check`         | Pack current package output and check isolated archive consumers |
 | `bun run release:check`      | Changesets versioning rules in disposable local fixtures         |
@@ -63,9 +64,9 @@ bun run build --filter=@raypx-kit/drizzle
 ```
 
 `verify` runs runtime and declaration checks, workspace architecture, lint, types,
-Knip, maintenance tests, workspace tests and builds, archive consumers, then
-Changesets fixtures. Its four phases (`verify:toolchain`, `verify:source`,
-`verify:tests`, `verify:artifacts`) also provide the named CI steps. CI adds an
+Knip, maintenance tests, workspace tests and builds, browser E2E, archive consumers,
+then Changesets fixtures. Its five phases (`verify:toolchain`, `verify:source`,
+`verify:tests`, `verify:e2e`, `verify:artifacts`) also provide the named CI steps. CI adds an
 archive compatibility matrix and an independent Drizzle database integration job. Local
 `verify`, default unit tests, coverage and tarball checks do not require a database;
 the normal gate does not enable coverage. Run a package's `test:coverage` after
@@ -75,8 +76,8 @@ changing its test runtime or coverage provider.
 
 Bun owns installation and script orchestration. Turbo schedules workspace tasks;
 `build` depends on that workspace's `check` and dependency builds. Vite+ owns
-formatting, linting, tests and the documentation application's Vite commands.
-tsdown builds the six ESM packages and their declarations. Drizzle Kit copies
+formatting, linting, unit tests and the documentation application's Vite commands.
+tsdown builds the ESM libraries and their declarations. Drizzle Kit copies
 upstream artifacts through its extractor; TSConfig publishes its JSON presets
 directly.
 
@@ -174,9 +175,62 @@ installations. Cache keys include the OS, architecture, Bun version and lockfile
 hash; a fallback reuses downloads from the same Bun version. Every job still runs
 `bun install --frozen-lockfile`, including on a cache hit.
 
+## Browser E2E by workspace
+
+Install the locked browser once after installing dependencies:
+
+```sh
+bun run test:e2e:install
+bun run test:e2e
+bun run test:e2e --project themes
+bun run --cwd packages/ui test:e2e
+bun run --cwd docs test:e2e
+```
+
+`test:e2e` builds the selected workspaces and their dependencies, checks browser
+fixture types and lint, then runs Playwright with Chromium. Additional Playwright
+flags such as `--headed`, `--grep` and `--list` are forwarded; multiple `--project`
+flags select a subset. `verify:e2e` uses the builds from `verify:tests` without
+rebuilding. Browser tests are deliberately uncached and do not run inside Vitest.
+CI installs Chromium with `--with-deps` on Ubuntu before running the same gate.
+
+| Project         | Browser contract                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `analytics`     | React consent controls, actual PostHog formatting with local request interception, revocation and error-boundary behavior            |
+| `intl`          | SSR hydration, ICU translation, locale preferences, cookies and cross-tab synchronization                                            |
+| `notifications` | Knock-backed React feed and unread interactions against a local test API                                                             |
+| `themes`        | Pre-hydration theme script, persistent choice, cross-tab state and system color-scheme changes                                       |
+| `ui`            | Keyboard navigation, dialog focus/escape, forms, responsive layout and reduced motion                                                |
+| `email-preview` | Built plugin in a Vite server, template navigation, sandbox preview, source copy/download, shared-file hot reload and error recovery |
+| `docs`          | Built application navigation, deep links, search, theme and mobile keyboard flows                                                    |
+
+Tests live in each workspace's `e2e/`; library fixture apps import built
+public exports, while Email Preview and Docs run their actual built applications.
+The shared library server uses port 4173, Email Preview uses 4174 and Docs uses 4175. Existing servers on those ports cause a failure; tests never attach to a
+user's unrelated session. Temporary email projects are cleaned up on exit.
+The browser fixtures use local test data and do not send analytics or notifications
+to live accounts. Notifications exercises the real Knock React SDK against its
+local test-owned API; no Knock credentials or production channel configuration
+are needed for that project.
+
+Public package source checks can run on a clean checkout before `dist/` exists.
+E2E consumers have their own `e2e/tsconfig.json`, checked after builds; their
+Vite+ lint pass explicitly uses the shared E2E config and the repository's rules.
+A maintenance test requires every workspace using React or JSX source to retain a project, package
+command and scenarios. TSConfig's JSX settings and Codemods' text transformations
+do not create a React application and are outside this browser inventory.
+
+HTML/JUnit reports, failure screenshots and traces are written to
+`.artifacts/e2e/`. Open the full-suite report with
+`bunx playwright show-report .artifacts/e2e/report`. Selected-project runs write to
+`.artifacts/e2e/projects/<sorted-project-names>/` to preserve other runs' diagnostics.
+CI uploads this dedicated
+browser diagnostics directory on failure, with seven-day retention; it is excluded
+from Git and package archives. Existing unit and tarball tests remain separate.
+
 ## CI diagnostics
 
-CI runs the four verification phases as named steps. Each command records its
+CI runs the five verification phases as named steps. Each command records its
 exit status, elapsed time and sanitized output under `.artifacts/ci/diagnostics/`;
 a failed command still fails its step and job. All CI and release jobs have
 explicit execution limits. Job summaries list completed stages and available
@@ -185,8 +239,8 @@ test counts, including failures and interrupted stages.
 Tests retain their usual console reporter and write a JUnit report at each
 workspace's `.artifacts/junit.xml`. Turbo restores the report with cached test
 results. Local reports remain ignored files; CI collects sanitized reports into
-the diagnostics directory. On failure, CI uploads only those diagnostics with a
-seven-day retention period; dotenv files, credentials and installed consumer
+the diagnostics directory. On failure, CI uploads those diagnostics and the
+dedicated browser reports with a seven-day retention period; dotenv files, credentials and installed consumer
 directories are excluded. These generated directories are ignored by Git.
 
 Every job calls `.github/actions/report-diagnostics` with `if: always()`, its

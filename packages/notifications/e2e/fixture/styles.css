@@ -1,0 +1,29 @@
+@import "@raypx-kit/notifications/styles.css";
+
+body {
+  margin: 0;
+  color: #202124;
+  background: #fff;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: 900px;
+  padding: 24px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+.inbox-placement {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: 16px;
+}

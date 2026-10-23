@@ -1,10 +1,4 @@
 /** Internal contracts shared by the preview server and its application. */
-export interface PreviewOptions {
-  cwd: string;
-  directory: string;
-  renderTimeoutMs?: number;
-}
-
 export interface Template {
   id: string;
   name: string;

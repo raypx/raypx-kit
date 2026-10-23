@@ -52,9 +52,11 @@
     "dev": "tsdown --watch",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run",
-    "pack:check": "bun pm pack --dry-run"
+    "pack:check": "bun pm pack --dry-run",
+    "test:e2e": "bun ../../e2e/run.ts --project themes"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

@@ -18,7 +18,10 @@ const contentTypes: Readonly<Record<string, string>> = {
   ".woff2": "font/woff2",
 };
 
-export async function readStaticFile(directory: string, name: string) {
+export async function readStaticFile(
+  directory: string,
+  name: string,
+): Promise<{ data: Uint8Array<ArrayBuffer>; contentType: string }> {
   let root: string;
   try {
     root = await realpath(resolve(directory, "static"));
@@ -30,7 +33,7 @@ export async function readStaticFile(directory: string, name: string) {
   }
   const path = await resolveContainedFile(root, name);
   return {
-    data: new Uint8Array(await readFile(path)),
+    data: await readFile(path),
     contentType: contentTypes[extname(path).toLowerCase()] ?? "application/octet-stream",
   };
 }

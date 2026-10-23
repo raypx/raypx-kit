@@ -2,20 +2,17 @@ import { mkdtemp, mkdir, realpath, rm, symlink, writeFile } from "node:fs/promis
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { createServer } from "vite";
+import type { ViteDevServer } from "vite";
 import { afterEach, describe, expect, it } from "vite-plus/test";
-import { PreviewRuntime } from "../src/server/runtime.js";
+import { emailPreview } from "../src/server/plugin.js";
+import type { PreviewRuntime } from "../src/server/runtime.js";
 
 const require = createRequire(import.meta.url);
 const directories: string[] = [];
-const runtimes: PreviewRuntime[] = [];
+const servers: ViteDevServer[] = [];
 
-async function fixture(timeout = 10_000, createEmails = true) {
-  const root = await realpath(await mkdtemp(join(tmpdir(), "email runtime ")));
-  directories.push(root);
-  const emails = join(root, "nested emails");
-  if (createEmails) await mkdir(emails);
-  await mkdir(join(root, "shared"));
-  await mkdir(join(root, "node_modules"));
+async function linkReact(root: string) {
   for (const name of ["react", "react-dom"]) {
     await symlink(
       dirname(require.resolve(`${name}/package.json`)),
@@ -23,6 +20,16 @@ async function fixture(timeout = 10_000, createEmails = true) {
       "dir",
     );
   }
+}
+
+async function fixture(timeout = 10_000, createEmails = true, installReact = true) {
+  const root = await realpath(await mkdtemp(join(tmpdir(), "email runtime ")));
+  directories.push(root);
+  const emails = join(root, "nested emails");
+  if (createEmails) await mkdir(emails);
+  await mkdir(join(root, "shared"));
+  await mkdir(join(root, "node_modules"));
+  if (installReact) await linkReact(root);
   await writeFile(
     join(root, "package.json"),
     JSON.stringify({ name: "email-consumer", private: true, type: "module" }),
@@ -33,12 +40,18 @@ async function fixture(timeout = 10_000, createEmails = true) {
       compilerOptions: { jsx: "react-jsx", baseUrl: ".", paths: { "@shared/*": ["./shared/*"] } },
     }),
   );
-  const runtime = await PreviewRuntime.create({
-    cwd: root,
-    directory: emails,
-    renderTimeoutMs: timeout,
+  const plugin = emailPreview({ dir: emails, renderTimeoutMs: timeout });
+  const server = await createServer({
+    configFile: false,
+    root,
+    appType: "custom",
+    logLevel: "silent",
+    resolve: { tsconfigPaths: true },
+    server: { middlewareMode: true, hmr: false },
+    plugins: [plugin],
   });
-  runtimes.push(runtime);
+  servers.push(server);
+  const runtime = (await (plugin.api as { runtime: () => Promise<PreviewRuntime> }).runtime())!;
   return { root, emails, runtime };
 }
 
@@ -62,7 +75,7 @@ async function changed(runtime: PreviewRuntime, mutate: () => Promise<void>) {
 }
 
 afterEach(async () => {
-  await Promise.all(runtimes.splice(0).map((runtime) => runtime.close()));
+  await Promise.all(servers.splice(0).map((server) => server.close()));
   await Promise.all(
     directories.splice(0).map((path) => rm(path, { recursive: true, force: true })),
   );
@@ -74,8 +87,8 @@ describe("preview runtime", () => {
     const comment = "<!--[if mso]><p>Outlook only</p><![endif]-->";
     const source = (markup: string) =>
       `export default () => <html><body dangerouslySetInnerHTML={{ __html: ${JSON.stringify(markup)} }} /></html>;`;
-    await writeFile(join(emails, "formatted.jsx"), source(`${comment}<p>Original email</p>`));
-    const rendered = await runtime.renderTemplate("formatted.jsx");
+    await writeFile(join(emails, "outlook.jsx"), source(`${comment}<p>Original email</p>`));
+    const rendered = await runtime.renderTemplate("outlook.jsx");
     expect(rendered.html).toContain(comment);
     expect(rendered.html).not.toContain("\n");
     expect(rendered.formattedHtml).toContain(comment);
@@ -83,10 +96,12 @@ describe("preview runtime", () => {
     expect(rendered.formattedHtml).not.toBe(rendered.html);
     expect(rendered.text).toContain("Original email");
 
-    await writeFile(join(emails, "formatted.jsx"), source("<div><span>Malformed source</div>"));
-    const fallback = await runtime.renderTemplate("formatted.jsx");
-    expect(fallback.formattedHtml).toBe(fallback.html);
-    expect(fallback.text).toContain("Malformed source");
+    await changed(runtime, () =>
+      writeFile(join(emails, "outlook.jsx"), source("<div><span>Malformed source</div>")),
+    );
+    const malformed = await runtime.renderTemplate("outlook.jsx");
+    expect(malformed.formattedHtml).toBe(malformed.html);
+    expect(malformed.text).toContain("Malformed source");
   });
 
   it("starts with an absent directory and discovers templates when it is created", async () => {
@@ -100,7 +115,7 @@ describe("preview runtime", () => {
     expect((await runtime.renderTemplate("first.tsx")).html).toContain("First email");
   });
 
-  it("renders PreviewProps, consumer hooks, and tsconfig aliases in a fresh worker", async () => {
+  it("renders PreviewProps, consumer hooks, and tsconfig aliases with the project React", async () => {
     const { root, emails, runtime } = await fixture();
     await writeFile(join(root, "shared", "label.ts"), 'export const label = "First version";');
     await writeFile(
@@ -160,6 +175,16 @@ Welcome.PreviewProps = { name: "Ada" };`,
     });
   }, 20_000);
 
+  it("recovers once React is installed without restarting", async () => {
+    const { root, emails, runtime } = await fixture(10_000, true, false);
+    await writeFile(join(emails, "welcome.jsx"), "export default () => <p>Installed</p>;");
+    await expect(runtime.renderTemplate("welcome.jsx")).rejects.toMatchObject({
+      code: "DEPENDENCY_ERROR",
+    });
+    await linkReact(root);
+    expect((await runtime.renderTemplate("welcome.jsx")).text).toContain("Installed");
+  });
+
   it("publishes directory and static-file changes and rejects unknown template IDs", async () => {
     const { emails, runtime } = await fixture();
     expect((await runtime.listTemplates()).templates).toEqual([]);
@@ -173,14 +198,17 @@ Welcome.PreviewProps = { name: "Ada" };`,
     expect((await runtime.getStaticFile("logo.svg")).contentType).toBe("image/svg+xml");
   });
 
-  it("terminates a stuck template and closes the runtime cleanly", async () => {
+  it("reports a template that never settles and closes the runtime cleanly", async () => {
     const { emails, runtime } = await fixture(100);
-    await writeFile(join(emails, "loop.tsx"), "export default function Loop() { while (true) {} }");
-    await expect(runtime.renderTemplate("loop.tsx")).rejects.toMatchObject({
+    await writeFile(
+      join(emails, "pending.tsx"),
+      "await new Promise(() => {});\nexport default function Pending() { return null; }",
+    );
+    await expect(runtime.renderTemplate("pending.tsx")).rejects.toMatchObject({
       code: "RENDER_TIMEOUT",
     });
-    await runtime.close();
-    await runtime.close();
+    runtime.close();
+    runtime.close();
     await expect(runtime.listTemplates()).rejects.toMatchObject({ status: 503 });
   }, 20_000);
 });

@@ -49,7 +49,7 @@ describe("bundled license notices", () => {
         {
           generated: {
             type: "chunk",
-            modules: { [join(root, "node_modules", ".nitro", "index.js")]: {} },
+            modules: { [join(root, "node_modules", ".cache", "index.js")]: {} },
           },
         },
       );
@@ -75,28 +75,6 @@ describe("bundled license notices", () => {
       expect(readFileSync(join(external, "LICENSE"), "utf8")).toBe("External runtime license\n");
       expect(readFileSync(join(stylesheet, "LICENSE"), "utf8")).toBe(
         "Complete stylesheet license\n",
-      );
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  it("retains the exact license omitted from Nitro's pinned ufo copy", () => {
-    const root = mkdtempSync(join(tmpdir(), "email-preview-ufo-license-"));
-    try {
-      const directory = join(root, "node_modules", "ufo");
-      mkdirSync(directory, { recursive: true });
-      writeFileSync(
-        join(directory, "package.json"),
-        JSON.stringify({ name: "ufo", version: "1.6.4" }),
-      );
-      const output = join(root, "notices.txt");
-      licenseNotices(output).generateBundle(
-        {},
-        { chunk: { type: "chunk", modules: { [join(directory, "index.js")]: {} } } },
-      );
-      expect(readFileSync(output, "utf8")).toContain(
-        readFileSync(new URL("../build/licenses/ufo-1.6.4.txt", import.meta.url), "utf8"),
       );
     } finally {
       rmSync(root, { recursive: true, force: true });

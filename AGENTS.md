@@ -18,9 +18,10 @@ validation and reusable presets; `packages/intl` owns generic internationalizati
 `packages/logger` owns evlog-based structured logging, wide events and Node
 request context.
 `packages/analytics` owns consent-controlled PostHog browser analytics and optional React bindings.
+`packages/notifications` owns explicit Knock workflow clients, signed user tokens and optional React feeds.
 `packages/security` owns Nosecone security headers and optional Arcjet request protection; applications supply keys and rules.
 `packages/storage` owns object storage drivers and signed upload and download URLs.
-`packages/email-preview` owns the local React Email preview CLI, template runtime and embedded TanStack Start application.
+`packages/email-preview` owns the React Email preview Vite plugin, template runtime and prebuilt interface.
 `packages/themes` owns shared theme tokens, CSS, initialization and optional React theme state.
 `packages/ui` owns reusable shadcn-style Base UI primitives and class utilities.
 Root `docs/` is an internal Fumadocs application and owns
@@ -44,7 +45,8 @@ Every workspace's TypeScript configuration extends an `@raypx-kit/tsconfig` pres
 declared once by the internal root through `workspace:*`; Turbo's global
 dependencies include the presets. Shared test configuration lives in root
 `tests/config.ts`; it is not a published runtime dependency.
-Keep every test under its owning workspace's `tests/` directory. Repository
+Keep unit and integration tests under their owning workspace's `tests/` directory,
+and browser scenarios in a sibling `e2e/` directory. Repository
 maintenance tests live in root `tests/scripts/`, mirroring the maintenance script
 directories where applicable; shared test preloads live in `tests/setup/`, and
 package fixtures in `tests/fixtures/`. Type checks include tests; library builds
@@ -119,9 +121,9 @@ Bun owns installation and repository scripts. Turbo owns task orchestration and
 uses loose environment mode so tasks inherit parent variables without passthrough
 allowlists. Declare variables that affect cached outputs in `env`/`globalEnv` so
 their values participate in cache keys.
-Vite+ owns formatting, linting, tests and the documentation application's Vite
+Vite+ owns formatting, linting, unit tests and the documentation application's Vite
 commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl, Analytics,
-Logger, Security, Storage, Themes and UI, including their declarations, from each package's
+Logger, Notifications, Security, Storage, Themes and UI, including their declarations, from each package's
 `tsdown.config.ts`; its dependency range starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
 exports its JSON presets directly. Package scripts invoke local `turbo`,
 `tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
@@ -130,9 +132,9 @@ use Bun-specific flags and the Intl jsdom preload. The internal documentation
 site retains `bun --bun vp` for its Bun development server. Its build and preview
 commands invoke `vp` directly so Wrangler runs with Node. Nitro builds a
 `cloudflare_module` Worker for deployment.
-Email Preview builds its CLI and private runtime with tsdown, then its embedded
-TanStack Start app with Vite+ and Nitro's Node middleware preset. Its development
-command runs the prebuilt CLI against examples; consumers never build the app.
+Email Preview builds its plugin with tsdown, then its static client-side interface
+with Vite+. Its development command runs `vp dev` with the examples' Vite
+configuration; consumers never build the interface.
 Themes generates package-root styles and Tailwind mappings from its token source.
 UI exports component subpaths and CSS that scans its published distribution.
 Repository TypeScript maintenance scripts, native type checking and archive
@@ -206,7 +208,7 @@ manifest version without running `version-packages`. Initial work belongs in the
 changelog; changesets increment versions for subsequent releases. Include a
 changeset for user-visible changes after initial release preparation. Retain full upstream
 licenses and pinned source provenance for copied or adapted code. UI, Themes,
-Email Preview and Security keep their own Apache license in `LICENSE`. Their READMEs contain
+Email Preview, Notifications and Security keep their own Apache license in `LICENSE`. Their READMEs contain
 generated indexes of direct runtime and peer dependencies, recording installed
 versions and license links. Maintain these indexes with `bun run licenses:update`;
 `licenses:check` rejects drift before source verification. Ordinary external
@@ -241,9 +243,21 @@ starts with `doctor`, `toolchain:check` and `architecture:check`, then checks fo
 code and dependencies with Knip, strict types, tests, the documentation build,
 library tarball contents and isolated Bun/Node consumers. `build` runs package
 `check` first through Turbo.
-`verify:toolchain`, `verify:source`, `verify:tests` and `verify:artifacts` are the
+`verify:toolchain`, `verify:source`, `verify:tests`, `verify:e2e` and `verify:artifacts` are the
 same ordered phases used by local `verify` and the named CI steps. Keep their
 commands in the root manifest rather than duplicating verification policy in YAML.
+React workspaces own Playwright scenarios and browser consumer applications in
+`e2e/`. Keep the project inventory and shared fixture server/runner in root
+`e2e/`, with the Playwright configuration at the repository root. The unit
+runner excludes E2E files. Browser consumers import built public exports, so their
+separate tsconfig and Vite+ lint checks run after builds through `test:e2e`.
+Install Chromium with `bun run test:e2e:install` before the full gate; CI also
+installs browser system dependencies. Run one package with its `test:e2e` script
+or root `bun run test:e2e --project <name>`. Never replace a failing browser flow
+with an implementation mock. Keep HTTP traffic local and test-owned; no live
+analytics accounts or application credentials. Browser reports and failure traces
+belong in ignored `.artifacts/e2e/` and never in npm archives. React workspace
+inventory tests reject a new React package that lacks its own E2E project.
 CI additionally tests the same archives against minimum supported Node and peer
 versions and the pinned development Node and locked peer versions. Consumer Node
 binaries are independent of the development runtime; never relax `doctor` to run

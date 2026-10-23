@@ -6,6 +6,8 @@
     "vitest.config.ts",
     "knip.ts",
     "scripts/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "e2e/**/*.ts",
+    "playwright.config.ts"
   ]
 }

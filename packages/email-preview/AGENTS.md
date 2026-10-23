@@ -2,20 +2,22 @@
 
 ## Purpose
 
-Provide a local React Email preview CLI with a prebuilt TanStack Start application.
-The public interface is `raypx-email dev`; package metadata is the only export.
+Provide a React Email preview as a Vite dev-server plugin with a prebuilt
+client-side interface. The root `emailPreview()` export is the public interface;
+projects run it with `vite dev`.
 
 ## Ownership
 
-- `src/cli.ts` owns option parsing, loopback listening and process lifecycle.
-- `src/server/` discovers and watches consumer templates and renders HTML/text.
-- `src/http/` integrates the runtime with the embedded server.
-- `src/app/` owns the TanStack Start interface and HTTP file routes.
+- `src/index.ts` exports the plugin.
+- `src/server/` owns the plugin, the dedicated `email_preview` Vite environment,
+  template discovery, rendering, formatting and the HTTP middleware.
+- `src/ui/` owns the client-side TanStack Router interface, built into `dist/ui/`.
 - `build/` collects complete third-party license and notice texts from the actual
   bundled module graphs into `dist/THIRD_PARTY_LICENSES.txt`. This generated file
   stays out of Git and ships with the prebuilt application.
-- `examples/` contains original templates and static assets for local exploration.
-- All tests and archive consumer contracts live under `tests/`.
+- `examples/` contains original templates, static assets and the Vite configuration
+  that previews them.
+- Unit tests and archive consumer contracts live under `tests/`; browser scenarios live in sibling `e2e/`.
 
 ## Constraints
 
@@ -29,15 +31,18 @@ The public interface is `raypx-email dev`; package metadata is the only export.
 - Resolve packaged assets from the package location and templates from the caller's
   working directory. Never write caches or generated files into the installed package.
 - Use the consumer's React and template dependencies when evaluating templates;
-  keep them separate from the prebuilt UI's module graph.
-- Bind to `127.0.0.1`. Template evaluation is for trusted local code.
-- Shut down HTTP streams, file watchers and rendering workers on exit.
-- Keep email delivery, remote hosting and a programmatic public API outside this
-  initial package. Document supported behavior in the English README.
+  keep them separate from the prebuilt UI's module graph and from the host
+  application's `ssr` environment.
+- Template evaluation is for trusted local code; the design document tracks moving
+  the module runner into a worker so stuck templates can be terminated.
+- Apply the plugin only to `vite dev`. Shut down event streams and watcher
+  listeners when the server closes.
+- Keep email delivery, remote hosting and a programmatic rendering API outside this
+  package. Document supported behavior in the English README.
 
 ## Verification
 
 Run focused package tests and type checks first, then the root `verify` gate.
-The installed archive contract must launch the real bin and load the embedded
-application, render consumer templates, observe changes and exit cleanly under
-both Bun and Node. Source-only tests cannot replace this packaging contract.
+The installed archive contract must run the consumer's real `vite dev` with the
+plugin, load the prebuilt interface, render consumer templates, observe changes and
+exit cleanly under both Bun and Node. Source-only tests cannot replace this packaging contract.

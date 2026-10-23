@@ -49,20 +49,17 @@ export default {
     "packages/email-preview": {
       kind: "tooling",
       target: "node",
-      sourceTargets: {
-        "src/app/**": "browser",
-        "src/app/routes/api/**": "node",
-        "src/app/routes/static/**": "node",
+      sourceEntries: {
+        ".": "./src/index.ts",
       },
-      // The preview application is built into the published CLI's UI payload.
+      sourceTargets: {
+        "src/ui/**": "browser",
+      },
+      // The static interface is prebuilt into the published package.
       bundledDependencies: [
         "@tanstack/react-router",
-        "@tanstack/react-start",
         "react",
         "react-dom",
-        "nitro",
-        "srvx",
-        "shiki",
         "@raypx-kit/ui",
         "@raypx-kit/themes",
       ],
@@ -114,6 +111,16 @@ export default {
         "./pipeline": "./src/pipeline.ts",
         "./safe": "./src/safe.ts",
         "./stream": "./src/stream.ts",
+      },
+    },
+    "packages/notifications": {
+      kind: "library",
+      target: "node",
+      entryTargets: { "./react": "browser" },
+      sourceTargets: { "src/react.tsx": "browser" },
+      sourceEntries: {
+        ".": "./src/index.ts",
+        "./react": "./src/react.tsx",
       },
     },
     "packages/security": {

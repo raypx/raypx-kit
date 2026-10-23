@@ -27,11 +27,11 @@ describe("release package scope", () => {
       "env",
       "intl",
       "logger",
+      "notifications",
       "security",
       "storage",
       "themes",
       "tsconfig",
-      "ui",
     ]);
     for (const { name } of packages) expect(() => assertReleasePackage(name)).not.toThrow();
   });

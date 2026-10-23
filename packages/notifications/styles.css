@@ -1,0 +1,37 @@
+@import "@knocklabs/react/dist/index.css";
+
+.raypx-notifications-inbox {
+  display: inline-block;
+}
+
+.raypx-notifications-trigger:focus-visible,
+.raypx-notifications-inbox :is(button, select, a, [tabindex]):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.raypx-notifications-inbox .rnf-notification-feed-popover {
+  width: min(400px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  min-width: 0;
+  height: min(400px, calc(100dvh - 100px));
+}
+
+.raypx-notifications-inbox .rnf-notification-feed__container {
+  max-height: min(500px, calc(100dvh - 180px));
+}
+
+.raypx-notifications-error {
+  padding: 16px;
+  font: inherit;
+}
+
+.raypx-notifications-error p {
+  margin: 0 0 8px;
+}
+
+.raypx-notifications-error button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

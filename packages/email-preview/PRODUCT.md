@@ -4,7 +4,7 @@
 
 Developers composing React Email templates need to compare layouts, inspect the
 generated HTML or plain text, and see the effect of a saved change without leaving
-their local workflow. The application runs through the `raypx-email` CLI and reads
+their local workflow. The application runs in the project's Vite dev server and reads
 templates from the developer's project.
 
 ## Experience

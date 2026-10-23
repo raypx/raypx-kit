@@ -17,7 +17,7 @@ export default defineConfig({
           name: "core",
           environment: "node",
           include: ["tests/**/*.{test,spec}.{ts,tsx}"],
-          exclude: ["tests/react/**"],
+          exclude: ["tests/react/**", "e2e/**"],
           execArgv: ["--no-env-file", "--no-install"],
         },
       },

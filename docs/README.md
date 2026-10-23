@@ -30,6 +30,7 @@ compatibility and consumer installation. They are also included in npm archives.
 | Intl          | [Locale negotiation, translation and controlled providers](../packages/intl/README.md)            |
 | Analytics     | [Consent-controlled browser analytics and errors](../packages/analytics/README.md)                |
 | Logger        | [Structured logging, wide events and request context](../packages/logger/README.md)               |
+| Notifications | [Knock workflows, signed user tokens and React feeds](../packages/notifications/README.md)        |
 | Security      | [Security headers and optional Arcjet request protection](../packages/security/README.md)         |
 | Storage       | [Drivers, policies and signed URLs](../packages/storage/README.md)                                |
 | TSConfig      | [Compiler presets and consumer responsibilities](../packages/tsconfig/README.md)                  |

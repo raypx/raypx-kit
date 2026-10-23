@@ -1,8 +1,11 @@
 {
   "extends": "@raypx-kit/tsconfig/browser.json",
   "compilerOptions": {
-    "paths": { "#components/*": ["./src/components/*"], "#lib/*": ["./src/lib/*"] }
+    "paths": {
+      "#components/*": ["./src/components/*"],
+      "#lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx", "*.config.ts"],
-  "exclude": ["tests/fixtures/**"]
+  "exclude": ["tests/fixtures/**", "e2e/**"]
 }

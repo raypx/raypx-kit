@@ -7,7 +7,6 @@ node_modules/
 /packages/*node_modules/
 /packages/*/dist/
 /packages/*/coverage/
-/packages/email-preview/.tanstack/
 /docs/.source/
 /docs/.output/
 /docs/.tanstack/

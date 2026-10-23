@@ -59,10 +59,12 @@
     "test:coverage": "bun --bun vp test --run --passWithNoTests --coverage --coverage.reporter=text --coverage.reporter=json --coverage.reporter=lcov",
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "pack:check": "bun pm pack --dry-run"
+    "pack:check": "bun pm pack --dry-run",
+    "test:e2e": "bun ../../e2e/run.ts --project intl"
   },
   "devDependencies": {
     "@formatjs/icu-messageformat-parser": "^3.5.22",
+    "@playwright/test": "^1.64.1",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

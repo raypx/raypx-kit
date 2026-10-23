@@ -15,6 +15,17 @@ interface Manifest {
 const indexStart = "<!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->";
 const indexEnd = "<!-- END GENERATED DEPENDENCY LICENSE INDEX -->";
 const licenseFile = /^(?:licen[cs]e|copying)(?:[.\-_]|$)/i;
+// This npm archive omits LICENSE. Its registry gitHead pins the verified upstream
+// text; upgrades and metadata changes require a new source verification.
+const sourceLicenses = new Map([
+  [
+    "@knocklabs/react@0.14.0",
+    {
+      license: "MIT",
+      url: "https://github.com/knocklabs/javascript/blob/f242ff85143843dd3579e72c2010d16c2c439ad1/LICENSE",
+    },
+  ],
+]);
 
 function manifest(directory: string): Manifest {
   const value = JSON.parse(readFileSync(join(directory, "package.json"), "utf8")) as Manifest;
@@ -82,7 +93,6 @@ export function dependencyLicenseIndex(directory: string): string {
       .filter((entry) => entry.isFile() && licenseFile.test(entry.name))
       .map((entry) => entry.name)
       .sort();
-    if (!files.length) throw new Error(`Installed package has no license file: ${identity}`);
     const links = files.map((file) => {
       if (!readFileSync(join(resolved, file), "utf8").trim())
         throw new Error(`Empty license file: ${identity}/${file}`);
@@ -95,6 +105,12 @@ export function dependencyLicenseIndex(directory: string): string {
         : `https://unpkg.com/${dependency.name}@${encodeURIComponent(dependency.version)}/${encodeURIComponent(file)}`;
       return `[${markdown(file)}](${url})`;
     });
+    if (!files.length) {
+      const source = sourceLicenses.get(identity);
+      if (!source || source.license !== dependency.license)
+        throw new Error(`Installed package has no license file: ${identity}`);
+      links.push(`[LICENSE](${source.url})`);
+    }
     rows.push([
       markdown(name),
       markdown(dependency.version),
@@ -133,7 +149,7 @@ function replaceIndex(readme: string, index: string, file: string): string {
 
 /** Refresh or verify only the marked README indexes; LICENSE files are never modified. */
 export function updatePackageLicenses(root: string, check = false): void {
-  const updates = ["email-preview", "security", "themes", "ui"].map((name) => {
+  const updates = ["email-preview", "notifications", "security", "themes", "ui"].map((name) => {
     const directory = join(root, "packages", name);
     const file = join(directory, "README.md");
     const original = readFileSync(file, "utf8");

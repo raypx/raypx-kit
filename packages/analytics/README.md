@@ -98,3 +98,12 @@ See [PostHog source maps](https://posthog.com/docs/error-tracking/upload-source-
 
 Run the package tests and check, then the repository `bun run verify`. Packed
 consumer fixtures cover public declarations and SSR imports with and without React.
+
+## Browser E2E
+
+React consent controls, revocation, local SDK request delivery and error-boundary fallback.
+
+Run `bun run test:e2e:install` once at the repository root, then
+`bun run --cwd packages/analytics test:e2e`. The package owns its scenarios in
+`e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
+for project selection, reports and CI behavior.

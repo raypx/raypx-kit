@@ -8,6 +8,7 @@ export function workspaceTests() {
       maxWorkers: 2,
       execArgv: ["--no-env-file", "--no-install"],
       include: ["tests/**/*.{test,spec}.{ts,tsx}"],
+      exclude: ["**/e2e/**"],
       reporters: [
         "default",
         ["junit", { outputFile: ".artifacts/junit.xml", includeConsoleOutput: false }],

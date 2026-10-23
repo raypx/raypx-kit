@@ -6,22 +6,23 @@ own their schemas, secrets, business rules and runtime configuration.
 
 ## Packages
 
-| Package                                                      | Purpose                                                                                        |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| [@raypx-kit/codemods](packages/codemods/README.md)           | Explicit-file migration runner and CLI; built-in migrations are added as needed                |
-| [@raypx-kit/devkit](packages/devkit/README.md)               | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers             |
-| [@raypx-kit/drizzle](packages/drizzle/README.md)             | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics           |
-| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md)     | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                                |
-| [@raypx-kit/email-preview](packages/email-preview/README.md) | Local React Email template previews, live updates and HTML/text inspection with TanStack Start |
-| [@raypx-kit/env](packages/env/README.md)                     | Zod environment validation, nested presets, defaults and guarded client access                 |
-| [@raypx-kit/intl](packages/intl/README.md)                   | Locale negotiation, ICU translation, formatting and controlled React providers                 |
-| [@raypx-kit/analytics](packages/analytics/README.md)         | Consent-controlled PostHog product events and sanitized browser errors                         |
-| [@raypx-kit/logger](packages/logger/README.md)               | evlog structured logging, wide events and Node request context                                 |
-| [@raypx-kit/security](packages/security/README.md)           | Nosecone security headers and optional Arcjet protection with application-owned keys and rules |
-| [@raypx-kit/storage](packages/storage/README.md)             | Object storage for S3-compatible services, the filesystem and memory with signed URLs          |
-| [@raypx-kit/tsconfig](packages/tsconfig/README.md)           | Strict TypeScript presets for libraries, browsers and Node                                     |
-| [@raypx-kit/themes](packages/themes/README.md)               | Shared theme tokens, initialization script and optional React theme state                      |
-| [@raypx-kit/ui](packages/ui/README.md)                       | shadcn-style React primitives on Base UI, shared styles and class utilities                    |
+| Package                                                      | Purpose                                                                                         |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [@raypx-kit/codemods](packages/codemods/README.md)           | Explicit-file migration runner and CLI; built-in migrations are added as needed                 |
+| [@raypx-kit/devkit](packages/devkit/README.md)               | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers              |
+| [@raypx-kit/drizzle](packages/drizzle/README.md)             | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics            |
+| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md)     | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                                 |
+| [@raypx-kit/email-preview](packages/email-preview/README.md) | React Email previews as a Vite plugin or CLI, with live updates and HTML/text inspection        |
+| [@raypx-kit/env](packages/env/README.md)                     | Zod environment validation, nested presets, defaults and guarded client access                  |
+| [@raypx-kit/intl](packages/intl/README.md)                   | Locale negotiation, ICU translation, formatting and controlled React providers                  |
+| [@raypx-kit/analytics](packages/analytics/README.md)         | Consent-controlled PostHog product events and sanitized browser errors                          |
+| [@raypx-kit/logger](packages/logger/README.md)               | evlog structured logging, wide events and Node request context                                  |
+| [@raypx-kit/notifications](packages/notifications/README.md) | Knock workflow client, signed user tokens and optional React notification feeds                 |
+| [@raypx-kit/security](packages/security/README.md)           | Nosecone security headers and optional Arcjet protection with application-owned keys and rules  |
+| [@raypx-kit/storage](packages/storage/README.md)             | Object storage for S3-compatible services, the filesystem and memory with signed URLs           |
+| [@raypx-kit/tsconfig](packages/tsconfig/README.md)           | Strict TypeScript presets for libraries, browsers and Node                                      |
+| [@raypx-kit/themes](packages/themes/README.md)               | Shared theme tokens, initialization script and optional React theme state                       |
+| [@raypx-kit/ui](packages/ui/README.md)                       | shadcn-style React primitives on Base UI, shared styles and class utilities (not yet published) |
 
 Package READMEs describe shipped APIs and installation requirements. All packages
 start at `0.0.0-alpha.0` and are independently versioned in Changesets alpha mode;

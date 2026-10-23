@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { fetchPreviewData, outputFilename, validatePreviewSearch } from "../src/app/lib/preview";
+import {
+  fetchPreviewData,
+  outputFilename,
+  validatePreviewSearch,
+  withPreviewBase,
+} from "../src/ui/lib/preview";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -22,6 +27,14 @@ describe("preview address state", () => {
       viewport: "desktop",
     });
     expect(validatePreviewSearch({ template: "" })).not.toHaveProperty("template");
+  });
+
+  it("points sandboxed previews at a mounted static directory without touching other URLs", () => {
+    const html = `<img src="/static/logo.png"><a href="https://x.test/static/y">y</a><div style="background:url(/static/bg.png)"></div>`;
+    expect(withPreviewBase(html, "/")).toBe(html);
+    expect(withPreviewBase(html, "/__email/")).toBe(
+      `<img src="/__email/static/logo.png"><a href="https://x.test/static/y">y</a><div style="background:url(/__email/static/bg.png)"></div>`,
+    );
   });
 
   it("downloads HTML for the visual view and preserves dotted template names", () => {
@@ -67,6 +80,27 @@ describe("preview API boundary", () => {
     );
   });
 
+  it("reports the HTTP status when the server fails before reaching the API", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response("The preview server could not handle this request.", { status: 500 }),
+        ),
+    );
+    await expect(fetchPreviewData("/api/templates", new AbortController().signal)).rejects.toThrow(
+      "Request failed (500).",
+    );
+  });
+
+  it("rejects a successful response that is not JSON", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("<html></html>")));
+    await expect(fetchPreviewData("/api/templates", new AbortController().signal)).rejects.toThrow(
+      "The preview server returned an invalid response.",
+    );
+  });
+
   it("preserves abort failures so callers can ignore superseded requests", async () => {
     const error = new DOMException("The request was aborted.", "AbortError");
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(error));
@@ -82,9 +116,9 @@ describe("preview API boundary", () => {
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => {
+        text: async () => {
           controller.abort();
-          return obsoletePreview;
+          return JSON.stringify(obsoletePreview);
         },
       }),
     );

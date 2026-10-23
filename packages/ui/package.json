@@ -1,6 +1,7 @@
 {
   "name": "@raypx-kit/ui",
   "version": "0.0.0-alpha.0",
+  "private": true,
   "description": "Accessible Base UI and shadcn primitives for React and Tailwind CSS.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/ui",
   "license": "Apache-2.0",
@@ -69,16 +70,14 @@
     },
     "./styles.css": "./styles.css"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",
     "build": "tsdown",
     "dev": "tsdown --watch",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run",
-    "pack:check": "bun pm pack --dry-run"
+    "pack:check": "bun pm pack --dry-run",
+    "test:e2e": "bun ../../e2e/run.ts --project ui"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -89,6 +88,7 @@
     "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/node": "^4.3.3",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

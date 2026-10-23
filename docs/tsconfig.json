@@ -15,5 +15,5 @@
     "tests/**/*.tsx",
     "vite.config.ts"
   ],
-  "exclude": [".output", "dist"]
+  "exclude": [".output", "dist", "e2e/**"]
 }

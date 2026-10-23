@@ -17,6 +17,14 @@ const library = {
   typescript: { config: ["tsconfig.json", "tsconfig.build.json"] },
 };
 
+const browserLibrary = {
+  ...library,
+  // Vite loads consumer HTML modules and the shared server loads optional SSR entries.
+  entry: ["e2e/fixture/main.tsx", "e2e/fixture/server.tsx"],
+  project: [...libraryProject, "e2e/**/*.{ts,tsx}"],
+  typescript: { config: ["tsconfig.json", "tsconfig.build.json", "e2e/tsconfig.json"] },
+};
+
 const config: KnipConfig = {
   workspaces: {
     ".": {
@@ -25,8 +33,9 @@ const config: KnipConfig = {
         "tests/setup/jsdom-preload.ts",
       ],
       // package.json scripts provide the CLI, pack and release entry points.
-      project: ["scripts/**/*.ts", "tests/**/*.ts", "*.ts"],
+      project: ["scripts/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],
       includeEntryExports: true,
+      vite: { config: ["vite.config.ts", "e2e/vite.config.ts"] },
     },
     "packages/devkit": {
       ...library,
@@ -43,36 +52,40 @@ const config: KnipConfig = {
       ...library,
     },
     "packages/email-preview": {
-      // Nitro and Start load these custom-directory entries; the CLI loads templates.
       entry: [
-        "src/http/entry.ts",
-        "src/app/router.tsx",
         // shadcn resolves this utility through components.json when generating components.
-        "src/app/lib/utils.ts",
-        "src/app/routes/**/*.{ts,tsx}",
+        "src/ui/lib/utils.ts",
         "examples/**/*.{tsx,jsx}",
+        "examples/vite.config.ts",
+        // Playwright starts this fixture through the selected Node executable.
+        "e2e/serve.ts",
       ],
       project: [
         ...libraryProject,
         "src/**/*.tsx",
         "src/**/*.css",
+        "e2e/**/*.{ts,tsx}",
         "build/**/*.ts",
         "examples/**/*.{ts,tsx,jsx}",
-        "!src/app/routeTree.gen.ts",
       ],
       vitest: true,
       tsdown: true,
-      "tanstack-router": true,
-      typescript: { config: ["tsconfig.json", "tsconfig.build.json"] },
-      // Resolved with createRequire and embedded into the consumer template compiler input.
-      ignoreDependencies: ["@react-email/render"],
+      typescript: { config: ["tsconfig.json", "tsconfig.build.json", "e2e/tsconfig.json"] },
     },
     "packages/intl": {
-      ...library,
+      ...browserLibrary,
     },
-    "packages/analytics": { ...library, project: [...libraryProject, "src/**/*.tsx"] },
+    "packages/analytics": {
+      ...browserLibrary,
+      entry: ["e2e/fixture/main.tsx"],
+      project: [...browserLibrary.project, "src/**/*.tsx"],
+    },
     "packages/logger": {
       ...library,
+    },
+    "packages/notifications": {
+      ...browserLibrary,
+      project: [...browserLibrary.project, "src/**/*.tsx"],
     },
     "packages/security": {
       ...library,
@@ -104,19 +117,19 @@ const config: KnipConfig = {
       typescript: true,
     },
     "packages/themes": {
-      ...library,
-      project: [...libraryProject, "src/**/*.tsx", "scripts/**/*.ts"],
+      ...browserLibrary,
+      project: [...browserLibrary.project, "src/**/*.tsx", "scripts/**/*.ts"],
     },
     "packages/ui": {
-      ...library,
-      project: [...libraryProject, "src/**/*.tsx"],
+      ...browserLibrary,
+      project: [...browserLibrary.project, "src/**/*.tsx"],
       // Compiled by the installed archive fixture, which has its own dependency environment.
       ignoreDependencies: ["@tailwindcss/node", "tailwindcss"],
     },
     docs: {
       // Nitro spawns the prerender preview wrapper by path from vite.config.ts.
       entry: ["scripts/preview.ts"],
-      project: ["scripts/**/*.ts", "src/**/*.{ts,tsx,css,mdx}", "tests/**/*.ts"],
+      project: ["scripts/**/*.ts", "src/**/*.{ts,tsx,css,mdx}", "tests/**/*.ts", "e2e/**/*.ts"],
       includeEntryExports: true,
       // Fumadocs' macro replaces the conventional source.config.ts in this application.
       fumadocs: { entry: ["src/lib/source.ts"] },

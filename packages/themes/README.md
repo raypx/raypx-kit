@@ -115,3 +115,12 @@ links to their licenses. Their full texts are not duplicated here. Run
 | react   | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react@19.3.1/LICENSE) |
 
 <!-- END GENERATED DEPENDENCY LICENSE INDEX -->
+
+## Browser E2E
+
+The first-paint script, hydration, reload persistence, real cross-tab synchronization and system preferences.
+
+Run `bun run test:e2e:install` once at the repository root, then
+`bun run --cwd packages/themes test:e2e`. The package owns its scenarios in
+`e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
+for project selection, reports and CI behavior.
