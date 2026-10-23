@@ -1,0 +1,294 @@
+tsconfig.json
+  s_3479c97f207758::t_10809ac0c5e025 9-11
+packages/notifications/tests/index.test.ts
+  s_3479c97f207758::t_e79c71e35471ae 1-227
+  s_3479c97f207758::t_af99d6a786df87 228-235
+docs/AGENTS.md
+  s_3479c97f207758::t_7c8d5f57e6a6a9 56,72-76
+packages/notifications/tests/fixtures/consumer/runtime.mjs
+  s_3479c97f207758::t_b3ec9562d863aa 97-99,110-115,134-135,155-158,160-163,165,174,179-180
+  s_3479c97f207758::t_de5b77f6c18ffd 1-3,5-96,100-109,116-124
+  s_3479c97f207758::t_0d89c45756826e 4,125-133,136-144,146-149,151-154,159,164
+  s_3479c97f207758::t_9935c53c2b6eda 145,150,166-173,175-178
+packages/notifications/tests/fixtures/consumer/tsconfig.json
+  s_3479c97f207758::t_de5b77f6c18ffd 1-16
+docs/development/README.md
+  s_3479c97f207758::t_75c5d50ba0ae2a 52,67-69,79,229
+  s_3479c97f207758::t_f72cff8cd8742e 80,178-226
+  s_49f01f37f619d1::t_0b217fcae78c0b 227-228,230,233,242-243
+tests/scripts/release/scope.test.ts
+  s_3479c97f207758::t_0838fdbab7d936 30
+tests/scripts/checks/browser-e2e.test.ts
+  s_3479c97f207758::t_9f58dc9e39dd50 2-5,7-9,11,16-23,34,43,49
+  s_3479c97f207758::t_10809ac0c5e025 6,38
+  s_3479c97f207758::t_f72cff8cd8742e 1,10,12-15,24-33,35-37,39-42,44-48
+packages/notifications/tests/fixtures/consumer/react-types.tsx
+  s_3479c97f207758::t_0d89c45756826e 1-48
+packages/notifications/e2e/fixture/app.tsx
+  s_3479c97f207758::t_9f9d2682ddb4a1 6-12,19-25,27-31,42-49,51,55-60
+  s_3479c97f207758::t_c898a22c73aeba 1-5,13-18,26,32-41,50,52-54
+  s_3479c97f207758::t_d5fa24d57d0ccd 61-62
+packages/notifications/tests/fixtures/consumer/types.ts
+  s_3479c97f207758::t_de5b77f6c18ffd 1-56
+tests/config.ts
+  s_3479c97f207758::t_1021b4c9bd946c 11
+packages/intl/vitest.config.ts
+  s_3479c97f207758::t_1021b4c9bd946c 20
+AGENTS.md
+  s_3479c97f207758::t_10809ac0c5e025 48-49,250-251
+  s_3479c97f207758::t_75c5d50ba0ae2a 124,246,249,252-260
+  s_3479c97f207758::t_0838fdbab7d936 21,126,135-137,211
+.github/workflows/ci.yml
+  s_3479c97f207758::t_17b92dc08ceb79 34-46
+packages/notifications/tests/fixtures/consumer/without-optional-peers/types.ts
+  s_3479c97f207758::t_de5b77f6c18ffd 1-14
+packages/notifications/e2e/fixture/server.tsx
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-6
+vite.config.ts
+  s_3479c97f207758::t_1021b4c9bd946c 18,20-21
+  s_3479c97f207758::t_17b92dc08ceb79 19
+packages/notifications/tests/react.test.tsx
+  s_3479c97f207758::t_7d4fefa6cad7f9 1,8-18,20,22,31,33-35,39-41,48-49,57-58
+  s_3479c97f207758::t_637080869fb114 2
+  s_3479c97f207758::t_31a822c879f44d 3-7,19,21,23-30,32,36-38,42-47,50-56
+scripts/packages/licenses.ts
+  s_3479c97f207758::t_a53cc2d0e4846f 18-28,108-113
+  s_3479c97f207758::t_0838fdbab7d936 152
+packages/notifications/e2e/fixture/main.tsx
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-10
+packages/notifications/tests/fixtures/consumer/package.json
+  s_3479c97f207758::t_de5b77f6c18ffd 1-8
+packages/notifications/styles.css
+  s_3479c97f207758::t_637080869fb114 16
+  s_3479c97f207758::t_9f9d2682ddb4a1 17
+  s_3479c97f207758::t_7d4fefa6cad7f9 1-15,18-37
+packages/notifications/src/react.tsx
+  s_3479c97f207758::t_7d4fefa6cad7f9 1-24,27-57,60-76,78-85,92,102-108,110-112,115-121,124-148,150-156,158-212,217-228
+  s_3479c97f207758::t_637080869fb114 26,113-114,149
+  s_3479c97f207758::t_c898a22c73aeba 93-101
+  s_3479c97f207758::t_9f9d2682ddb4a1 157
+  s_3479c97f207758::t_31a822c879f44d 25,58-59,77,86-91,109,122-123,213-216
+packages/notifications/src/index.ts
+  s_3479c97f207758::t_e79c71e35471ae 1-30,32-51
+  s_3479c97f207758::t_0c3dca134f8aed 31
+  s_3479c97f207758::t_8babd9f1c194a8 52-56
+playwright.config.ts
+  s_3479c97f207758::t_f72cff8cd8742e 8-12,22,25-26,51-58,61-62,64-69,72-73,75-80
+  s_3479c97f207758::t_1021b4c9bd946c 1-5,13-21,23-24,27-50,59-60,70-71,81-83
+  s_3479c97f207758::t_0445dcc691e85f 6-7,63,74
+knip.ts
+  s_3479c97f207758::t_d5cd2148e47984 59
+  s_3479c97f207758::t_12a24a36300fac 24
+  s_3479c97f207758::t_10809ac0c5e025 23,25,36,38,60,79
+  s_3479c97f207758::t_0838fdbab7d936 86-88,132
+  s_3479c97f207758::t_9f58dc9e39dd50 20-22,26-27,76-78,80,120-121,124
+  s_3479c97f207758::t_d9d4118696560d 61
+  s_3479c97f207758::t_f25d10fa86d515 81
+  s_3479c97f207758::t_6dde3706686eef 89
+  s_3479c97f207758::t_52fa39ca9dc487 125
+e2e/run.ts
+  s_3479c97f207758::t_10809ac0c5e025 1-4,6-19,21,23-27,29-31,33-36,40-46,48-68,70-79
+  s_3479c97f207758::t_8d97bcfdd3d455 5
+  s_3479c97f207758::t_f801c4f979c8a9 20
+  s_3479c97f207758::t_68bcc43c0dcc3c 22
+  s_3479c97f207758::t_cf520fa528a4c7 28
+  s_3479c97f207758::t_fda37f8d0aa7ed 32
+  s_3479c97f207758::t_4ac472397f5f35 37-39
+  s_3479c97f207758::t_ee9847368c51f1 47
+  s_3479c97f207758::t_854c8b53c8729c 69
+docs/architecture/README.md
+  s_3479c97f207758::t_7222139d447e12 40,45-47,63,68,76,96,99,130-136,145-151,157-159,173,213,221
+  s_49f01f37f619d1::t_28c0a025c4457c 19,24
+e2e/projects.ts
+  s_3479c97f207758::t_0838fdbab7d936 1-32
+packages/notifications/tests/fixtures/consumer/without-optional-peers/runtime.mjs
+  s_3479c97f207758::t_de5b77f6c18ffd 1-43
+  s_3479c97f207758::t_94832ea8488631 44-48
+packages/notifications/e2e/notifications.spec.ts
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-7,16-33,38-41,43-45,48-53,57-62,68-76,84-92,98,101,108-124,129-130,134-140,144,148-150,157-161,166-169,173-178,191-198,200-204,209-213,215-216,218-220,222-229,234-236,240-246,264,269-275,277-279
+  s_3479c97f207758::t_c898a22c73aeba 8-15,34-37,42,46-47,54-56,63-67,77-83,93-97,99-100,102-107,125-128,131-133,141-143,145-147,151-156,162-165,170-172,179-190,199,205-208,214,217,221,230-233,237-239,247-263,265-268,276
+  s_3479c97f207758::t_bfb1d0cea2d6b4 280-293
+packages/email-preview/AGENTS.md
+  s_3479c97f207758::t_10809ac0c5e025 19
+  s_3479c97f207758::t_25e171ff0bf2e9 18
+  s_3479c97f207758::t_b3a4054202cd35 20
+packages/notifications/tsdown.config.ts
+  s_3479c97f207758::t_eba538c56838ef 1-12
+packages/notifications/e2e/tsconfig.json
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-12
+packages/notifications/e2e/fixture/index.html
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-14
+e2e/vite.config.ts
+  s_3479c97f207758::t_10809ac0c5e025 1-58
+tests/scripts/packages/licenses.test.ts
+  s_3479c97f207758::t_0838fdbab7d936 14
+  s_3479c97f207758::t_a53cc2d0e4846f 86-104
+packages/notifications/e2e/fixture/styles.css
+  s_3479c97f207758::t_9f9d2682ddb4a1 1-29
+README.md
+  s_49f01f37f619d1::t_1c4f2530797e76 9-25
+docs/e2e/docs.spec.ts
+  s_3479c97f207758::t_2c319c483e2c64 1-109
+docs/e2e/tsconfig.json
+  s_3479c97f207758::t_0233e658e3409a 1-12
+docs/email-preview/vite-plugin.md
+  s_49f01f37f619d1::t_27eadabac5b8f8 1-194
+docs/package.json
+  s_3479c97f207758::t_34fc746b720300 14-15,28
+docs/tsconfig.json
+  s_3479c97f207758::t_90f81ec906cbcf 18
+e2e/assets.d.ts
+  s_3479c97f207758::t_dc26933b4eabee 1
+package.json
+  s_3479c97f207758::t_54119b162b5838 32,49-52,56,58,61,65-66
+packages/analytics/README.md
+  s_3479c97f207758::t_a063fedb2ab2f3 101-109
+packages/analytics/e2e/analytics.spec.ts
+  s_3479c97f207758::t_e325a3250f8c0c 1-168
+packages/analytics/e2e/fixture/app.tsx
+  s_3479c97f207758::t_71e21c5753a8a0 1-144
+packages/analytics/e2e/fixture/main.tsx
+  s_3479c97f207758::t_5fc56d02d26ddb 1-11
+packages/analytics/e2e/tsconfig.json
+  s_3479c97f207758::t_23e5210ced8430 1-12
+packages/analytics/package.json
+  s_3479c97f207758::t_28e3a74eeb0a00 50-51,57
+packages/analytics/tsconfig.json
+  s_3479c97f207758::t_eb1673081d0fdd 15
+packages/email-preview/e2e/serve.ts
+  s_49f01f37f619d1::t_7479260ddaa114 1-74
+packages/email-preview/e2e/tsconfig.json
+  s_3479c97f207758::t_8d2f3ed72145c8 1-12
+packages/email-preview/src/ui/components/html-source.tsx
+  s_525d200a0d307c::t_95bb69188194ad 2,6,11
+packages/email-preview/src/ui/components/mail-icon.tsx
+  s_49f01f37f619d1::t_b8dd5768b49fb4 1-2,4-18
+packages/email-preview/src/ui/components/preview-workspace.tsx
+  s_49f01f37f619d1::t_ae38411487377b 6,106-113,332
+packages/email-preview/src/ui/index.html
+  s_49f01f37f619d1::t_035391bfd1abee 1-18
+packages/email-preview/tests/fixtures/consumer/runtime.mjs
+  s_49f01f37f619d1::t_c33f185b3accfd 15-20,26,115-116,127-136,164,175,200,211-213,231,312,317,321,323,327
+packages/intl/README.md
+  s_3479c97f207758::t_fc3cdae416f098 302-310
+packages/intl/e2e/fixture/main.tsx
+  s_3479c97f207758::t_03143e8eeb04b3 1-22
+packages/intl/e2e/fixture/server.tsx
+  s_3479c97f207758::t_2327f11b0193af 1-13
+packages/intl/e2e/intl.spec.ts
+  s_3479c97f207758::t_a390d89b6f33e7 1-84
+packages/intl/e2e/tsconfig.json
+  s_3479c97f207758::t_594269c973804c 1-12
+packages/intl/package.json
+  s_3479c97f207758::t_610b3ae3d31bf5 62-63,67
+packages/intl/tsconfig.json
+  s_3479c97f207758::t_8f29f95c520d9f 15
+packages/notifications/AGENTS.md
+  s_3479c97f207758::t_eda523e995a5c2 1,3-7,9-12,14-17
+packages/notifications/CHANGELOG.md
+  s_3479c97f207758::t_a6886285fb81bb 1-8
+packages/notifications/LICENSE
+  s_3479c97f207758::t_e44444c4ac8a4a 1-201
+packages/notifications/README.md
+  s_3479c97f207758::t_0eabd8d436f649 1-209
+packages/notifications/package.json
+  s_3479c97f207758::t_98dcf033caeeac 1-80
+packages/notifications/tsconfig.build.json
+  s_3479c97f207758::t_64dd8734c52e78 1-5
+packages/notifications/tsconfig.json
+  s_3479c97f207758::t_78cbe38867a95e 1-9
+packages/notifications/vitest.config.ts
+  s_3479c97f207758::t_aeb6f893cfcaf3 1-4
+packages/themes/README.md
+  s_3479c97f207758::t_d8d00f66700ebe 118-126
+packages/themes/e2e/fixture/app.tsx
+  s_3479c97f207758::t_eaf2296abc6515 1-48
+packages/themes/e2e/fixture/config.ts
+  s_3479c97f207758::t_4cdb23bdfaedc4 1
+packages/themes/e2e/fixture/index.html
+  s_3479c97f207758::t_7d372cc24851cb 1-14
+packages/themes/e2e/fixture/main.tsx
+  s_3479c97f207758::t_e84c4cb354dfb1 1-2,4-9
+packages/themes/e2e/fixture/server.tsx
+  s_3479c97f207758::t_6200524fac5c50 1-11
+packages/themes/e2e/fixture/styles.css
+  s_3479c97f207758::t_493f5631b29de6 1-52
+packages/themes/e2e/themes.spec.ts
+  s_3479c97f207758::t_912a19fc30d0e7 1-141
+packages/themes/e2e/tsconfig.json
+  s_3479c97f207758::t_c677accb50acc2 1-12
+packages/themes/package.json
+  s_3479c97f207758::t_e48303baa0b55a 55-56,59
+packages/themes/tsconfig.json
+  s_3479c97f207758::t_4e28f112add7ef 3-6,16
+packages/ui/CHANGELOG.md
+  s_49f01f37f619d1::t_7c0b0b415d9bb6 9
+packages/ui/README.md
+  s_49f01f37f619d1::t_a39a2d8898023e 9-12,164-172
+packages/ui/e2e/fixture/app.tsx
+  s_3479c97f207758::t_c3f87c400290ff 1-100
+packages/ui/e2e/fixture/index.html
+  s_3479c97f207758::t_2b5eb7909e2cdb 1-14
+packages/ui/e2e/fixture/main.tsx
+  s_3479c97f207758::t_2868a68a7ae594 1-2,4-9
+packages/ui/e2e/fixture/server.tsx
+  s_3479c97f207758::t_1051068f4cfc12 1-6
+packages/ui/e2e/fixture/styles.css
+  s_3479c97f207758::t_c0420a5dce215b 1-3
+packages/ui/e2e/primitives.spec.ts
+  s_3479c97f207758::t_fdf756a2ff6fdc 1-115
+packages/ui/e2e/tsconfig.json
+  s_3479c97f207758::t_d791b3bdb9826f 1-12
+packages/ui/package.json
+  s_49f01f37f619d1::t_b67eac0d5e9fd1 4,79-80,91
+packages/ui/src/components/ui/dialog.tsx
+  s_3479c97f207758::t_3e0b85f73de8cd 31,53
+packages/ui/tsconfig.json
+  s_3479c97f207758::t_102a9664d7e2cc 4-7,10
+packages/analytics/e2e/fixture/index.html
+  s_e8947bd4e271a9::t_4993d30fe4ba4d 1-12
+packages/intl/e2e/fixture/app.tsx
+  s_e8947bd4e271a9::t_632bb800089a8a 1-5,7-10,12-82
+packages/intl/e2e/fixture/index.html
+  s_e8947bd4e271a9::t_2b4d6896b7cc11 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cdb18b1219fc27a85e806de8dfe62b456bcead42",
+  "prompts": {},
+  "sessions": {
+    "s_3479c97f207758": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16463-0d07-7e82-ad3d-bf48e311d55b",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_49f01f37f619d1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1538b-0c9d-7351-bd78-3f13ed331ac0",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_525d200a0d307c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1595d-432a-72b2-974a-dcbfa83701ab",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_e8947bd4e271a9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16472-99b2-7af3-96e3-24613da77224",
+        "model": "unknown"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
