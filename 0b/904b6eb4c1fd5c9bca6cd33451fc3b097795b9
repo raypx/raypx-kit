@@ -1,0 +1,14 @@
+.changeset/republish-through-ci.md
+  h_f0766e80fd3864 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0b904b6eb4c1fd5c9bca6cd33451fc3b097795b9",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
