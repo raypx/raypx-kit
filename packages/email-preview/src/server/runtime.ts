@@ -1,3 +1,4 @@
+import { statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { isRunnableDevEnvironment } from "vite";
 import type { RunnableDevEnvironment, ViteDevServer } from "vite";
@@ -17,9 +18,20 @@ export interface RuntimeOptions {
   /** Template directory, relative to the Vite root unless absolute. */
   directory: string;
   renderTimeoutMs: number;
+  /**
+   * Vite's watcher drops a second change to the same file within 50 ms, which would
+   * leave a failed render cached until an unrelated edit. Each changed file is compared
+   * again after this window. Defaults to 75 ms; tests widen it.
+   */
+  missedChangeWindowMs?: number;
 }
 
 type RenderedEmail = Pick<PreviewResult, "html" | "text">;
+
+function fileSignature(path: string): string {
+  const stats = statSync(path, { throwIfNoEntry: false });
+  return stats ? `${stats.mtimeMs}:${stats.size}` : "missing";
+}
 
 function isRenderedEmail(value: unknown): value is RenderedEmail {
   return (
@@ -35,6 +47,7 @@ function isRenderedEmail(value: unknown): value is RenderedEmail {
 export class PreviewRuntime {
   private readonly listeners = new Set<(revision: number) => void>();
   private readonly streams = new Set<() => void>();
+  private readonly rechecks = new Map<string, ReturnType<typeof setTimeout>>();
   private notification: ReturnType<typeof setTimeout> | undefined;
   private closed = false;
   private currentRevision = 0;
@@ -43,6 +56,7 @@ export class PreviewRuntime {
     private readonly server: ViteDevServer,
     readonly directory: string,
     private readonly timeoutMs: number,
+    private readonly recheckMs: number,
   ) {}
 
   static async create(server: ViteDevServer, options: RuntimeOptions): Promise<PreviewRuntime> {
@@ -54,7 +68,12 @@ export class PreviewRuntime {
       );
     }
     const directory = await resolveDirectory(server.config.root, options.directory);
-    const runtime = new PreviewRuntime(server, directory, options.renderTimeoutMs);
+    const runtime = new PreviewRuntime(
+      server,
+      directory,
+      options.renderTimeoutMs,
+      options.missedChangeWindowMs ?? 75,
+    );
     // The template directory may sit outside the Vite root, for example in a sibling package.
     server.watcher.add(directory);
     server.watcher.on("all", runtime.onFileEvent);
@@ -83,14 +102,28 @@ export class PreviewRuntime {
     ) {
       return;
     }
+    this.refresh();
+    const seen = fileSignature(path);
+    clearTimeout(this.rechecks.get(path));
+    this.rechecks.set(
+      path,
+      setTimeout(() => {
+        this.rechecks.delete(path);
+        if (!this.closed && fileSignature(path) !== seen) this.refresh();
+      }, this.recheckMs),
+    );
+  };
+
+  private refresh(): void {
     // Vite invalidates changed modules asynchronously. Template graphs are small,
     // so drop them now and the next render can never observe stale code.
+    const environment = this.server.environments[environmentName];
     if (environment && isRunnableDevEnvironment(environment)) {
       environment.moduleGraph.invalidateAll();
       environment.runner.clearCache();
     }
     this.invalidate();
-  };
+  }
 
   get revision(): number {
     return this.currentRevision;
@@ -216,6 +249,8 @@ export class PreviewRuntime {
     if (this.closed) return;
     this.closed = true;
     if (this.notification) clearTimeout(this.notification);
+    for (const timer of this.rechecks.values()) clearTimeout(timer);
+    this.rechecks.clear();
     this.server.watcher.off("all", this.onFileEvent);
     for (const close of this.streams) close();
     this.streams.clear();

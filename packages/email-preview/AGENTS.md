@@ -37,6 +37,8 @@ projects run it with `vite dev`.
   the module runner into a worker so stuck templates can be terminated.
 - Apply the plugin only to `vite dev`. Shut down event streams and watcher
   listeners when the server closes.
+- Vite's watcher drops a second change to one file within 50 ms. The runtime compares
+  each changed file again after that window instead of trusting every save to arrive.
 - Keep email delivery, remote hosting and a programmatic rendering API outside this
   package. Document supported behavior in the English README.
 

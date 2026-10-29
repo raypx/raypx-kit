@@ -1,3 +1,4 @@
+import { EventEmitter } from "node:events";
 import { mkdtemp, mkdir, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -6,7 +7,7 @@ import { createServer } from "vite";
 import type { ViteDevServer } from "vite";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import { emailPreview } from "../src/server/plugin.js";
-import type { PreviewRuntime } from "../src/server/runtime.js";
+import { PreviewRuntime } from "../src/server/runtime.js";
 
 const require = createRequire(import.meta.url);
 const directories: string[] = [];
@@ -22,7 +23,7 @@ async function linkReact(root: string) {
   }
 }
 
-async function fixture(timeout = 10_000, createEmails = true, installReact = true) {
+async function fixture(timeout = 10_000, createEmails = true, installReact = true, watch = true) {
   const root = await realpath(await mkdtemp(join(tmpdir(), "email runtime ")));
   directories.push(root);
   const emails = join(root, "nested emails");
@@ -47,12 +48,12 @@ async function fixture(timeout = 10_000, createEmails = true, installReact = tru
     appType: "custom",
     logLevel: "silent",
     resolve: { tsconfigPaths: true },
-    server: { middlewareMode: true, hmr: false },
+    server: { middlewareMode: true, hmr: false, ...(watch ? {} : { watch: null }) },
     plugins: [plugin],
   });
   servers.push(server);
   const runtime = (await (plugin.api as { runtime: () => Promise<PreviewRuntime> }).runtime())!;
-  return { root, emails, runtime };
+  return { root, emails, runtime, server };
 }
 
 async function changed(runtime: PreviewRuntime, mutate: () => Promise<void>) {
@@ -174,6 +175,43 @@ Welcome.PreviewProps = { name: "Ada" };`,
       code: "RENDER_ERROR",
     });
   }, 20_000);
+
+  it("recovers when the watcher drops a repair inside its change throttle", async () => {
+    // Vite reports the broken save, the failed render is cached, and the repair lands
+    // inside the watcher's change throttle, as on Linux. Real watching is off; a runtime on
+    // a scripted watcher replays that sequence with a window wide enough for slow runners.
+    const { emails, server } = await fixture(10_000, true, true, false);
+    const watcher = Object.assign(new EventEmitter(), { add() {} });
+    const scripted = new Proxy(server, {
+      get: (target, key) => (key === "watcher" ? watcher : Reflect.get(target, key)),
+    });
+    const runtime = await PreviewRuntime.create(scripted, {
+      directory: emails,
+      renderTimeoutMs: 10_000,
+      missedChangeWindowMs: 1_000,
+    });
+    try {
+      const file = join(emails, "quick.jsx");
+      await writeFile(file, "export default function Broken() { return <div>;");
+      watcher.emit("all", "change", file);
+      await expect(runtime.renderTemplate("quick.jsx")).rejects.toMatchObject({
+        code: "COMPILE_ERROR",
+      });
+      await writeFile(file, "export default () => <p>Quick repair</p>;");
+      const deadline = Date.now() + 3_000;
+      let text = "";
+      while (Date.now() < deadline && !text.includes("Quick repair")) {
+        text = await runtime.renderTemplate("quick.jsx").then(
+          (result) => result.text,
+          () => "",
+        );
+        await new Promise((resolve) => setTimeout(resolve, 25));
+      }
+      expect(text).toContain("Quick repair");
+    } finally {
+      runtime.close();
+    }
+  });
 
   it("recovers once React is installed without restarting", async () => {
     const { root, emails, runtime } = await fixture(10_000, true, false);
