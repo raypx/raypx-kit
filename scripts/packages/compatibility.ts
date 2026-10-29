@@ -10,6 +10,7 @@ import { withTempDirectory, writeFileAtomic } from "../shared/fs.js";
 import {
   assertPackageInventory,
   compatibilityMatrix,
+  consumerVersion,
   minimumNode,
   packagesForNode,
   peerVersions,
@@ -75,12 +76,8 @@ async function prepare(): Promise<CompatibilityIndex> {
     const require = createRequire(join(directory, "package.json"));
     const result: Dependencies = {};
     for (const name of Object.keys(declarations)) {
-      const version = (await manifest(require.resolve(`${name}/package.json`))).version;
-      assert.ok(
-        version && lock.includes(JSON.stringify(`${name}@${version}`)),
-        `${name}@${version}: not in bun.lock`,
-      );
-      result[name] = version;
+      const resolved = await manifest(require.resolve(`${name}/package.json`));
+      result[name] = consumerVersion(name, resolved, lock);
     }
     return result;
   };

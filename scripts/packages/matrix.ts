@@ -47,6 +47,28 @@ export function minimumNode(manifest: Manifest): string {
   return "22.21.0";
 }
 
+/** A workspace install of a consumer dependency, possibly through an npm alias. */
+export interface InstalledPackage {
+  name: string;
+  version: string;
+  /** Upstream versions an alias, such as Vite+ core for `vite`, ships under that name. */
+  bundledVersions?: Record<string, string>;
+}
+
+/**
+ * The published version consumers install for a dependency the workspace resolves.
+ * An npm alias installs another package under the requested name, so its own version
+ * means nothing to consumers; the upstream version it bundles stands in for it.
+ */
+export function consumerVersion(name: string, installed: InstalledPackage, lock: string): string {
+  const locked = `${installed.name}@${installed.version}`;
+  assert.ok(lock.includes(JSON.stringify(locked)), `${locked}: not in bun.lock`);
+  if (installed.name === name) return installed.version;
+  const version = installed.bundledVersions?.[name];
+  assert.ok(version, `${name}: alias ${locked} declares no bundled ${name} version`);
+  return version;
+}
+
 /** Never resolve a range to a newly published release in the current profile. */
 export function peerVersions(
   declarations: Dependencies,

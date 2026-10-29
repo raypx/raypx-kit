@@ -2,6 +2,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   assertPackageInventory,
   compatibilityMatrix,
+  consumerVersion,
   minimumNode,
   minimumVersion,
   packagesForNode,
@@ -36,6 +37,25 @@ function index(): CompatibilityIndex {
     packages: [library("env"), library("devkit", ">=22.21")],
   };
 }
+
+describe("consumer versions", () => {
+  const lock = `"react": ["react@19.2.0", ""],\n"vite": ["@voidzero-dev/vite-plus-core@1.3.0", ""],`;
+  const core = { name: "@voidzero-dev/vite-plus-core", version: "1.3.0" };
+
+  it("uses installed versions and follows npm aliases to their bundled upstream", () => {
+    expect(consumerVersion("react", { name: "react", version: "19.2.0" }, lock)).toBe("19.2.0");
+    expect(consumerVersion("vite", { ...core, bundledVersions: { vite: "8.3.4" } }, lock)).toBe(
+      "8.3.4",
+    );
+  });
+
+  it("rejects unlocked installs and aliases without a bundled upstream version", () => {
+    expect(() => consumerVersion("react", { name: "react", version: "18.3.1" }, lock)).toThrow(
+      "react@18.3.1: not in bun.lock",
+    );
+    expect(() => consumerVersion("vite", core, lock)).toThrow("declares no bundled vite version");
+  });
+});
 
 describe("consumer compatibility matrix", () => {
   it("derives exact engine floors instead of testing the newest patch in a major", () => {
