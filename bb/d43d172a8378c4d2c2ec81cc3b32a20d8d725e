@@ -1,0 +1,42 @@
+docs/package.json
+  s_c8ddb790d61691::t_f875d23a8b7420 18-22
+  s_c8ddb790d61691::t_a77c7f1868b878 23
+package.json
+  s_be0cafefd5c0be::t_35de87178025c3 65,69,73
+packages/devkit/package.json
+  s_be0cafefd5c0be::t_9a3e2df213e522 78
+packages/email-preview/README.md
+  s_be0cafefd5c0be::t_b7b32a40d6dae5 199
+packages/email-preview/package.json
+  s_be0cafefd5c0be::t_c150194fa5ade6 49,59,67
+packages/security/README.md
+  s_be0cafefd5c0be::t_53f77968977f19 206-207
+packages/ui/README.md
+  s_be0cafefd5c0be::t_30560ad2fa83eb 157
+.changeset/refresh-compatible-dependencies-2.md
+  s_c8ddb790d61691::t_6b491babae0df7 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bbd43d172a8378c4d2c2ec81cc3b32a20d8d725e",
+  "prompts": {},
+  "sessions": {
+    "s_be0cafefd5c0be": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a176ee-3d90-7a50-b1c2-93b35b041162",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
