@@ -30,6 +30,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@fumadocs/base-ui": "^16.17.9",
+        "@raypx-kit/intl": "workspace:*",
         "@tanstack/react-router": "^1.170.46",
         "@tanstack/react-start": "^1.169.4",
         "fumadocs-core": "^16.17.9",
@@ -56,7 +57,7 @@
     },
     "packages/analytics": {
       "name": "@raypx-kit/analytics",
-      "version": "0.0.0-alpha.2",
+      "version": "0.0.0-alpha.3",
       "dependencies": {
         "posthog-js": "^1.442.0",
       },
@@ -89,7 +90,7 @@
     },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
-      "version": "0.0.0-alpha.3",
+      "version": "0.0.0-alpha.4",
       "dependencies": {
         "@dotenvx/dotenvx": "^2.38.2",
         "confbox": "^0.3.2",
@@ -117,7 +118,7 @@
     },
     "packages/drizzle-kit": {
       "name": "@raypx-kit/drizzle-kit",
-      "version": "0.0.0-alpha.2",
+      "version": "0.0.0-alpha.3",
       "bin": {
         "drizzle-kit": "./dist/bin.cjs",
       },
@@ -138,7 +139,7 @@
     },
     "packages/email-preview": {
       "name": "@raypx-kit/email-preview",
-      "version": "0.0.0-alpha.2",
+      "version": "0.0.0-alpha.3",
       "dependencies": {
         "@react-email/render": "^2.2.0",
         "prettier": "^3.9.10",
@@ -201,7 +202,7 @@
     },
     "packages/logger": {
       "name": "@raypx-kit/logger",
-      "version": "0.0.0-alpha.3",
+      "version": "0.0.0-alpha.4",
       "dependencies": {
         "evlog": "^2.34.0",
       },
@@ -236,7 +237,7 @@
     },
     "packages/security": {
       "name": "@raypx-kit/security",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "dependencies": {
         "nosecone": "^1.15.0",
       },

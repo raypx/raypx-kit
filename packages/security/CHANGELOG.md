@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.0-alpha.2
+
+### Patch Changes
+
+- bbd43d1: Update compatible dependencies: PostHog in Analytics, confbox in Devkit, the bundled
+  CLI dependencies in Drizzle Kit, React Email render in Email Preview, evlog in Logger
+  and Nosecone in Security. Public interfaces and peer ranges are unchanged.
+
 ## 0.0.0-alpha.1
 
 ### Patch Changes
