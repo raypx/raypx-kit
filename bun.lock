@@ -89,7 +89,7 @@
     },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "dependencies": {
         "@dotenvx/dotenvx": "^2.38.2",
         "confbox": "^0.3.1",
@@ -138,7 +138,7 @@
     },
     "packages/email-preview": {
       "name": "@raypx-kit/email-preview",
-      "version": "0.0.0-alpha.0",
+      "version": "0.0.0-alpha.1",
       "bin": {
         "raypx-email": "./dist/cli.mjs",
       },

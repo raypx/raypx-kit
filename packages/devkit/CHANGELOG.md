@@ -1,5 +1,13 @@
 # @raypx-kit/devkit
 
+## 0.0.0-alpha.2
+
+### Minor Changes
+
+- 5515e5f: Support Bun-only repository toolchain checks and active runtime validation without
+  requiring Node pins. Preserve the existing Node/Bun defaults. Export independent
+  Vite+ lint presets and plain Bun test defaults for consumer-owned configuration.
+
 ## 0.0.0-alpha.1
 
 ### Major Changes
