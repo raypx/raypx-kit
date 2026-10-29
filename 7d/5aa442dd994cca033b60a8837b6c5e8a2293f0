@@ -1,0 +1,19 @@
+packages/email-preview/src/server/runtime.ts
+  s_f89f64b1a9bd16::t_de1b2c8cb09ace 1,80-90,169,172,174-180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d5aa442dd994cca033b60a8837b6c5e8a2293f0",
+  "prompts": {},
+  "sessions": {
+    "s_f89f64b1a9bd16": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1871a-f68c-7551-874c-962b347d8893",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
