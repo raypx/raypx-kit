@@ -31,8 +31,17 @@ jobs:
         run: bun scripts/ci/diagnostics.ts run source bun run verify:source
       - name: Test libraries and build documentation and packages
         run: bun scripts/ci/diagnostics.ts run tests-build bun run verify:tests
-      - name: Install the E2E browser and system dependencies
-        run: bun scripts/ci/diagnostics.ts run browser-install bun run test:e2e:install --with-deps
+      - name: Resolve the Playwright version
+        id: playwright
+        run: printf 'version=%s\n' "$(bun x playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      # Browser revisions follow the Playwright version.
+      - name: Cache the E2E browser
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-shell-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
+      - name: Install the E2E browser and missing system libraries
+        run: bun scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
       - name: Test React workspace browser flows
         run: bun scripts/ci/diagnostics.ts run browser-e2e bun run verify:e2e
       - name: Retain browser failure traces and reports

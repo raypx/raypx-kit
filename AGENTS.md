@@ -255,8 +255,8 @@ React workspaces own Playwright scenarios and browser consumer applications in
 `e2e/`, with the Playwright configuration at the repository root. The unit
 runner excludes E2E files. Browser consumers import built public exports, so their
 separate tsconfig and Vite+ lint checks run after builds through `test:e2e`.
-Install Chromium with `bun run test:e2e:install` before the full gate; CI also
-installs browser system dependencies. Run one package with its `test:e2e` script
+Install Chromium with `bun run test:e2e:install` before the full gate; CI caches the
+headless shell and installs system libraries only when one is missing. Run one package with its `test:e2e` script
 or root `bun run test:e2e --project <name>`. Never replace a failing browser flow
 with an implementation mock. Keep HTTP traffic local and test-owned; no live
 analytics accounts or application credentials. Browser reports and failure traces

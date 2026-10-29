@@ -221,7 +221,9 @@ fixture types and lint, then runs Playwright with Chromium. Additional Playwrigh
 flags such as `--headed`, `--grep` and `--list` are forwarded; multiple `--project`
 flags select a subset. `verify:e2e` uses the builds from `verify:tests` without
 rebuilding. Browser tests are deliberately uncached and do not run inside Vitest.
-CI installs Chromium with `--with-deps` on Ubuntu before running the same gate.
+CI caches Chromium's headless shell by Playwright version and runs
+`playwright install-deps` only when `ldd` reports a missing system library
+(`scripts/ci/browser.sh`), then runs the same gate.
 
 | Project         | Browser contract                                                                                                                     |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
