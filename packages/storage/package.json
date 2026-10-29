@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/storage",
-  "version": "0.0.0-alpha.1",
+  "version": "0.0.0-alpha.2",
   "description": "Object storage behind one interface: S3-compatible, filesystem and memory drivers with signed upload and download URLs.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/storage",
   "license": "Apache-2.0",

@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/security",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "Security response headers and optional Arcjet request protection for Fetch applications.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/security",
   "license": "Apache-2.0",

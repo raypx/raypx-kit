@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/codemods",
-  "version": "0.0.0-alpha.1",
+  "version": "0.0.0-alpha.2",
   "description": "Explicit source migration runner and CLI scaffold for Raypx Kit.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/codemods",
   "license": "Apache-2.0",

@@ -56,7 +56,7 @@
     },
     "packages/analytics": {
       "name": "@raypx-kit/analytics",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "dependencies": {
         "posthog-js": "^1.438.14",
       },
@@ -79,7 +79,7 @@
     },
     "packages/codemods": {
       "name": "@raypx-kit/codemods",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "bin": {
         "raypx-kit-codemod": "./dist/cli.mjs",
       },
@@ -89,7 +89,7 @@
     },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
-      "version": "0.0.0-alpha.2",
+      "version": "0.0.0-alpha.3",
       "dependencies": {
         "@dotenvx/dotenvx": "^2.38.2",
         "confbox": "^0.3.1",
@@ -102,7 +102,7 @@
     },
     "packages/drizzle": {
       "name": "@raypx-kit/drizzle",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "devDependencies": {
         "@vitest/coverage-v8": "^5.0.5",
         "drizzle-orm": ">=1.0.0-rc.5-5935859 <1.0.0-rc.5-z",
@@ -117,7 +117,7 @@
     },
     "packages/drizzle-kit": {
       "name": "@raypx-kit/drizzle-kit",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "bin": {
         "drizzle-kit": "./dist/bin.cjs",
       },
@@ -138,7 +138,7 @@
     },
     "packages/email-preview": {
       "name": "@raypx-kit/email-preview",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "bin": {
         "raypx-email": "./dist/cli.mjs",
       },
@@ -174,7 +174,7 @@
     },
     "packages/env": {
       "name": "@raypx-kit/env",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "devDependencies": {
         "@vitest/coverage-v8": "^5.0.5",
         "zod": "^4.6.7",
@@ -185,7 +185,7 @@
     },
     "packages/intl": {
       "name": "@raypx-kit/intl",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "devDependencies": {
         "@formatjs/icu-messageformat-parser": "^3.5.22",
         "@playwright/test": "^1.64.1",
@@ -204,7 +204,7 @@
     },
     "packages/logger": {
       "name": "@raypx-kit/logger",
-      "version": "0.0.0-alpha.2",
+      "version": "0.0.0-alpha.3",
       "dependencies": {
         "evlog": "^2.33.1",
       },
@@ -214,7 +214,7 @@
     },
     "packages/notifications": {
       "name": "@raypx-kit/notifications",
-      "version": "0.0.0-alpha.0",
+      "version": "0.0.0-alpha.1",
       "dependencies": {
         "@knocklabs/node": "^1.40.0",
       },
@@ -239,7 +239,7 @@
     },
     "packages/security": {
       "name": "@raypx-kit/security",
-      "version": "0.0.0-alpha.0",
+      "version": "0.0.0-alpha.1",
       "dependencies": {
         "nosecone": "^1.14.1",
       },
@@ -255,7 +255,7 @@
     },
     "packages/storage": {
       "name": "@raypx-kit/storage",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "dependencies": {
         "aws4fetch": "^1.0.20",
       },
@@ -265,7 +265,7 @@
     },
     "packages/themes": {
       "name": "@raypx-kit/themes",
-      "version": "0.0.0-alpha.0",
+      "version": "0.0.0-alpha.1",
       "devDependencies": {
         "@playwright/test": "^1.64.1",
         "@testing-library/react": "^16.3.3",
@@ -284,7 +284,7 @@
     },
     "packages/tsconfig": {
       "name": "@raypx-kit/tsconfig",
-      "version": "0.0.0-alpha.1",
+      "version": "0.0.0-alpha.2",
       "devDependencies": {
         "@vitest/coverage-v8": "^5.0.5",
       },

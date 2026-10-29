@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/logger",
-  "version": "0.0.0-alpha.2",
+  "version": "0.0.0-alpha.3",
   "description": "Evlog structured logging, wide events, drain pipelines and request-scoped context.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/logger",
   "license": "Apache-2.0",
