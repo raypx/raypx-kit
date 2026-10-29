@@ -1,0 +1,67 @@
+packages/devkit/src/lint.ts
+  s_c8ddb790d61691::t_e6a145d1212e41 1-51
+  s_c8ddb790d61691::t_9368861e2e470b 52-61
+packages/devkit/tests/toolchain.test.ts
+  s_c8ddb790d61691::t_fb0956b9e2421d 6,10,103-220,233-234,240-241,249
+  s_c8ddb790d61691::t_0a251a0aad1fd8 221-232,235-239,242-248,250-254
+tests/config.ts
+  s_c8ddb790d61691::t_e6a145d1212e41 1-2,6-15
+  s_c8ddb790d61691::t_76eccd087e34bd 16-18
+packages/devkit/tests/fixtures/consumer/runtime.mjs
+  s_c8ddb790d61691::t_50fdc50139a717 2,6,8,63-82,86-109,111
+  s_c8ddb790d61691::t_7263ddb820d7e4 110,112-148
+.changeset/devkit-repository-presets.md
+  s_c8ddb790d61691::t_e6a145d1212e41 1-7
+packages/devkit/src/toolchain.ts
+  s_c8ddb790d61691::t_1cc17062340805 14-15,48-69,73,107,115,132,135-136,138-140,144-149,162-163,176-181,190,195,216,222,237,246,248,251-252,254,264-267,278-283,285-290,293,322
+  s_c8ddb790d61691::t_a7307b94d69968 299,316-321,326,330-334
+packages/devkit/tests/presets.test.ts
+  s_c8ddb790d61691::t_fb0956b9e2421d 1-36
+  s_c8ddb790d61691::t_7e12b0582bf670 37-42
+packages/devkit/tests/fixtures/consumer/package.json
+  s_c8ddb790d61691::t_50fdc50139a717 1-6
+devkit.config.ts
+  s_c8ddb790d61691::t_e6a145d1212e41 29-30
+vite.config.ts
+  s_c8ddb790d61691::t_e6a145d1212e41 2,14
+packages/devkit/AGENTS.md
+  s_c8ddb790d61691::t_50fdc50139a717 19-20,39-42
+turbo.json
+  s_c8ddb790d61691::t_e6a145d1212e41 29
+docs/architecture/README.md
+  s_c8ddb790d61691::t_50fdc50139a717 90
+  s_c8ddb790d61691::t_341ac235a686d9 87-89,91-101
+packages/devkit/README.md
+  s_c8ddb790d61691::t_50fdc50139a717 6,25-26,153-213,217
+  s_c8ddb790d61691::t_34a4f4b68f76e7 214-216
+packages/devkit/tests/fixtures/consumer/tsconfig.json
+  s_c8ddb790d61691::t_2ec6c91e1557d8 6
+packages/devkit/src/testing.ts
+  s_c8ddb790d61691::t_fb0956b9e2421d 1,11
+  s_c8ddb790d61691::t_e6a145d1212e41 2-10
+packages/devkit/tests/fixtures/consumer/types.ts
+  s_c8ddb790d61691::t_50fdc50139a717 2-11,39-50
+  s_c8ddb790d61691::t_e84e2dcb354acc 51
+packages/devkit/package.json
+  s_c8ddb790d61691::t_e6a145d1212e41 52-59,82-83
+packages/devkit/tsdown.config.ts
+  s_c8ddb790d61691::t_e6a145d1212e41 13-14
+bun.lock
+  s_c8ddb790d61691::t_4bc3ac559a9d11 100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5515e5fe6bbd11a1b1588347b976a6f35c409dd5",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
