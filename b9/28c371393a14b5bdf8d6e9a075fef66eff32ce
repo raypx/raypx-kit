@@ -1,0 +1,23 @@
+docs/development/changesets.md
+  s_be0cafefd5c0be::t_74d8d0209b35a5 43-44
+package.json
+  s_be0cafefd5c0be::t_39c92ecc0f033e 38
+packages/ui/README.md
+  s_be0cafefd5c0be::t_a8d51db3f700bf 154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b928c371393a14b5bdf8d6e9a075fef66eff32ce",
+  "prompts": {},
+  "sessions": {
+    "s_be0cafefd5c0be": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a176ee-3d90-7a50-b1c2-93b35b041162",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
