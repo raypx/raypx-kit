@@ -1,0 +1,41 @@
+AGENTS.md
+  s_c8ddb790d61691::t_f114c861cb3212 96-99
+scripts/tasks/model.ts
+  s_c8ddb790d61691::t_e305274e33aafa 122
+.github/workflows/release.yml
+  s_c8ddb790d61691::t_79a6ad9abc44cd 89-90
+scripts/tasks/environment.ts
+  s_c8ddb790d61691::t_f114c861cb3212 1-6
+  s_c8ddb790d61691::t_15ea2a3dcc1198 7-11
+scripts/tasks/run.ts
+  s_c8ddb790d61691::t_f114c861cb3212 6,56,61
+tests/scripts/ci/workflows.test.ts
+  s_c8ddb790d61691::t_fe8104f49f534b 13
+  s_c8ddb790d61691::t_ff65fb19ba3a55 14-16,38-42
+tests/scripts/tasks/environment.test.ts
+  s_c8ddb790d61691::t_f114c861cb3212 1-10
+  s_c8ddb790d61691::t_0fe6fb3b670b51 11-40
+tests/scripts/ci/gates.test.ts
+  s_c8ddb790d61691::t_fe8104f49f534b 1-24
+  s_c8ddb790d61691::t_a31c8441e13207 25-32
+docs/development/README.md
+  s_c8ddb790d61691::t_f08e191f57bef6 64-66
+scripts/verify/run.ts
+  s_c8ddb790d61691::t_d871f828281a11 16-17,31,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9474eae351d74b380b15ebfe0385c0e1724b27fd",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
