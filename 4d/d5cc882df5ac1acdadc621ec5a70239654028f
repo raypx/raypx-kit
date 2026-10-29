@@ -1,0 +1,23 @@
+scripts/packages/compatibility.ts
+  s_be0cafefd5c0be::t_382067d9aef881 13,79-80
+scripts/packages/matrix.ts
+  s_be0cafefd5c0be::t_db9722e8d6f84e 50-71
+tests/scripts/packages/matrix.test.ts
+  s_be0cafefd5c0be::t_6ed19feddef352 5,41-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4dd5cc882df5ac1acdadc621ec5a70239654028f",
+  "prompts": {},
+  "sessions": {
+    "s_be0cafefd5c0be": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a176ee-3d90-7a50-b1c2-93b35b041162",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
