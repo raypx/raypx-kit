@@ -1,0 +1,16 @@
+.github/workflows/debug-email-preview.yml
+  h_f0766e80fd3864 31,40
+packages/email-preview/src/server/runtime.ts
+  h_f0766e80fd3864 1,21-26,31-35,50,59,71-76,105-117,120,126,252-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c02762a48888e7982dbb76b83b472e58190afc1",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
