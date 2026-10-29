@@ -1,0 +1,70 @@
+bun.lock
+  h_f0766e80fd3864 59,82,92,105,120,141,177,188,207,217,242,258,268,287
+packages/analytics/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/analytics/package.json
+  h_f0766e80fd3864 3
+packages/codemods/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/codemods/package.json
+  h_f0766e80fd3864 3
+packages/devkit/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/devkit/package.json
+  h_f0766e80fd3864 3
+packages/drizzle-kit/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/drizzle-kit/package.json
+  h_f0766e80fd3864 3
+packages/drizzle/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/drizzle/package.json
+  h_f0766e80fd3864 3
+packages/email-preview/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/email-preview/package.json
+  h_f0766e80fd3864 3
+packages/env/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/env/package.json
+  h_f0766e80fd3864 3
+packages/intl/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/intl/package.json
+  h_f0766e80fd3864 3
+packages/logger/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/logger/package.json
+  h_f0766e80fd3864 3
+packages/notifications/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/notifications/package.json
+  h_f0766e80fd3864 3
+packages/security/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/security/package.json
+  h_f0766e80fd3864 3
+packages/storage/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/storage/package.json
+  h_f0766e80fd3864 3
+packages/themes/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/themes/package.json
+  h_f0766e80fd3864 3
+packages/tsconfig/CHANGELOG.md
+  h_f0766e80fd3864 3-8
+packages/tsconfig/package.json
+  h_f0766e80fd3864 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0341fefbef721c5e0a2f6f28965fbc4772f70bbd",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
