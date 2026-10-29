@@ -92,7 +92,7 @@
     },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
-      "version": "0.0.0-alpha.4",
+      "version": "0.0.0-alpha.5",
       "dependencies": {
         "@dotenvx/dotenvx": "^2.38.2",
         "confbox": "^0.3.2",
@@ -120,7 +120,7 @@
     },
     "packages/drizzle-kit": {
       "name": "@raypx-kit/drizzle-kit",
-      "version": "0.0.0-alpha.3",
+      "version": "0.0.0-alpha.4",
       "bin": {
         "drizzle-kit": "./dist/bin.cjs",
       },
@@ -141,7 +141,7 @@
     },
     "packages/email-preview": {
       "name": "@raypx-kit/email-preview",
-      "version": "0.0.0-alpha.3",
+      "version": "0.0.0-alpha.4",
       "dependencies": {
         "@react-email/render": "^2.2.0",
         "prettier": "^3.9.10",
