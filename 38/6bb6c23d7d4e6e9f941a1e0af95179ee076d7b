@@ -1,0 +1,38 @@
+bun.lock
+  h_f0766e80fd3864 33,60,93,121,142,205,240
+packages/analytics/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/analytics/package.json
+  h_f0766e80fd3864 3
+packages/devkit/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/devkit/package.json
+  h_f0766e80fd3864 3
+packages/drizzle-kit/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/drizzle-kit/package.json
+  h_f0766e80fd3864 3
+packages/email-preview/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/email-preview/package.json
+  h_f0766e80fd3864 3
+packages/logger/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/logger/package.json
+  h_f0766e80fd3864 3
+packages/security/CHANGELOG.md
+  h_f0766e80fd3864 3-10
+packages/security/package.json
+  h_f0766e80fd3864 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "386bb6c23d7d4e6e9f941a1e0af95179ee076d7b",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
