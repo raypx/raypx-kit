@@ -43,10 +43,10 @@
     "pack:check": "bun pm pack --dry-run"
   },
   "dependencies": {
-    "nosecone": "^1.14.1"
+    "nosecone": "^1.15.0"
   },
   "devDependencies": {
-    "@arcjet/node": "^1.14.1"
+    "@arcjet/node": "^1.15.0"
   },
   "peerDependencies": {
     "@arcjet/node": "^1.14.1"

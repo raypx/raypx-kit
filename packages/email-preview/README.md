@@ -196,7 +196,7 @@ changes; `bun run licenses:check` checks this index without requiring build outp
 
 | Package             | Installed version | License | License text                                                            |
 | ------------------- | ----------------- | ------- | ----------------------------------------------------------------------- |
-| @react-email/render | 2.1.1             | MIT     | [license.md](https://unpkg.com/@react-email/render@2.1.1/license.md)    |
+| @react-email/render | 2.2.0             | MIT     | [license.md](https://unpkg.com/@react-email/render@2.2.0/license.md)    |
 | prettier            | 3.9.10            | MIT     | [LICENSE](https://unpkg.com/prettier@3.9.10/LICENSE)                    |
 | react               | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react@19.3.1/LICENSE)                       |
 | react-dom           | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react-dom@19.3.1/LICENSE)                   |

@@ -51,7 +51,7 @@
     "test:e2e": "bun ../../e2e/run.ts --project analytics"
   },
   "dependencies": {
-    "posthog-js": "^1.438.14"
+    "posthog-js": "^1.442.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

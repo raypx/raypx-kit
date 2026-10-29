@@ -203,7 +203,7 @@ rejects a stale index.
 
 | Package      | Installed version | License    | License text                                             |
 | ------------ | ----------------- | ---------- | -------------------------------------------------------- |
-| @arcjet/node | 1.14.1            | Apache-2.0 | [LICENSE](https://unpkg.com/@arcjet/node@1.14.1/LICENSE) |
-| nosecone     | 1.14.1            | Apache-2.0 | [LICENSE](https://unpkg.com/nosecone@1.14.1/LICENSE)     |
+| @arcjet/node | 1.15.0            | Apache-2.0 | [LICENSE](https://unpkg.com/@arcjet/node@1.15.0/LICENSE) |
+| nosecone     | 1.15.0            | Apache-2.0 | [LICENSE](https://unpkg.com/nosecone@1.15.0/LICENSE)     |
 
 <!-- END GENERATED DEPENDENCY LICENSE INDEX -->

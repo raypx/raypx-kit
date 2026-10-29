@@ -154,7 +154,7 @@ Run `bun run licenses:update` from the repository root after dependency changes;
 | @raypx-kit/themes        | 0.0.0-alpha.1     | Apache-2.0 | [LICENSE](../themes/LICENSE)                                        |
 | class-variance-authority | 0.7.1             | Apache-2.0 | [LICENSE](https://unpkg.com/class-variance-authority@0.7.1/LICENSE) |
 | cn                       | 0.5.0             | MIT        | [LICENSE](https://unpkg.com/cn@0.5.0/LICENSE)                       |
-| lucide-react             | 1.61.0            | ISC        | [LICENSE](https://unpkg.com/lucide-react@1.61.0/LICENSE)            |
+| lucide-react             | 1.64.0            | ISC        | [LICENSE](https://unpkg.com/lucide-react@1.64.0/LICENSE)            |
 | react                    | 19.3.1            | MIT        | [LICENSE](https://unpkg.com/react@19.3.1/LICENSE)                   |
 | react-dom                | 19.3.1            | MIT        | [LICENSE](https://unpkg.com/react-dom@19.3.1/LICENSE)               |
 | tailwindcss              | 4.3.3             | MIT        | [LICENSE](https://unpkg.com/tailwindcss@4.3.3/LICENSE)              |

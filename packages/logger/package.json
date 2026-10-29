@@ -58,7 +58,7 @@
     "pack:check": "bun pm pack --dry-run"
   },
   "dependencies": {
-    "evlog": "^2.33.1"
+    "evlog": "^2.34.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.5"
