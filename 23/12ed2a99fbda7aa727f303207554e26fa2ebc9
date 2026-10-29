@@ -1,0 +1,111 @@
+docs/src/routes/__root.tsx
+  s_c8ddb790d61691::t_97b19aefacae55 1-8,10,13-21,48,52-59,72,77-80,83-86
+  s_c8ddb790d61691::t_f881447e374382 11,22,43-44,46,65-71,73-76,81-82,87-92
+  s_c8ddb790d61691::t_bbe6d6d4c3fda8 93-94
+docs/src/lib/i18n/en.ts
+  s_c8ddb790d61691::t_f875d23a8b7420 1-55
+  s_c8ddb790d61691::t_735321853a4f85 56
+docs/src/components/not-found.tsx
+  s_c8ddb790d61691::t_f881447e374382 1-3,5-6,11
+  s_c8ddb790d61691::t_7c4713aa420ad6 13,15,18
+docs/content/zh/index.md
+  s_c8ddb790d61691::t_be48d58810ed3a 7-13,19-24,26-35
+  s_c8ddb790d61691::t_f311a0b9115433 6,25,40,43-44,52-55,57
+  s_c8ddb790d61691::t_1f351f176261cd 1-4,14,16-18,36-38,41-42,45-51,59-68
+  s_c8ddb790d61691::t_57f983ed1b1ddf 5,15,39,56,58
+docs/src/routes/index.tsx
+  s_c8ddb790d61691::t_f881447e374382 5
+docs/src/lib/i18n/zh.ts
+  s_c8ddb790d61691::t_f875d23a8b7420 1-58
+turbo.json
+  s_c8ddb790d61691::t_0d591fa382f960 21-25
+docs/AGENTS.md
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 5,51-59,61-62,70-72
+  s_c8ddb790d61691::t_026fa5ceeb3e87 60
+  s_c8ddb790d61691::t_5798e2cd43dfd1 63-67
+docs/src/lib/i18n/client.ts
+  s_c8ddb790d61691::t_f875d23a8b7420 1-56
+docs/src/lib/pages.ts
+  s_c8ddb790d61691::t_1f351f176261cd 1-3,225,230-236,238-240,250-261,270-271,283
+  s_c8ddb790d61691::t_be48d58810ed3a 78,226-229,237,241-249,272-273,280-282
+docs/architecture/README.md
+  s_c8ddb790d61691::t_5798e2cd43dfd1 276-280
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 267-275
+docs/src/routes/api/search.ts
+  s_c8ddb790d61691::t_f881447e374382 5
+docs/src/lib/layout.ts
+  s_c8ddb790d61691::t_f881447e374382 2-3,6,8
+  s_c8ddb790d61691::t_97b19aefacae55 4,10
+docs/e2e/docs.spec.ts
+  s_c8ddb790d61691::t_e76130f09cf45d 54,111-113,121-122,138-141,150-152,167-169,171-173,176-179,183,191,193,196,201-203,220-224,227-229
+  s_c8ddb790d61691::t_97b19aefacae55 72,162-165,214
+  s_c8ddb790d61691::t_862f1011dadc69 241-243,247-248,251-257,263-273,278-281,285-288,298-300,304-307,316
+  s_c8ddb790d61691::t_f311a0b9115433 149,154-158
+  s_c8ddb790d61691::t_5219f16341ecd9 206-210
+  s_c8ddb790d61691::t_52560fc0a4fdc9 110,114-120,123-137,142-148,153,159-161,166,170,174-175,180-182,184-190,192,194-195,197-200,204-205,211-213,215-219,225-226,230-239
+  s_c8ddb790d61691::t_026fa5ceeb3e87 240,244-246,249-250,258-262,274-277,282-284,289-297,301-303,308-315,317-319
+docs/package.json
+  s_c8ddb790d61691::t_97b19aefacae55 19-20,25
+docs/src/components/search.tsx
+  s_c8ddb790d61691::t_f881447e374382 2-3,19,22,28-30,46,51,58
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 31-38,54,60
+docs/vite.config.ts
+  s_c8ddb790d61691::t_dd6a5da02747aa 29
+  s_c8ddb790d61691::t_0d591fa382f960 28
+  s_c8ddb790d61691::t_f881447e374382 10
+  s_c8ddb790d61691::t_2c60a0232bf4ad 13-15,30
+docs/src/lib/i18n/config.ts
+  s_c8ddb790d61691::t_f875d23a8b7420 1-26
+docs/src/lib/source.ts
+  s_c8ddb790d61691::t_1f351f176261cd 5-12,22,45,54-69
+  s_c8ddb790d61691::t_e366621ddb7cc2 70-71,77
+PRODUCT.md
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 21-24,48-50
+  s_c8ddb790d61691::t_5798e2cd43dfd1 25-26
+docs/src/routes/{-$lang}/docs/$.tsx
+  s_c8ddb790d61691::t_f881447e374382 1-69,71-107
+  s_c8ddb790d61691::t_dd6a5da02747aa 70
+  s_c8ddb790d61691::t_33050929cbd168 108-114,122,124,126
+docs/src/lib/i18n/pages.ts
+  s_c8ddb790d61691::t_be48d58810ed3a 3-94,96-107
+  s_c8ddb790d61691::t_1f351f176261cd 1-2,95,108-113
+docs/tsconfig.json
+  s_c8ddb790d61691::t_97b19aefacae55 8-9,13-14
+  s_c8ddb790d61691::t_0d591fa382f960 10-12,15
+docs/src/components/mdx.tsx
+  s_c8ddb790d61691::t_f881447e374382 4-17
+  s_c8ddb790d61691::t_1a01e722f022d8 20,22,31
+AGENTS.md
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 76-78
+docs/README.md
+  s_c8ddb790d61691::t_5798e2cd43dfd1 99-108
+  s_c8ddb790d61691::t_57f983ed1b1ddf 91
+  s_c8ddb790d61691::t_3f3a8f56ecbc35 75-89,92-98
+  s_c8ddb790d61691::t_f311a0b9115433 90
+docs/src/components/theme-switch.tsx
+  s_c8ddb790d61691::t_97b19aefacae55 1-61
+  s_c8ddb790d61691::t_7b5af2b3fc34cb 62-75
+docs/tests/pages.test.ts
+  s_c8ddb790d61691::t_0d591fa382f960 10-13,15-19,51-100,108
+  s_c8ddb790d61691::t_704bd8d65841b8 101-107,109-110
+docs/src/lib/theme.ts
+  s_c8ddb790d61691::t_97b19aefacae55 1-7
+bun.lock
+  s_c8ddb790d61691::t_2a315be98ef322 33-34,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2312ed2a99fbda7aa727f303207554e26fa2ebc9",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
