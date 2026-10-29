@@ -1,0 +1,48 @@
+packages/drizzle-kit/package.json
+  s_c8ddb790d61691::t_a90b280c3a1191 55
+packages/devkit/package.json
+  s_c8ddb790d61691::t_a90b280c3a1191 79,83
+docs/development/dependencies.md
+  s_c8ddb790d61691::t_2c0ef09ae3f3e0 34-36
+packages/drizzle/vitest.integration.config.ts
+  s_c8ddb790d61691::t_c0f1a99140925b 11
+  s_c8ddb790d61691::t_bdd9a5120b802d 4-10
+packages/drizzle-kit/README.md
+  s_c8ddb790d61691::t_2c0ef09ae3f3e0 24-27
+packages/drizzle-kit/AGENTS.md
+  s_c8ddb790d61691::t_2c0ef09ae3f3e0 25-27
+packages/email-preview/package.json
+  s_c8ddb790d61691::t_a90b280c3a1191 69-70
+knip.ts
+  s_c8ddb790d61691::t_bdd9a5120b802d 48
+docs/package.json
+  s_c8ddb790d61691::t_a90b280c3a1191 42-43
+package.json
+  s_c8ddb790d61691::t_a90b280c3a1191 72,76
+packages/drizzle-kit/tests/fixtures/consumer/runtime.mjs
+  s_c8ddb790d61691::t_2c0ef09ae3f3e0 1-43
+.changeset/refresh-build-and-parser-dependencies.md
+  s_c8ddb790d61691::t_2c0ef09ae3f3e0 1-10
+bun.lock
+  s_c8ddb790d61691::t_3b9d1fe7abcd9c 24,56-57,99,103,130,166-167,323,492,494,496,498,500,502,504,506,508,510,512,514,516,518,520,522,524,526,528,530,532,534,536,538,540,542,662,664,666,668,670,672,674,676,678,680,682,684,686,688,690,692,694,696,698,700,702,742,744,746,748,750,752,754,756,758,760,762,764,766,768,770,772,774,776,778,792,794,796,798,800,802,804,806,808,810,812,814,816,818,820,822,824,826,828,830,1248,1250,1252,1254,1256,1258,1260,1262,1444,1780,1784,1786,2032,2034,2162,2172-2173,2178,2222,2224,2226,2228,2230,2232,2234,2236,2238,2240,2242,2244,2246,2248,2250,2252,2254,2256,2258,2260,2262,2264,2266,2268,2270,2272,2276,2278,2280,2282,2284,2286,2288,2290,2292,2294,2296,2298,2300,2302,2304,2306,2308,2310,2312
+docs/src/lib/source.ts
+  s_c8ddb790d61691::t_f27accb7c5ab91 55-71
+packages/email-preview/README.md
+  s_c8ddb790d61691::t_20122734ffc501 203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "069e9e7ce373211621799ceb93cdc0aa9bcafb7d",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
