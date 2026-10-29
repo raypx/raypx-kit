@@ -86,6 +86,8 @@ jobs:
   compatibility:
     needs: plan
     if: needs.plan.outputs.mode == 'publish' && vars.NPM_PUBLISH_ENABLED == 'true'
+    permissions:
+      contents: read
     uses: ./.github/workflows/node-compatibility.yml
 
   publish:

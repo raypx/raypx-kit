@@ -93,7 +93,10 @@ scripts remain terminal leaf commands. `scripts/tasks/leaf.ts` forwards argument
 only to the selected task, and runtime/platform identity participates in commands.
 Keep native Bun typechecker source inputs explicit across dependency workspaces;
 filesystem tracing does not capture every native checker read. Cache real output
-files, inherit the parent environment and fingerprint outcome-affecting variables.
+files, preserve build environment values and fingerprint outcome-affecting variables.
+The private runner omits agent/job metadata: TanStack Start otherwise fingerprints
+every environment key through its unrestricted `loadEnv` hook. Keep `CI` and
+`GITHUB_ACTIONS` guards, credentials and application build inputs available.
 Create ignored output directories before tracing to keep enumeration stable.
 Do not introduce a second task runner.
 

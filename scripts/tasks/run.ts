@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { run } from "../../packages/devkit/src/process.js";
 import { argumentKey, taskModel, taskPlan, taskRef } from "./model.js";
+import { taskEnvironment } from "./environment.js";
 
 export async function runTasks(
   root: string,
@@ -52,12 +53,12 @@ export async function runTasks(
       filtered ? `task:${task}` : taskRef(owner, task),
     ],
     root,
-    {
+    taskEnvironment({
       ...process.env,
       ...environment,
       ...taskArguments,
       VP_RUN_CONCURRENCY_LIMIT: process.env.VP_RUN_CONCURRENCY_LIMIT ?? "2",
-    },
+    }),
   );
 }
 

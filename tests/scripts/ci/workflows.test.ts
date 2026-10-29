@@ -10,7 +10,10 @@ interface Steps {
   steps?: { uses?: string }[];
 }
 interface Workflow {
-  jobs: Record<string, Steps & { needs?: string[]; if?: string }>;
+  jobs: Record<
+    string,
+    Steps & { needs?: string[]; if?: string; permissions?: { contents?: string } }
+  >;
 }
 const read = <T>(path: string) => parseYAML(readFileSync(join(root, path), "utf8")) as T;
 
@@ -30,6 +33,11 @@ it("keeps Node installation outside every default CI job, including nested setup
   expect(Object.values(ci.jobs).some(installsNode)).toBe(false);
   const compatibility = read<Workflow>(".github/workflows/node-compatibility.yml");
   expect(installsNode(compatibility.jobs.prepare!)).toBe(true);
+});
+
+it("grants read access when Release calls the reusable compatibility workflow", () => {
+  const release = read<Workflow>(".github/workflows/release.yml");
+  expect(release.jobs.compatibility?.permissions?.contents).toBe("read");
 });
 
 it("runs the final required check after failures and covers every conditional gate", () => {

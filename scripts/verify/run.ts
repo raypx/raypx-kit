@@ -13,6 +13,8 @@ export async function runVerification(
 ) {
   assertToolchainRuntime(root);
   const model = taskModel(root);
+  const builds = (names: string[]) =>
+    names.map((name) => taskRef(name, "build")).filter((ref) => model.tasks.has(ref));
   const execute = (tasks: string[]) =>
     runTasks(root, "verify:run", [], { TOOLKIT_VERIFY_TASKS: JSON.stringify([...new Set(tasks)]) });
   if (["javascript", "full", "quick"].includes(phase)) {
@@ -26,9 +28,7 @@ export async function runVerification(
   if (["browser", "full"].includes(phase) && plan.browser.length) {
     if (phase === "browser")
       await execute(
-        plan.browser.map((name) =>
-          taskRef(browserProjects[name as BrowserProject].workspace, "build"),
-        ),
+        builds(plan.browser.map((name) => browserProjects[name as BrowserProject].workspace)),
       );
     await run(
       process.execPath,
@@ -38,7 +38,7 @@ export async function runVerification(
   }
   if (["artifacts", "full"].includes(phase)) {
     if (plan.packages.length) {
-      if (phase === "artifacts") await execute(plan.packages.map((name) => taskRef(name, "build")));
+      if (phase === "artifacts") await execute(builds(plan.packages));
       await run(process.execPath, ["scripts/packages/check.ts"], root, {
         ...process.env,
         TOOLKIT_PACKAGES: JSON.stringify(plan.packages),

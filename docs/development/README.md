@@ -61,7 +61,9 @@ VP caches successful tasks in `node_modules/.vite/task-cache`, including build
 outputs and JUnit reports. Source edits in a workspace dependency invalidate its
 consumers. Native Bun typechecker source inputs are explicit because filesystem
 tracing does not observe every native read. Task commands include runtime/platform
-identity; environment inputs and private task arguments are fingerprinted. Keep
+identity; environment inputs and private task arguments are fingerprinted. The
+private runner omits changing agent and job metadata before TanStack Start loads
+environment values, retaining CI guards and application inputs. Keep
 the cache between runs. Maintenance tests spawn independent VP runners and stay
 uncached, avoiding nested filesystem tracing on macOS.
 

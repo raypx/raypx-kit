@@ -119,7 +119,7 @@ export function taskModel(root: string, selection?: string): TaskModel {
         "!.source/**",
         "!coverage/**",
         ...[
-          "!.artifacts/**",
+          "!**/.artifacts/**",
           "!.changeset/pack/**",
           "!**/node_modules/**",
           "!**/dist/**",
