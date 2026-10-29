@@ -1,0 +1,21 @@
+scripts/tasks/environment.ts
+  s_c8ddb790d61691::t_474f3ae686635e 1-8,12
+tests/scripts/tasks/environment.test.ts
+  s_c8ddb790d61691::t_ad366bd026e0b0 21-23,35-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4fed89a5ff6e8fbaaddecf4929743c3877f33282",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
