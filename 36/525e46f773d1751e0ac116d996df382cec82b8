@@ -1,0 +1,19 @@
+.github/debug/watch-probe.mjs
+  s_a28f815ca15c3e::t_895248e79b7c6b 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36525e46f773d1751e0ac116d996df382cec82b8",
+  "prompts": {},
+  "sessions": {
+    "s_a28f815ca15c3e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a167aa-286b-7d10-b682-c37f5fff770d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
