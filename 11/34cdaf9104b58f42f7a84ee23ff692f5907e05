@@ -1,0 +1,19 @@
+.github/workflows/debug-email-preview.yml
+  s_a28f815ca15c3e::t_f1ba6cd117a9e6 30-31,33,38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1134cdaf9104b58f42f7a84ee23ff692f5907e05",
+  "prompts": {},
+  "sessions": {
+    "s_a28f815ca15c3e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a167aa-286b-7d10-b682-c37f5fff770d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
