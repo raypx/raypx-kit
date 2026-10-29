@@ -1,0 +1,16 @@
+.github/debug/watch-probe.mjs
+  h_f0766e80fd3864 22,38-39
+.github/workflows/debug-email-preview.yml
+  h_f0766e80fd3864 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b0ca1253864376fac1e9592ecfdea5d7e3d0d475",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
