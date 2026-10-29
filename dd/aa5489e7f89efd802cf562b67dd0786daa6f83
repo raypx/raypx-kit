@@ -1,0 +1,31 @@
+bun.lock
+  s_c8ddb790d61691::t_0220386e253e50 95,123,144
+packages/devkit/CHANGELOG.md
+  s_c8ddb790d61691::t_e07f4bfb0600ff 3-11
+packages/devkit/package.json
+  s_c8ddb790d61691::t_4f6e1e64c5363a 3
+packages/drizzle-kit/CHANGELOG.md
+  s_c8ddb790d61691::t_c22fc132242510 3-11
+packages/drizzle-kit/package.json
+  s_c8ddb790d61691::t_256aa1d5cc04c9 3
+packages/email-preview/CHANGELOG.md
+  s_c8ddb790d61691::t_f5642048faf281 3-11
+packages/email-preview/package.json
+  s_c8ddb790d61691::t_15a3b86867652a 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ddaa5489e7f89efd802cf562b67dd0786daa6f83",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
