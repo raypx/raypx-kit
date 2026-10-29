@@ -1,0 +1,25 @@
+.changeset/email-preview-missed-watch-change.md
+  s_be0cafefd5c0be::t_4cee78dc964908 1-5
+packages/email-preview/AGENTS.md
+  s_be0cafefd5c0be::t_0b268ed59c695d 40-41
+packages/email-preview/src/server/runtime.ts
+  s_be0cafefd5c0be::t_ea29067ed8bf98 1,21-26,31-35,50,59,71-76,105-117,120,126,252-253
+packages/email-preview/tests/runtime.test.ts
+  s_be0cafefd5c0be::t_78a5338049e502 1,10,26,51,56,179-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f4006e4de439cbe4430e0b313dfc0ee55a95db36",
+  "prompts": {},
+  "sessions": {
+    "s_be0cafefd5c0be": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a176ee-3d90-7a50-b1c2-93b35b041162",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
