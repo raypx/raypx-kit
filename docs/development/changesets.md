@@ -40,7 +40,8 @@ exercise npm's dist-tag behavior.
    requests one.
 2. Merge to `canary`. Prepare versions through a version PR or run
    `bun run version-packages` locally. That command consumes changesets, updates
-   versions and changelogs, refreshes `bun.lock`, and formats the result.
+   versions and changelogs, refreshes `bun.lock` and README license indexes, and
+   formats the result.
 3. Review and commit the resulting versions, changelogs and lockfile. A local
    version commit pushed to `canary` is valid; a version PR is optional.
 4. Follow the [publishing runbook](publishing.md) to verify, pack and publish the
