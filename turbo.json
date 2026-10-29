@@ -26,6 +26,7 @@
     "devkit.config.ts",
     "scripts/checks/toolchain.ts",
     "packages/devkit/src/toolchain.ts",
+    "packages/devkit/src/testing.ts",
     "tests/setup/**",
     "packages/tsconfig/*.json",
     "tests/config.ts"

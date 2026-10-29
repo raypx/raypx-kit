@@ -3,9 +3,11 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import {
+  assertBunRuntime,
   assertToolchainRuntime,
   checkToolchain,
   pinnedNode,
+  readBunPin,
   readToolchain,
 } from "../src/toolchain.js";
 
@@ -96,6 +98,158 @@ function manifestAt(root: string) {
 beforeEach(() => {
   execFileSync.mockReset();
   vi.stubEnv("DEVKIT_NODE_BINARY", undefined);
+});
+
+describe("Bun-only repositories", () => {
+  function bunRepository(overrides: Record<string, string> = {}) {
+    const root = repository({
+      "mise.toml": '[settings]\nidiomatic_version_file_enable_tools = ["bun"]\n',
+      ".github/workflows/ci.yml": `jobs:\n  verify:\n    steps:\n      - uses: oven-sh/setup-bun@v2\n        with: { bun-version-file: package.json }\n`,
+      "README.md": `Develop with Bun ${bunVersion}.\n`,
+      ...overrides,
+    });
+    rmSync(join(root, ".nvmrc"));
+    const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+    delete manifest.engines;
+    // Node API types do not imply a Node runtime dependency.
+    manifest.devDependencies["@types/node"] = "^26.6.5";
+    writeFileSync(join(root, "package.json"), JSON.stringify(manifest));
+    return root;
+  }
+
+  const check = (root: string) => checkToolchain(root, { runtime: "bun" });
+
+  it("checks Bun pins without Node and still defaults to requiring both runtimes", () => {
+    const root = bunRepository();
+    expect(readBunPin(root)).toBe(bunVersion);
+    expect(check(root)).toEqual([]);
+    expect(checkToolchain(root).length).toBeGreaterThan(0);
+    expect(execFileSync).not.toHaveBeenCalled();
+  });
+
+  it.each(["bun@1.4", "bun@latest", "npm@10.9.0", "bun@1.4.3-extra"])(
+    "rejects an ambiguous or non-Bun pin: %s",
+    (pin) => {
+      const root = bunRepository();
+      changeManifest(root, (manifest) => {
+        manifest.packageManager = pin;
+      });
+      expect(() => readBunPin(root)).toThrow("Pin an exact Bun version");
+      expect(check(root)).toEqual(["Pin an exact Bun version in package.json packageManager."]);
+    },
+  );
+
+  it.each([".nvmrc", ".node-version", ".bun-version", ".tool-versions"])(
+    "rejects a second runtime pin: %s",
+    (file) => {
+      const root = bunRepository();
+      writeFileSync(join(root, file), nodeVersion);
+      expect(check(root)).toContain(`${file}: package.json packageManager is the only runtime pin`);
+    },
+  );
+
+  it("rejects a Node engine and duplicated Bun declarations", () => {
+    const root = bunRepository();
+    changeManifest(root, (manifest) => {
+      manifest.engines = { node: nodeVersion };
+      manifest.devEngines.runtime = { name: "bun", version: "1.4.2", onFail: "warn" };
+    });
+    expect(check(root)).toEqual(
+      expect.arrayContaining([
+        "package.json: remove engines.node; Bun is the only runtime",
+        `package.json: devEngines.runtime is bun@1.4.2, expected bun@${bunVersion}`,
+        "package.json: devEngines.runtime.onFail is warn, expected error",
+      ]),
+    );
+  });
+
+  it("requires mise to read only the Bun pin", () => {
+    expect(
+      check(
+        bunRepository({
+          "mise.toml": '[settings]\nidiomatic_version_file_enable_tools = ["node", "bun"]\n',
+        }),
+      ),
+    ).toContain("mise.toml: enable idiomatic version files for bun only");
+  });
+
+  it.each([".github/workflows/node.yml", ".github/actions/nested/setup/action.yaml"])(
+    "rejects Node setup in %s",
+    (file) => {
+      const source = file.includes("workflows") ? workflow : compositeAction;
+      expect(
+        check(
+          bunRepository({
+            [file]: source.replace("actions/setup-node@v7", "AcTiOnS/SeTuP-NoDe@KeepCase"),
+          }),
+        ),
+      ).toContain(`${file}: remove actions/setup-node; Bun is the only runtime`);
+    },
+  );
+
+  it("keeps Bun setup validation in workflows and composite actions", () => {
+    const file = ".github/actions/setup/action.yml";
+    const root = bunRepository({
+      [file]:
+        "runs:\n  using: composite\n  steps:\n    - uses: oven-sh/setup-bun@v2\n      with: { bun-version: latest }\n",
+    });
+    expect(check(root)).toEqual(
+      expect.arrayContaining([
+        `${file}: read bun-version-file: package.json instead of a literal version`,
+        `${file}: every bun setup must read package.json`,
+      ]),
+    );
+  });
+
+  it("checks Bun catalog types while allowing Node API types", () => {
+    const root = bunRepository();
+    changeManifest(root, (manifest) => {
+      Object.assign(manifest, {
+        workspaces: {
+          packages: ["packages/*"],
+          catalog: { "@types/node": "^26.6.5", "@types/bun": "1.4.2" },
+        },
+      });
+    });
+    expect(check(root)).toEqual([
+      `package.json catalog: @types/bun is 1.4.2, expected ${bunVersion}`,
+    ]);
+  });
+
+  it.each(["FROM node:latest", "FROM node:24.22.0", "from --platform=linux/amd64 node:lts"])(
+    "rejects a Node Docker runtime: %s",
+    (image) => {
+      expect(
+        check(bunRepository({ "apps/api/Dockerfile": `${image}\nFROM oven/bun:1.4.2\n` })),
+      ).toEqual([
+        "apps/api/Dockerfile: build and run on oven/bun images",
+        `apps/api/Dockerfile: bun image is 1.4.2, expected ${bunVersion}`,
+      ]);
+    },
+  );
+
+  it("rejects documented Node pins and checks Bun documentation", () => {
+    expect(
+      check(bunRepository({ "README.md": "Develop with Node **24.22.0** and Bun **1.4.2**." })),
+    ).toEqual([
+      "README.md: documents a Node release; Bun is the only runtime",
+      `README.md: documented Bun is 1.4.2, expected ${bunVersion}`,
+    ]);
+  });
+
+  it("checks the active Bun without probing Node", () => {
+    const root = bunRepository();
+    changeManifest(root, (manifest) => {
+      manifest.packageManager = `bun@${process.versions.bun}`;
+    });
+    expect(assertBunRuntime(root)).toEqual({ bun: process.versions.bun });
+    expect(execFileSync).not.toHaveBeenCalled();
+    changeManifest(root, (manifest) => {
+      manifest.packageManager = "bun@0.0.0";
+    });
+    expect(() => assertBunRuntime(root)).toThrow("Expected Bun 0.0.0");
+    expect(execFileSync).not.toHaveBeenCalled();
+  });
 });
 
 afterEach(() => {

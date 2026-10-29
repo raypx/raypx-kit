@@ -26,6 +26,8 @@ export default {
         "./artifact": "./src/artifact.ts",
         "./catalogs": "./src/catalogs.ts",
         "./docs": "./src/docs.ts",
+        "./lint": "./src/lint.ts",
+        "./testing": "./src/testing.ts",
       },
     },
     "packages/drizzle": {

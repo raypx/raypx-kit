@@ -3,6 +3,7 @@
 Maintenance checks and task helpers for Bun monorepos: workspace boundaries,
 toolchain pins, static message catalogs, documentation links and relocated build
 artifacts.
+The package also exports plain Vite+ lint presets and Bun test defaults.
 
 ```sh
 bun add -d @raypx-kit/devkit
@@ -21,6 +22,8 @@ contains no product rules, so repositories compose their own policy from it.
 | `./docs`         | Report broken relative Markdown links                                  |
 | `./process`      | Run commands, load dotenv files and run Turbo with a guarded cache     |
 | `./artifact`     | Stage a relocated output and probe a running Node server               |
+| `./lint`         | Base and opt-in strict Vite+ lint presets without repository paths     |
+| `./testing`      | Plain Vitest defaults for Bun workers                                  |
 
 ## Workspace architecture
 
@@ -146,6 +149,71 @@ and checks Dockerfile `node:` and `oven/bun:` images,
 documented `Node x.y.z` and `Bun x.y.z` versions and Turbo global dependencies.
 `pinnedNode` returns the Node executable after checking its version; the binary
 variable selects an executable but never relaxes the version.
+
+### Bun-only repositories
+
+The default policy still requires Node and Bun. Repositories that run JavaScript
+only with Bun can select that policy explicitly:
+
+```ts
+import { assertBunRuntime, checkToolchain, readBunPin } from "@raypx-kit/devkit/toolchain";
+
+const findings = checkToolchain(root, { runtime: "bun", documents: ["README.md"] });
+const version = readBunPin(root);
+const { bun } = assertBunRuntime(root);
+```
+
+This mode reads only `package.json#packageManager`. It checks `devEngines`, Bun
+types, mise, Dockerfiles, GitHub workflows/composite actions and selected docs.
+It rejects Node engine declarations, Node version files, Node setup actions and
+Node runtime images. Node API types remain allowed without a Node runtime pin.
+`readBunPin` and `assertBunRuntime` never read `.nvmrc` or execute Node.
+
+### Lint and test presets
+
+With Vite+ 1.3 or later, import the independent configuration entries. They contain
+plain data and do not load Vite+, application plugins, test setup or repository
+configuration. Their declarations do not require Vite+ in unrelated consumers.
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite-plus";
+import { strictLint } from "@raypx-kit/devkit/lint";
+
+export default defineConfig({
+  lint: {
+    ...strictLint,
+    ignorePatterns: ["**/dist/**", "**/*.gen.ts"],
+    rules: { ...strictLint.rules, "react/no-danger": "off" },
+  },
+});
+```
+
+`baseLint` provides type-aware checking and the Vite+ import rule. `strictLint`
+adds TypeScript, React, accessibility, promise and import correctness checks;
+adopt it explicitly because stricter rules can introduce findings. Neither
+preset chooses generated files, workspace paths or project exceptions.
+Consumers own formatting and staged Git commands as well.
+
+```ts
+// vitest.config.ts
+import { defineConfig, mergeConfig } from "vite-plus/test/config";
+import { bunTestDefaults } from "@raypx-kit/devkit/testing";
+
+export default mergeConfig(
+  bunTestDefaults,
+  defineConfig({
+    test: { include: ["tests/**/*.test.ts"], setupFiles: ["./tests/setup.ts"] },
+  }),
+);
+```
+
+`bunTestDefaults` selects the Node environment, one worker, Bun's `--no-env-file`
+and `--no-install` flags, and V8 coverage with text/JSON/LCOV reporters. Execute
+tests with `bun --bun vp test --run`; install the matching coverage provider when
+requesting coverage. Suites, DOM environments, setup files, React deduplication
+and application fixtures remain consumer-owned. Use native `mergeConfig` for
+overrides; no configuration factory or custom option schema is required.
 
 ## Catalogs and documentation
 

@@ -10,6 +10,8 @@ export default defineConfig({
     artifact: "src/artifact.ts",
     catalogs: "src/catalogs.ts",
     docs: "src/docs.ts",
+    lint: "src/lint.ts",
+    testing: "src/testing.ts",
   },
   dts: true,
   format: ["esm"],

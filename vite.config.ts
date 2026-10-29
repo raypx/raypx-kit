@@ -1,4 +1,5 @@
 import { defineConfig } from "vite-plus";
+import { baseLint } from "./packages/devkit/src/lint.js";
 
 export default defineConfig({
   fmt: {
@@ -10,6 +11,7 @@ export default defineConfig({
     "*.{ts,tsx,mts}": "vp lint --fix",
   },
   lint: {
+    ...baseLint,
     ignorePatterns: [
       "packages/*/dist/**",
       // Public consumer contracts resolve installed tarballs, not workspace source.
@@ -24,8 +26,5 @@ export default defineConfig({
       "docs/.source/**",
       "docs/src/routeTree.gen.ts",
     ],
-    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
-    options: { typeAware: true, typeCheck: true },
-    rules: { "vite-plus/prefer-vite-plus-imports": "error" },
   },
 });

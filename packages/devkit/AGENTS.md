@@ -16,6 +16,8 @@ compose their own policy, CLI and product probes from these entries.
 | `./docs`         | Relative Markdown link check                                |
 | `./process`      | Commands, dotenv environment and guarded Turbo runs         |
 | `./artifact`     | Relocated output staging and Node server probes             |
+| `./lint`         | Plain Vite+ base and opt-in strict lint presets             |
+| `./testing`      | Plain Vitest defaults for Bun workers                       |
 
 The README documents the complete shipped API.
 
@@ -34,6 +36,10 @@ The README documents the complete shipped API.
 - Never execute inspected sources or catalogs; parse them with oxc-parser.
 - Never print loaded environment values or secrets.
 - Use Node APIs only; `turbo` alone requires Bun at call time.
+- Toolchain checks default to Node/Bun; explicit `runtime: "bun"` forbids Node
+  pins without requiring a Node executable. Keep existing defaults compatible.
+- Lint/test entries export plain objects with no runtime Vite+ imports. Consumers
+  own paths, suites, setup, app plugins and native configuration composition.
 - Do not import other Raypx Kit packages. Keep entries independent so each loads
   only its own dependencies.
 - Allow internal bundled runtime imports only for app/tooling workspaces with both

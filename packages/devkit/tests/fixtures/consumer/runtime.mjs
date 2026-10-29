@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { checkArchitecture } from "@raypx-kit/devkit/architecture";
+import { checkToolchain, readBunPin } from "@raypx-kit/devkit/toolchain";
 import { discover } from "@raypx-kit/devkit/workspaces";
 
 const root = mkdtempSync(join(tmpdir(), "devkit-consumer-"));
@@ -57,6 +60,89 @@ try {
   assert.ok(unknown.findings.some((finding) => finding.includes("packages/missing")));
   assert.ok(checkArchitecture(unknown).length > 0);
   assert.equal(existsSync(marker), false);
+
+  // A consumer can use Bun policy independently of the host running this contract.
+  writeFileSync(
+    join(root, "package.json"),
+    JSON.stringify({
+      private: true,
+      workspaces: ["packages/*"],
+      packageManager: "bun@1.4.3",
+      devEngines: {
+        packageManager: { name: "bun", version: "1.4.3", onFail: "error" },
+        runtime: { name: "bun", version: "1.4.3", onFail: "error" },
+      },
+    }),
+  );
+  writeFileSync(
+    join(root, "mise.toml"),
+    '[settings]\nidiomatic_version_file_enable_tools = ["bun"]\n',
+  );
+  assert.equal(readBunPin(root), "1.4.3");
+  assert.deepEqual(checkToolchain(root, { runtime: "bun" }), []);
 } finally {
   rmSync(root, { recursive: true, force: true });
+}
+
+// Run the installed presets through the consumer's actual Vite+ commands.
+const probe = mkdtempSync(fileURLToPath(new URL("./config-probe-", import.meta.url)));
+try {
+  writeFileSync(join(probe, "package.json"), '{"private":true,"type":"module"}');
+  writeFileSync(
+    join(probe, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        target: "ES2022",
+        module: "ESNext",
+        moduleResolution: "Bundler",
+        strict: true,
+        noEmit: true,
+      },
+      include: ["src.ts"],
+    }),
+  );
+  writeFileSync(
+    join(probe, "vite.config.ts"),
+    `import { defineConfig } from "vite-plus";
+import { strictLint } from "@raypx-kit/devkit/lint";
+export default defineConfig({ lint: strictLint });\n`,
+  );
+  const run = (args) =>
+    execFileSync("bun", ["--bun", "vp", ...args], {
+      cwd: probe,
+      encoding: "utf8",
+      stdio: "pipe",
+      timeout: 30_000,
+    });
+  writeFileSync(
+    join(probe, "src.ts"),
+    "export const equals = (value: string | number) => value == 1;\n",
+  );
+  assert.throws(
+    () => run(["lint", "src.ts"]),
+    (error) => {
+      assert.match(`${error.stdout}\n${error.stderr}`, /eqeqeq/);
+      return true;
+    },
+  );
+  writeFileSync(
+    join(probe, "src.ts"),
+    "export const equals = (value: string | number) => value === 1;\n",
+  );
+  run(["lint", "src.ts"]);
+  writeFileSync(
+    join(probe, "vitest.config.ts"),
+    `import { defineConfig, mergeConfig } from "vite-plus/test/config";
+import { bunTestDefaults } from "@raypx-kit/devkit/testing";
+export default mergeConfig(bunTestDefaults, defineConfig({ test: { include: ["fixture.test.ts"] } }));\n`,
+  );
+  writeFileSync(
+    join(probe, "fixture.test.ts"),
+    `import { expect, it } from "vite-plus/test";
+import { equals } from "./src.js";
+it("runs the consumer's selected suite", () => { expect(equals(1)).toBe(true); expect(equals("1")).toBe(false); });\n`,
+  );
+  run(["test", "--run"]);
+} finally {
+  rmSync(probe, { recursive: true, force: true });
 }

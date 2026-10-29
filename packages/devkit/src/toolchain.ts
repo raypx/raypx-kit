@@ -11,6 +11,8 @@ export interface Toolchain {
 }
 
 export interface ToolchainOptions {
+  /** Bun-only repositories forbid Node runtime pins; the default checks both runtimes. */
+  runtime?: "node-bun" | "bun";
   /** Repository-relative documents whose `Node x.y.z` and `Bun x.y.z` mentions must match. */
   documents?: readonly string[];
   /** Files every Turbo cache key must include when `turbo.json` exists. */
@@ -43,10 +45,32 @@ const catalogsOf = (manifest: Manifest): Record<string, string>[] => {
   return [...(catalog ? [catalog] : []), ...Object.values(catalogs ?? {})];
 };
 
+const bunVersion = (root: string) =>
+  /^bun@(\d+\.\d+\.\d+)$/.exec(manifestAt(root).packageManager ?? "")?.[1];
+
+/** Read the exact Bun pin without requiring a Node development runtime. */
+export function readBunPin(root: string): string {
+  const bun = bunVersion(root);
+  if (!bun) throw new Error("Pin an exact Bun version in package.json packageManager.");
+  return bun;
+}
+
+function assertBunVersion(bun: string) {
+  if (process.versions.bun !== bun)
+    throw new Error(`Expected Bun ${bun}, got ${process.versions.bun ?? "none"}.`);
+}
+
+/** Check the active Bun runtime without executing Node or inspected repository code. */
+export function assertBunRuntime(root: string): { bun: string } {
+  const bun = readBunPin(root);
+  assertBunVersion(bun);
+  return { bun };
+}
+
 /** `.nvmrc` pins Node and the root `packageManager` pins Bun; every other pin follows them. */
 export function readToolchain(root: string): Toolchain {
   const node = readFileSync(join(root, ".nvmrc"), "utf8").trim().replace(/^v/, "");
-  const bun = /^bun@(.+)$/.exec(manifestAt(root).packageManager ?? "")?.[1] ?? "";
+  const bun = bunVersion(root) ?? "";
   if (!exactVersion.test(node) || !exactVersion.test(bun))
     throw new Error("Pin exact Node and Bun versions in .nvmrc and package.json packageManager.");
   return { node, bun };
@@ -80,8 +104,7 @@ export function assertToolchainRuntime(
   options: RuntimeOptions = {},
 ): Toolchain & { nodeBinary: string } {
   const pins = readToolchain(root);
-  if (process.versions.bun !== pins.bun)
-    throw new Error(`Expected Bun ${pins.bun}, got ${process.versions.bun ?? "none"}.`);
+  assertBunVersion(pins.bun);
   return { ...pins, nodeBinary: pinnedNode(root, options) };
 }
 
@@ -89,7 +112,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function checkMise(root: string): string[] {
+function checkMise(root: string, bunOnly: boolean): string[] {
   const file = "mise.toml";
   const path = join(root, file);
   if (!existsSync(path)) return [`${file}: missing runtime manager configuration`];
@@ -106,16 +129,24 @@ function checkMise(root: string): string[] {
   const tools = isRecord(mise.settings)
     ? mise.settings.idiomatic_version_file_enable_tools
     : undefined;
+  const expected = bunOnly ? ["bun"] : ["node", "bun"];
   if (
     !Array.isArray(tools) ||
-    tools.length !== 2 ||
-    !["node", "bun"].every((tool) => tools.includes(tool))
+    tools.length !== expected.length ||
+    !expected.every((tool) => tools.includes(tool))
   )
-    findings.push(`${file}: enable idiomatic version files for node and bun`);
+    findings.push(
+      `${file}: enable idiomatic version files for ${bunOnly ? "bun only" : "node and bun"}`,
+    );
   return findings;
 }
 
-function checkSetupStep(file: string, location: string, step: Record<string, unknown>): string[] {
+function checkSetupStep(
+  file: string,
+  location: string,
+  step: Record<string, unknown>,
+  bunOnly: boolean,
+): string[] {
   if (typeof step.uses !== "string") return [];
   const refSeparator = step.uses.indexOf("@");
   if (refSeparator < 0) return [];
@@ -128,6 +159,8 @@ function checkSetupStep(file: string, location: string, step: Record<string, unk
   ).find(([, action]) => repository === action);
   if (!setup) return [];
   const [tool, , source] = setup;
+  if (bunOnly && tool === "node")
+    return [`${file}: remove actions/setup-node; Bun is the only runtime`];
   const findings: string[] = [];
   if (step.with !== undefined && !isRecord(step.with))
     findings.push(`${file}: ${location}.with must be a mapping`);
@@ -140,7 +173,12 @@ function checkSetupStep(file: string, location: string, step: Record<string, unk
   return findings;
 }
 
-function checkSetupSteps(file: string, location: string, steps: unknown): string[] {
+function checkSetupSteps(
+  file: string,
+  location: string,
+  steps: unknown,
+  bunOnly: boolean,
+): string[] {
   if (!Array.isArray(steps)) return [`${file}: ${location} must be an array`];
   const findings: string[] = [];
   for (const [index, step] of steps.entries()) {
@@ -149,12 +187,12 @@ function checkSetupSteps(file: string, location: string, steps: unknown): string
       findings.push(`${file}: ${stepLocation} must be a mapping`);
       continue;
     }
-    findings.push(...checkSetupStep(file, stepLocation, step));
+    findings.push(...checkSetupStep(file, stepLocation, step, bunOnly));
   }
   return findings;
 }
 
-function checkWorkflows(root: string): string[] {
+function checkWorkflows(root: string, bunOnly: boolean): string[] {
   const findings: string[] = [];
   for (const file of globSync(".github/workflows/*.{yml,yaml}", { cwd: root })) {
     let workflow: unknown;
@@ -175,13 +213,13 @@ function checkWorkflows(root: string): string[] {
         continue;
       }
       if (job.steps === undefined) continue;
-      findings.push(...checkSetupSteps(file, `${location}.steps`, job.steps));
+      findings.push(...checkSetupSteps(file, `${location}.steps`, job.steps, bunOnly));
     }
   }
   return findings;
 }
 
-function checkCompositeActions(root: string): string[] {
+function checkCompositeActions(root: string, bunOnly: boolean): string[] {
   const findings: string[] = [];
   for (const file of globSync(".github/actions/**/action.{yml,yaml}", { cwd: root })) {
     let action: unknown;
@@ -196,7 +234,7 @@ function checkCompositeActions(root: string): string[] {
       continue;
     }
     if (action.runs.using !== "composite") continue;
-    findings.push(...checkSetupSteps(file, "runs.steps", action.runs.steps));
+    findings.push(...checkSetupSteps(file, "runs.steps", action.runs.steps, bunOnly));
   }
   return findings;
 }
@@ -205,13 +243,15 @@ function checkCompositeActions(root: string): string[] {
 export function checkToolchain(
   root: string,
   {
+    runtime = "node-bun",
     documents = ["README.md", "AGENTS.md"],
-    turboGlobalDependencies = [".nvmrc", "mise.toml"],
+    turboGlobalDependencies = runtime === "bun" ? ["mise.toml"] : [".nvmrc", "mise.toml"],
   }: ToolchainOptions = {},
 ): string[] {
-  let pins: Toolchain;
+  const bunOnly = runtime === "bun";
+  let pins: { bun: string; node?: string };
   try {
-    pins = readToolchain(root);
+    pins = bunOnly ? { bun: readBunPin(root) } : readToolchain(root);
   } catch (error) {
     return [error instanceof Error ? error.message : String(error)];
   }
@@ -221,7 +261,10 @@ export function checkToolchain(
     if (actual !== expected)
       findings.push(`${file}: ${label} is ${actual ?? "missing"}, expected ${expected}`);
   };
-  expect("package.json", "engines.node", manifest.engines?.node, pins.node);
+  if (bunOnly) {
+    if (manifest.engines?.node !== undefined)
+      findings.push("package.json: remove engines.node; Bun is the only runtime");
+  } else expect("package.json", "engines.node", manifest.engines?.node, pins.node!);
   for (const key of ["packageManager", "runtime"]) {
     const engine = manifest.devEngines?.[key];
     expect(
@@ -232,19 +275,28 @@ export function checkToolchain(
     );
     expect("package.json", `devEngines.${key}.onFail`, engine?.onFail, "error");
   }
-  for (const file of [".node-version", ".bun-version", ".tool-versions"])
+  for (const file of [
+    ...(bunOnly ? [".nvmrc"] : []),
+    ".node-version",
+    ".bun-version",
+    ".tool-versions",
+  ])
     if (existsSync(join(root, file)))
-      findings.push(`${file}: use .nvmrc and package.json instead of a second version source`);
-  findings.push(...checkMise(root));
+      findings.push(
+        bunOnly
+          ? `${file}: package.json packageManager is the only runtime pin`
+          : `${file}: use .nvmrc and package.json instead of a second version source`,
+      );
+  findings.push(...checkMise(root, bunOnly));
 
   // Runtime type packages follow the pins: @types/node by major, @types/bun exactly.
-  const nodeMajor = pins.node.split(".")[0]!;
+  const nodeMajor = pins.node?.split(".")[0];
   // Protocol ranges such as catalog: and workspace: are checked where they resolve.
   const version = (range: string | undefined) =>
     range && !/^[a-z]+:/.test(range) ? range.replace(/^[\^~]/, "") : undefined;
   const checkTypes = (file: string, dependencies: Record<string, string> | undefined) => {
     const node = version(dependencies?.["@types/node"]);
-    if (node && node.split(".")[0] !== nodeMajor)
+    if (nodeMajor && node && node.split(".")[0] !== nodeMajor)
       findings.push(`${file}: @types/node must match the Node ${nodeMajor} major`);
     const bun = version(dependencies?.["@types/bun"]);
     if (bun) expect(file, "@types/bun", bun, pins.bun);
@@ -261,17 +313,25 @@ export function checkToolchain(
 
   for (const file of globSync("**/Dockerfile", { cwd: root, exclude: ["**/node_modules/**"] })) {
     const source = readFileSync(join(root, file), "utf8");
-    for (const [, version] of source.matchAll(/^FROM\s+node:(\d+\.\d+\.\d+)/gm))
-      expect(file, "node image", version, pins.node);
+    if (bunOnly) {
+      if (/^\s*FROM\s+(?:--platform=\S+\s+)?node:/im.test(source))
+        findings.push(`${file}: build and run on oven/bun images`);
+    } else {
+      for (const [, version] of source.matchAll(/^FROM\s+node:(\d+\.\d+\.\d+)/gm))
+        expect(file, "node image", version, pins.node!);
+    }
     for (const [, version] of source.matchAll(/^FROM\s+oven\/bun:(\d+\.\d+\.\d+)/gm))
       expect(file, "bun image", version, pins.bun);
   }
-  findings.push(...checkWorkflows(root), ...checkCompositeActions(root));
+  findings.push(...checkWorkflows(root, bunOnly), ...checkCompositeActions(root, bunOnly));
   for (const file of documents) {
     if (!existsSync(join(root, file))) continue;
     const document = readFileSync(join(root, file), "utf8").replaceAll("**", "");
-    for (const [, tool, version] of document.matchAll(/\b(Node|Bun) v?(\d+\.\d+\.\d+)\b/g))
-      expect(file, `documented ${tool}`, version, tool === "Node" ? pins.node : pins.bun);
+    for (const [, tool, version] of document.matchAll(/\b(Node|Bun) v?(\d+\.\d+\.\d+)\b/g)) {
+      if (bunOnly && tool === "Node")
+        findings.push(`${file}: documents a Node release; Bun is the only runtime`);
+      else expect(file, `documented ${tool}`, version, tool === "Node" ? pins.node! : pins.bun);
+    }
   }
   const turboFile = join(root, "turbo.json");
   if (existsSync(turboFile)) {
