@@ -67,7 +67,9 @@ function digest(contents: Uint8Array): string {
 
 async function prepare(): Promise<CompatibilityIndex> {
   assertToolchainRuntime(root);
-  const developmentNode = (await readFile(join(root, ".nvmrc"), "utf8")).trim();
+  const developmentNode = (
+    await readFile(join(root, "scripts/packages/node-version"), "utf8")
+  ).trim();
   const lock = await readFile(join(root, "bun.lock"), "utf8");
   const installed = async (
     directory: string,
@@ -140,7 +142,7 @@ async function check(): Promise<void> {
   assertPackageInventory(index, await publicPackages());
   assert.equal(
     index.developmentNode,
-    (await readFile(join(root, ".nvmrc"), "utf8")).trim(),
+    (await readFile(join(root, "scripts/packages/node-version"), "utf8")).trim(),
     "Compatibility artifact development Node differs from this checkout",
   );
   const expectedNode = options.get("--expected-node");
@@ -178,6 +180,7 @@ async function check(): Promise<void> {
       const consumerOptions = {
         bunBinary: process.execPath,
         nodeBinary,
+        nodeOnly: true,
         compilerDependencies: index.compilerDependencies,
         dependencies: entry.profiles[peers as PeerProfile],
         fixtureDevDependencies: entry.fixtureDevDependencies,

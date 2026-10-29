@@ -24,9 +24,6 @@ it("resolves CSS exports and transitive dependencies from the same packed batch"
     exports: { "./styles.css": "./styles.css" },
     dependencies: { [theme.name]: theme.version },
   };
-  const nodeBinary =
-    process.env.TOOLKIT_NODE_BINARY ??
-    execFileSync("node", ["-p", "process.execPath"], { encoding: "utf8" }).trim();
   const packageArchives: Record<string, string> = {};
   for (const packed of [theme, ui]) {
     const directory = join(root, packed.name.split("/").at(-1)!);
@@ -59,7 +56,6 @@ assert.match(await readFile(fromUi.resolve("@raypx-kit-test/theme/styles.css"), 
   const consumer = join(root, "consumer");
   await checkConsumer(packageArchives[ui.name]!, ui, consumer, packageDirectory, {
     bunBinary: process.execPath,
-    nodeBinary,
     compilerDependencies: {},
     packageArchives,
   });
@@ -71,6 +67,6 @@ assert.match(await readFile(fromUi.resolve("@raypx-kit-test/theme/styles.css"), 
   // The CSS check verifies contents, not only that Node can resolve an export.
   await writeFile(join(consumer, "node_modules/@raypx-kit-test/ui/styles.css"), "\n");
   expect(() =>
-    execFileSync(nodeBinary, ["exports.mjs"], { cwd: consumer, stdio: "pipe" }),
+    execFileSync(process.execPath, ["exports.mjs"], { cwd: consumer, stdio: "pipe" }),
   ).toThrow();
 }, 30_000);

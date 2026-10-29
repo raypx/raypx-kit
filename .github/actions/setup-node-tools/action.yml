@@ -1,0 +1,15 @@
+name: Set up isolated Node vendor tools
+description: Node is limited to compatibility, Cloudflare packaging and npm transport.
+inputs:
+  registry-url:
+    description: Optional npm registry for the publication job
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: scripts/packages/node-version
+        registry-url: ${{ inputs.registry-url }}
+        package-manager-cache: false

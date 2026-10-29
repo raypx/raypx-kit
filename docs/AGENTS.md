@@ -29,20 +29,16 @@ without a third-party service.
 
 ## Constraints
 
-- Use TanStack Start, Fumadocs and the repository Bun/Vite+/Turbo toolchain.
+- Use TanStack Start, Fumadocs and the repository Bun/Vite+ toolchain.
 - Use the official `@fumadocs/base-ui` components and `fumadocs-core` with caret
   ranges that resolve to the same installed version. The root `toolchain:check`
   verifies this pairing. Do not reintroduce the Radix-based `fumadocs-ui` package.
-- Use Nitro's `bun` preset for development and `cloudflare_module` for builds.
-  Use `bun --bun vp` for development and invoke `vp` directly for build and
-  preview so Wrangler runs with Node.
-  Node 24.22.0 is the repository consumer-check and npm transport baseline.
-- Library tsdown builds belong to their packages. This internal application keeps
-  its Vite+ build and does not generate library declarations or archives.
-- Read Node from `.nvmrc` and Bun from root `packageManager`; mise only enables
-  those sources without `[tools]` versions. Use `mise trust && mise install`,
-  shell activation or `mise exec -- <command>`, then `bun run doctor` and
-  `bun run toolchain:check` when setting up or changing runtimes.
+- Use Nitro's `bun` target for normal builds and previews. `build:cloudflare`
+  explicitly selects the Worker target and isolated Node vendor tooling; keep the
+  deployment build working through the separate compatibility workflow.
+  All commands use VP; application plugins belong in `vite.app.config.ts`.
+- Root `packageManager` is the single Bun development pin. mise enables Bun only.
+  Run doctor and toolchain checks after runtime/configuration changes.
 - Preserve current versus proposed API status, source provenance and all inventory rows.
 - Resolve Markdown links against their canonical source during compilation;
   registered pages use site routes and other repository files link to GitHub.
@@ -58,7 +54,7 @@ without a third-party service.
   `src/lib/i18n/pages.ts` and compile them from `content/zh/`. Missing translations
   use the English body with an explicit localized notice and body `lang`.
 - Source type checks map consumed public Intl/Themes entries to their maintained sources;
-  Vite builds and browser tests resolve the built public exports. `docs#dev` builds
+  Vite builds and browser tests resolve the built public exports. The VP docs development task builds
   workspace dependencies before starting the server.
 - `@raypx-kit/themes` owns theme state, first-paint initialization and persistence.
   Keep `ThemeScript` before styles, share `src/lib/theme.ts` with the provider,
@@ -92,6 +88,6 @@ bun run verify
 Use `bun run docs:dev` for development at `http://localhost:3100`.
 
 Browser scenarios live in `e2e/` and run through `bun run test:e2e`. They use
-the built Cloudflare application through the existing local preview wrapper,
+the built Bun application through the shared local preview wrapper,
 with Playwright Chromium and the root shared E2E runner. Keep browser cases out
 of the unit runner; root verification includes their separate post-build gate.

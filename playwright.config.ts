@@ -3,8 +3,8 @@ import { browserProjects, projectNames } from "./e2e/projects.js";
 
 const selected = projectNames(process.env.RAYPX_E2E_PROJECTS?.split(","));
 const ports = new Set(selected.map((name) => browserProjects[name].port));
-// The runner launches Playwright with the validated Node binary, including an override.
-const node = `'${process.execPath.replaceAll("'", "'\\''")}'`;
+// Playwright and its fixture servers use the same pinned Bun runtime.
+const bun = `'${process.execPath.replaceAll("'", "'\\''")}'`;
 // Independent workspace runs must not delete another run's failure traces.
 const artifacts =
   selected.length === Object.keys(browserProjects).length
@@ -60,7 +60,7 @@ export default defineConfig({
     ...(ports.has(4174)
       ? [
           {
-            command: `${node} packages/email-preview/e2e/serve.ts --port 4174`,
+            command: `${bun} packages/email-preview/e2e/serve.ts --port 4174`,
             url: "http://127.0.0.1:4174/api/templates",
             reuseExistingServer: false,
             timeout: 60_000,
@@ -71,7 +71,7 @@ export default defineConfig({
     ...(ports.has(4175)
       ? [
           {
-            command: `${node} docs/scripts/preview.ts --host 127.0.0.1 --port 4175`,
+            command: `${bun} docs/scripts/preview.ts --host 127.0.0.1 --port 4175`,
             url: "http://127.0.0.1:4175/docs",
             reuseExistingServer: false,
             timeout: 150_000,

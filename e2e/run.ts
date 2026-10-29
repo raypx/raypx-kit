@@ -4,7 +4,7 @@ import { assertToolchainRuntime } from "../scripts/checks/toolchain.js";
 import { browserProjects, projectNames } from "./projects.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const { nodeBinary } = assertToolchainRuntime(root);
+assertToolchainRuntime(root);
 const forwarded: string[] = [];
 const requested: string[] = [];
 let skipBuild = false;
@@ -55,7 +55,7 @@ if (!forwarded.includes("--list")) {
     ]);
   }
   await run(
-    nodeBinary,
+    process.execPath,
     [
       `${root}node_modules/vite-plus/bin/vp`,
       "lint",
@@ -68,7 +68,7 @@ if (!forwarded.includes("--list")) {
   );
 }
 await run(
-  nodeBinary,
+  process.execPath,
   [
     "node_modules/@playwright/test/cli.js",
     "test",

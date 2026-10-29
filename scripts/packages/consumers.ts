@@ -26,12 +26,21 @@ export interface Manifest {
 
 export interface ConsumerOptions {
   bunBinary: string;
-  nodeBinary: string;
+  nodeBinary?: string;
+  nodeOnly?: boolean;
   compilerDependencies: Dependencies;
   dependencies?: Dependencies;
   fixtureDevDependencies?: Dependencies;
   /** Archives from this verification batch replace internal registry dependencies. */
   packageArchives?: Dependencies;
+}
+
+function runtimes(options: ConsumerOptions): string[] {
+  if (options.nodeOnly) {
+    assert.ok(options.nodeBinary, "Node-only consumer checks require an explicit binary");
+    return [options.nodeBinary];
+  }
+  return [...new Set([options.bunBinary, ...(options.nodeBinary ? [options.nodeBinary] : [])])];
 }
 
 function run(binary: string, args: string[], cwd: string): string {
@@ -119,8 +128,7 @@ export async function checkConsumer(
       ...imports,
     ].join("\n"),
   );
-  run(options.bunBinary, ["exports.mjs"], consumer);
-  run(options.nodeBinary, ["exports.mjs"], consumer);
+  for (const binary of runtimes(options)) run(binary, ["exports.mjs"], consumer);
   const requireSpecifiers = Object.entries(packed.exports)
     .filter(([key, target]) => !key.endsWith(".css") && hasRequireCondition(target))
     .map(([key]) => packed.name + key.slice(1));
@@ -129,12 +137,11 @@ export async function checkConsumer(
       join(consumer, "exports.cjs"),
       requireSpecifiers.map((specifier) => `require(${JSON.stringify(specifier)});`).join("\n"),
     );
-    run(options.bunBinary, ["exports.cjs"], consumer);
-    run(options.nodeBinary, ["exports.cjs"], consumer);
+    for (const binary of runtimes(options)) run(binary, ["exports.cjs"], consumer);
   }
   // Exercise installed bin links outside the workspace, without a database or config.
   for (const [name] of binaryEntries(packed)) {
-    for (const binary of [options.bunBinary, options.nodeBinary]) {
+    for (const binary of runtimes(options)) {
       const help = execFileSync(binary, [join(consumer, "node_modules/.bin", name), "--help"], {
         cwd: consumer,
         encoding: "utf8",
@@ -149,8 +156,7 @@ export async function checkConsumer(
   if (fixtureTypes || fixtureRuntime)
     await cp(fixture, join(consumer, "contract"), { recursive: true });
   if (fixtureRuntime) {
-    run(options.bunBinary, ["contract/runtime.mjs"], consumer);
-    run(options.nodeBinary, ["contract/runtime.mjs"], consumer);
+    for (const binary of runtimes(options)) run(binary, ["contract/runtime.mjs"], consumer);
   }
   if (modules.length === 0) return;
 
@@ -238,8 +244,7 @@ export async function checkWithoutOptionalPeers(
   run(options.bunBinary, ["install", "--ignore-scripts"], consumer);
   await cp(fixture, join(consumer, "contract"), { recursive: true });
   if (runtime) {
-    run(options.bunBinary, ["contract/runtime.mjs"], consumer);
-    run(options.nodeBinary, ["contract/runtime.mjs"], consumer);
+    for (const binary of runtimes(options)) run(binary, ["contract/runtime.mjs"], consumer);
   }
   if (types) {
     await writeFile(

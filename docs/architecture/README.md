@@ -81,13 +81,13 @@ other domain rules.
 Subpaths below are relative to their package names. The manifests remain the
 authoritative export list.
 Public packages declare Node `>=22.21`; Security follows Arcjet's narrower
-`>=22.21.0 <23 || >=24.5.0` range. The tsdown builds target Node 22.21.0.
+`>=22.21.0 <23 || >=24.5.0` range. The VP pack builds target Node 22.21.0.
 The development runtime pin remains separate.
 
 | Package       | Public entries                                                                                                                  | Dependency boundary                                                                                                                              |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Codemods      | Root runner API; `raypx-kit-codemod` executable                                                                                 | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                      |
-| Devkit        | `/workspaces`, `/architecture`, `/toolchain`, `/catalogs`, `/docs`, `/process`, `/artifact`, `/lint`, `/testing`; no root entry | Node APIs and external parser/configuration dependencies; lint/test presets contain plain data and its Turbo helper runs under Bun               |
+| Devkit        | `/workspaces`, `/architecture`, `/toolchain`, `/catalogs`, `/docs`, `/process`, `/artifact`, `/lint`, `/testing`; no root entry | Node APIs and external parser/configuration dependencies; lint/test presets contain plain data and its VP helper runs under Bun                  |
 | Drizzle       | Root, `/postgres`, `/errors`, `/results`, `/diagnostics`                                                                        | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                               |
 | Drizzle Kit   | Root `defineConfig` for ESM and CommonJS; `drizzle-kit` executable                                                              | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                    |
 | Env           | Root, `/runtime`                                                                                                                | Zod is a required external peer, preserving schema runtime identity                                                                              |
@@ -142,15 +142,15 @@ for those runtimes.
 
 ## From source to installable artifacts
 
-| Packages                                                                                      | Build path                                                                 | Published result                                                                                                                                              |
-| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codemods, Devkit, Drizzle, Env, Intl, Analytics, Logger, Notifications, Security, Storage, UI | `src/` entries → `tsdown.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
-| Drizzle Kit                                                                                   | Installed upstream package → `src/extract.ts` → `dist/`                    | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
-| Email Preview                                                                                 | Plugin → tsdown; interface → Vite+ static build                            | `dist/index.mjs` and `dist/ui/`; consumers never build the preview UI                                                                                         |
-| TSConfig                                                                                      | Package-root JSON files → archive                                          | The five presets directly; no JavaScript compilation                                                                                                          |
-| Themes                                                                                        | Token source → CSS generator; TypeScript entries → tsdown                  | ESM and declarations, package-root `styles.css` and Tailwind mappings                                                                                         |
+| Packages                                                                                      | Build path                                                               | Published result                                                                                                                                              |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codemods, Devkit, Drizzle, Env, Intl, Analytics, Logger, Notifications, Security, Storage, UI | `src/` entries → `vite.config.ts`, using `tsconfig.build.json` → `dist/` | ESM `.mjs`, `.d.mts` declarations and source maps; explicit entry names and dependency bundling rules                                                         |
+| Drizzle Kit                                                                                   | Installed upstream package → `src/extract.ts` → `dist/`                  | Unchanged upstream CLI/configuration files, declaration chunks and CLI skills; generated `dist/package.json` retains CommonJS semantics for `.js` and `.d.ts` |
+| Email Preview                                                                                 | Plugin → VP pack; interface → Vite+ static build                         | `dist/index.mjs` and `dist/ui/`; consumers never build the preview UI                                                                                         |
+| TSConfig                                                                                      | Package-root JSON files → archive                                        | The five presets directly; no JavaScript compilation                                                                                                          |
+| Themes                                                                                        | Token source → CSS generator; TypeScript entries → VP pack               | ESM and declarations, package-root `styles.css` and Tailwind mappings                                                                                         |
 
-The tsdown configurations explicitly preserve output extensions and their
+The VP pack configurations explicitly preserve output extensions and their
 consumer runtime targets. Those targets are independent of the repository's
 development runtime pins. Drizzle Kit preserves both ESM and CommonJS exports;
 its omitted programmatic API and payload bundles are not recreated locally.
@@ -158,7 +158,7 @@ Email Preview is public tooling with a prebuilt interface. Its root export is th
 `emailPreview()` Vite plugin, which projects run with `vite dev`. Templates run in a dedicated Vite environment of the consumer's dev
 server, while the installed UI assets remain read-only. The browser receives rendered output and file-change notifications.
 Its build derives complete third-party license notices from the actual bundled
-module graphs and writes `dist/THIRD_PARTY_LICENSES.txt`. The root Turbo `dist/`
+module graphs and writes `dist/THIRD_PARTY_LICENSES.txt`. The root VP `dist/`
 output rule caches these notices with the application. They remain outside Git
 and ship in the archive; package `LICENSE` files are not build outputs.
 UI retains explicit `components/ui/*` exports, a utility entry and package-root
@@ -183,21 +183,22 @@ including UI's shadcn MIT license and notice and Themes' original source notice.
 The internal root owns shared development tools and composes repository policy
 through `scripts/` and [devkit.config.ts](../../devkit.config.ts). That typed
 configuration contains all workspaces' architecture rules and the toolchain
-document and Turbo dependency check lists. The scripts explicitly import it and
+document checks and shared VP task inputs. The scripts explicitly import it and
 pass plain data to Devkit; scanning another repository never executes its
 configuration. Workspace metadata maps must cover the discovered workspace paths
 exactly. Manifests retain exports, dependencies and supported runtime ranges;
-`.nvmrc` and root `packageManager` retain the development pins.
+root `packageManager` retains the Bun development pin. The isolated Node consumer
+baseline lives in `scripts/packages/node-version`.
 
 The wrappers import Devkit source directly, so
 maintenance checks do not require a prebuilt Devkit archive. This is a development
 dependency direction, not a dependency from a published library back to the root.
-Root type checking includes the configuration, and Turbo global dependencies
+Root type checking includes the configuration, and VP shared inputs
 include it so policy changes invalidate cached workspace tasks. The TSConfig
 workspace supplies compiler presets during repository development.
 
 Bun owns installation, native type checks, repository TypeScript scripts and
-archive packing. Turbo orders workspace tasks; tsdown builds the ESM libraries.
+archive packing. VP orders workspace tasks; VP pack builds the ESM libraries.
 Vite+ supplies formatting, linting, tests and the documentation application's
 Vite commands. Knip treats the declared library entries as public roots while
 checking unused implementation code and dependencies. Independent Changesets
@@ -247,7 +248,7 @@ export, CLI and fixture contracts with a separate consumer Node executable.
 Internal runtime dependencies install from the same batch of verified archives,
 and exported CSS assets are resolved and read without importing them as JavaScript.
 Minimum peer versions and the lockfile's tested peer versions use independent
-installations. These jobs supplement the ordinary Bun/Node archive checks and
+installations. These jobs supplement the default Bun archive checks and
 do not require a local database.
 
 Drizzle's separate CI job runs `test:integration` against a temporary PostgreSQL 17

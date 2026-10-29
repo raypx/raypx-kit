@@ -20,7 +20,8 @@
     "src/**/*.tsx",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "vite.config.ts"
+    "vite.config.ts",
+    "vite.app.config.ts"
   ],
   "exclude": [".output", "dist", "e2e/**"]
 }

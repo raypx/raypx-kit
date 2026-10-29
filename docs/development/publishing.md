@@ -18,10 +18,9 @@ and tag those exact archives. Never run plain `changeset publish`.
    reviewers if desired.
 2. Create the npm organization `raypx-kit` and give maintainers publish access to
    the `@raypx-kit` scope. GitHub organization access does not grant npm access.
-3. Follow [repository setup](README.md#setup) to select the pinned Bun and Node,
-   install dependencies and check the toolchain. Keep Node on `PATH` for direct
-   tool binaries; `TOOLKIT_NODE_BINARY` selects only the Node used by runtime and
-   isolated consumer checks. Authenticate with `npm login --force` and confirm
+3. Follow [repository setup](README.md#setup) to select the pinned Bun,
+   install dependencies and check the toolchain. Node is only needed here for npm transport (or explicit Cloudflare packaging),
+   using the baseline in `scripts/packages/node-version`. Authenticate with `npm login --force` and confirm
    the account with `npm whoami --force`. npm may require a one-time password
    for publication.
 
@@ -50,17 +49,18 @@ commands below. Place options after the final CLI subcommand, such as
 1. **Version.** Follow the [Changesets workflow](changesets.md) and commit the
    prepared versions, changelogs and lockfile. Skip versioning for a package's
    first publication.
-2. **Verify.** Run `bun run verify`, the same [complete gate](README.md#daily-commands)
+2. **Verify.** Run `bun run verify --full`, the same [complete gate](README.md#daily-commands)
    used by CI, including package builds and isolated archive consumers.
 3. **Plan.** `bun run release:plan` is read-only and never replaces a packed
    plan. It lists every version missing from npm with its dist-tag, fails unless
    each is a `@raypx-kit/*` package at an `-alpha.N` version, and reports
    changesets that still need `bun run version-packages`.
 4. **Pack.** `bun run release:pack` refuses unreleased changesets, rebuilds
-   stale package output through Turbo and packs each planned package with
+   stale package output through VP and packs each planned package with
    `bun pm pack`. It rejects archives that would still publish `workspace:`,
    `catalog:`, `file:` or `link:` dependencies, then installs and loads those
-   exact archives in isolated Bun and Node consumers. Only after those checks
+   exact archives in isolated Bun consumers. CI also requires the independent
+   Node compatibility workflow before publication. Only after those checks
    pass does it record the packed commit. Output replaces only
    `.changeset/pack/release/`; inspect an archive with
    `tar -tzf .changeset/pack/release/packages/<archive>.tgz`.
@@ -130,7 +130,8 @@ CI publication:
    registry requiring tokens, set the `NPM_TOKEN` secret instead.
 2. Set the repository variable `NPM_PUBLISH_ENABLED` to `true`.
 
-On `canary`, the workflow verifies, then runs `release:ci`, which chains the same
+On `canary`, the workflow first calls the independent Node compatibility workflow,
+then verifies with Bun and runs `release:ci`, which chains the same
 `release:pack` and `release:publish` commands for versions absent from npm,
 requesting provenance. The action runs its script without a shell.
 Pushes without new versions pass as no-ops. The separate

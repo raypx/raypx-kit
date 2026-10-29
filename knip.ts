@@ -1,4 +1,5 @@
 import type { KnipConfig } from "knip";
+import devkitConfig from "./devkit.config.js";
 
 // Archive contracts run in their own installed tarball environments, not source workspaces.
 const libraryProject = [
@@ -8,12 +9,11 @@ const libraryProject = [
   "!tests/fixtures/consumer/**",
 ];
 const library = {
-  // tsdown.config.ts declares public source entries and CLI binaries.
-  // Its plugin roots those APIs without treating every implementation file as public.
+  // Public entries come from the same maintained source mappings as architecture checks.
   entry: [],
   project: libraryProject,
   vitest: true,
-  tsdown: true,
+  vite: true,
   typescript: { config: ["tsconfig.json", "tsconfig.build.json"] },
 };
 
@@ -31,6 +31,7 @@ const config: KnipConfig = {
       entry: [
         // Bun receives this preload through a computed execArgv path in Intl's test config.
         "tests/setup/jsdom-preload.ts",
+        "scripts/ci/{cache,gate,plan,result}.ts",
       ],
       // package.json scripts provide the CLI, pack and release entry points.
       project: ["scripts/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],
@@ -42,6 +43,8 @@ const config: KnipConfig = {
     },
     "packages/codemods": {
       ...library,
+      // vp pack also builds the executable declared in package.json.
+      entry: ["src/cli.ts"],
     },
     "packages/drizzle": {
       ...library,
@@ -56,8 +59,7 @@ const config: KnipConfig = {
         // shadcn resolves this utility through components.json when generating components.
         "src/ui/lib/utils.ts",
         "examples/**/*.{tsx,jsx}",
-        "examples/vite.config.ts",
-        // Playwright starts this fixture through the selected Node executable.
+        // Playwright starts this fixture through the Bun executable.
         "e2e/serve.ts",
       ],
       project: [
@@ -69,7 +71,10 @@ const config: KnipConfig = {
         "examples/**/*.{ts,tsx,jsx}",
       ],
       vitest: true,
-      tsdown: true,
+      vite: {
+        config: ["vite.config.ts", "vite.app.config.ts", "examples/vite.config.ts"],
+        entry: ["src/ui/index.html"],
+      },
       typescript: { config: ["tsconfig.json", "tsconfig.build.json", "e2e/tsconfig.json"] },
     },
     "packages/intl": {
@@ -103,10 +108,6 @@ const config: KnipConfig = {
         "esbuild",
         "get-tsconfig",
         "jiti",
-        // Upstream's copied declarations reference its optional PGlite adapter type,
-        // while upstream declares that driver only as a development dependency.
-        // Keep the slim distribution's upstream files and runtime dependency mirror intact.
-        "@electric-sql/pglite",
       ],
     },
     "packages/tsconfig": {
@@ -127,10 +128,11 @@ const config: KnipConfig = {
       ignoreDependencies: ["@tailwindcss/node", "tailwindcss"],
     },
     docs: {
-      // Nitro spawns the prerender preview wrapper by path from vite.config.ts.
+      // Nitro spawns the prerender preview wrapper by path from vite.app.config.ts.
       entry: ["scripts/preview.ts"],
       project: ["scripts/**/*.ts", "src/**/*.{ts,tsx,css,mdx}", "tests/**/*.ts", "e2e/**/*.ts"],
       includeEntryExports: true,
+      vite: { config: ["vite.config.ts", "vite.app.config.ts"] },
       // Fumadocs' macro replaces the conventional source.config.ts in this application.
       fumadocs: { entry: ["src/lib/source.ts"] },
       "tanstack-router": true,
@@ -138,5 +140,13 @@ const config: KnipConfig = {
     },
   },
 };
+
+for (const [directory, metadata] of Object.entries(devkitConfig.workspaces)) {
+  const workspace = config.workspaces?.[directory];
+  if (!workspace || typeof workspace !== "object" || !("sourceEntries" in metadata)) continue;
+  const entries = typeof workspace.entry === "string" ? [workspace.entry] : (workspace.entry ?? []);
+  if (directory === "packages/drizzle-kit") continue;
+  workspace.entry = [...entries, ...Object.values(metadata.sourceEntries)];
+}
 
 export default config;

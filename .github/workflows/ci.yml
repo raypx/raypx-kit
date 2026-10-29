@@ -1,126 +1,122 @@
 name: CI
-
 on:
   pull_request:
   push:
     branches: [canary]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
 jobs:
-  verify:
+  plan:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     outputs:
-      matrix: ${{ steps.compatibility.outputs.matrix }}
+      browser: ${{ steps.plan.outputs.browser }}
+      artifacts: ${{ steps.plan.outputs.artifacts }}
+      postgres: ${{ steps.plan.outputs.postgres }}
     steps:
       - uses: actions/checkout@v7
         with:
+          fetch-depth: 0
           persist-credentials: false
-      - name: Set up repository toolchain
-        uses: ./.github/actions/setup-toolchain
-      - name: Verify development toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
-      - name: Verify architecture, formatting, lint, types and unused code
-        run: bun scripts/ci/diagnostics.ts run source bun run verify:source
-      - name: Test libraries and build documentation and packages
-        run: bun scripts/ci/diagnostics.ts run tests-build bun run verify:tests
-      - name: Resolve the Playwright version
+      # Planning imports only Bun/standard-library modules; no dependency install needed.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - id: plan
+        run: bun scripts/ci/plan.ts
+  javascript:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-toolchain
+      - uses: ./.github/actions/vp-restore
+        id: cache
+      - name: Verify affected sources, tests and builds
+        run: bun scripts/ci/diagnostics.ts run javascript bun scripts/ci/gate.ts javascript
+      - name: Generated sources remain reproducible
+        run: git diff --exit-code
+      - uses: ./.github/actions/vp-save
+        with:
+          key: ${{ steps.cache.outputs.key }}
+      - uses: ./.github/actions/report-diagnostics
+        if: always()
+        with:
+          job-status: ${{ job.status }}
+          artifact-name: javascript-diagnostics
+  browser:
+    needs: [plan, javascript]
+    if: needs.plan.outputs.browser == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-toolchain
+      - uses: ./.github/actions/vp-restore
+        id: cache
+      - name: Resolve Playwright version
         id: playwright
-        run: printf 'version=%s\n' "$(bun x playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-      # Browser revisions follow the Playwright version.
-      - name: Cache the E2E browser
-        uses: actions/cache@v6
+        run: printf 'version=%s\n' "$(bun --bun playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-shell-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
-      - name: Install the E2E browser and missing system libraries
+      - name: Install missing browser and system libraries
         run: bun scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
-      - name: Test React workspace browser flows
-        run: bun scripts/ci/diagnostics.ts run browser-e2e bun run verify:e2e
-      - name: Retain browser failure traces and reports
-        if: failure()
-        uses: actions/upload-artifact@v7
+      - name: Test affected React workspaces
+        run: bun scripts/ci/diagnostics.ts run browser bun scripts/ci/gate.ts browser
+      - uses: ./.github/actions/vp-save
         with:
-          name: browser-e2e-diagnostics
+          key: ${{ steps.cache.outputs.key }}
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: browser-failures
           path: .artifacts/e2e/
           include-hidden-files: true
           if-no-files-found: ignore
-          retention-days: 7
-      - name: Verify archives, consumer contracts and release preparation
-        run: bun scripts/ci/diagnostics.ts run artifacts bun run verify:artifacts
-      - name: Prepare compatibility archives from the verified build
-        run: bun scripts/ci/diagnostics.ts run compatibility-archives bun scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
-      - name: Select public runtime and peer dependency contracts
-        id: compatibility
-        run: |
-          matrix="$(bun scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility)"
-          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
-      - name: Share exact compatibility archives
-        uses: actions/upload-artifact@v7
-        with:
-          name: compatibility-archives
-          path: |
-            .artifacts/compatibility/*.tgz
-            .artifacts/compatibility/index.json
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 7
-      - name: Report verification diagnostics
+      - uses: ./.github/actions/report-diagnostics
         if: always()
-        uses: ./.github/actions/report-diagnostics
         with:
           job-status: ${{ job.status }}
-          artifact-name: verify-diagnostics
-
-  compatibility:
-    name: Consumers on Node ${{ matrix.node }} / ${{ matrix.peers }} peers
-    needs: verify
+          artifact-name: browser-diagnostics
+  artifacts:
+    needs: [plan, javascript]
+    if: needs.plan.outputs.artifacts == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.verify.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v7
         with:
+          fetch-depth: 0
           persist-credentials: false
-      # Repository tooling keeps its development pin; only installed consumers use the matrix Node.
-      - name: Set up repository toolchain
-        uses: ./.github/actions/setup-toolchain
-      - name: Verify development toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
-      - uses: actions/download-artifact@v8
+      - uses: ./.github/actions/setup-toolchain
+      - uses: ./.github/actions/vp-restore
+        id: cache
+      - name: Check affected archives and Bun consumers
+        run: bun scripts/ci/diagnostics.ts run artifacts bun scripts/ci/gate.ts artifacts
+      - uses: ./.github/actions/vp-save
         with:
-          name: compatibility-archives
-          path: .artifacts/compatibility
-      - name: Download and verify isolated consumer Node
-        env:
-          CONSUMER_NODE_VERSION: ${{ matrix.node }}
-        run: bun scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
-      - name: Check installed archive consumers
-        run: >-
-          bun scripts/ci/diagnostics.ts run consumers
-          bun scripts/packages/compatibility.ts check
-          --artifacts .artifacts/compatibility
-          --node "$RUNNER_TEMP/consumer-node/node-v${{ matrix.node }}-linux-x64/bin/node"
-          --expected-node '${{ matrix.node }}'
-          --peers '${{ matrix.peers }}'
-      - name: Report compatibility diagnostics
+          key: ${{ steps.cache.outputs.key }}
+      - uses: ./.github/actions/report-diagnostics
         if: always()
-        uses: ./.github/actions/report-diagnostics
         with:
           job-status: ${{ job.status }}
-          artifact-name: compatibility-${{ matrix.node }}-${{ matrix.peers }}-diagnostics
-
-  drizzle-integration:
-    name: Drizzle PostgreSQL integration
+          artifact-name: artifact-diagnostics
+  postgres:
+    needs: plan
+    if: needs.plan.outputs.postgres == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:
@@ -130,28 +126,35 @@ jobs:
           POSTGRES_USER: drizzle
           POSTGRES_PASSWORD: drizzle
           POSTGRES_DB: drizzle_test
-        ports:
-          - 5432/tcp
+        ports: [5432/tcp]
         options: >-
           --health-cmd "pg_isready -U drizzle -d drizzle_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Set up repository toolchain
-        uses: ./.github/actions/setup-toolchain
-      - name: Verify development toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
-      - name: Test Drizzle against PostgreSQL
+      - uses: ./.github/actions/setup-toolchain
+      - name: Test Drizzle against isolated PostgreSQL
         run: bun scripts/ci/diagnostics.ts run postgres bun run --cwd packages/drizzle test:integration
         env:
           DRIZZLE_TEST_DATABASE_URL: postgresql://drizzle:drizzle@localhost:${{ job.services.postgres.ports['5432'] }}/drizzle_test
-      - name: Report PostgreSQL integration diagnostics
+      - uses: ./.github/actions/report-diagnostics
         if: always()
-        uses: ./.github/actions/report-diagnostics
         with:
           job-status: ${{ job.status }}
-          artifact-name: drizzle-integration-diagnostics
+          artifact-name: postgres-diagnostics
+  verify:
+    if: always()
+    needs: [plan, javascript, browser, artifacts, postgres]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - name: Require every selected gate to pass
+        env:
+          GITHUB_NEEDS: ${{ toJSON(needs) }}
+        run: bun scripts/ci/result.ts

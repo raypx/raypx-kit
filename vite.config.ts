@@ -1,7 +1,9 @@
 import { defineConfig } from "vite-plus";
 import { baseLint } from "./packages/devkit/src/lint.js";
+import { workspaceTaskConfig } from "./scripts/tasks/config.js";
 
 export default defineConfig({
+  ...workspaceTaskConfig(import.meta.url),
   fmt: {
     ignorePatterns: ["docs/src/routeTree.gen.ts"],
   },

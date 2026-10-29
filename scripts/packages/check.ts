@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { assertToolchainRuntime } from "../checks/toolchain.js";
 
 import { checkConsumer, checkWithoutOptionalPeers, type Manifest } from "./consumers.js";
+import { archiveSelection } from "./selection.js";
 
 interface PlanEntry {
   kind: string;
@@ -15,11 +16,22 @@ interface PlanEntry {
 }
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const { nodeBinary: node } = assertToolchainRuntime(root);
+assertToolchainRuntime(root);
 const rootManifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as Manifest;
 const temporary = await mkdtemp(join(tmpdir(), "raypx-kit-pack-"));
 // Release packing checks the exact archives it will publish instead of packing again.
 const releasePlan = process.env.TOOLKIT_RELEASE_PLAN;
+const requested: unknown = process.env.TOOLKIT_PACKAGES
+  ? JSON.parse(process.env.TOOLKIT_PACKAGES)
+  : undefined;
+assert.ok(
+  requested === undefined ||
+    (Array.isArray(requested) &&
+      requested.length > 0 &&
+      requested.every((name) => typeof name === "string")),
+  "TOOLKIT_PACKAGES must name packages",
+);
+assert.ok(!releasePlan || !requested, "Release checking cannot filter its planned archives");
 const releaseArchives = releasePlan
   ? new Map(
       (JSON.parse(await readFile(releasePlan, "utf8")) as { plan: PlanEntry[][] }).plan
@@ -115,6 +127,7 @@ try {
     archive: string;
     packed: Manifest;
   }[] = [];
+  const inventory = [];
   for (const directory of await readdir(join(root, "packages"), { withFileTypes: true })) {
     if (!directory.isDirectory()) continue;
     const packageDirectory = join(root, "packages", directory.name);
@@ -122,22 +135,46 @@ try {
       await readFile(join(packageDirectory, "package.json"), "utf8"),
     ) as Manifest;
     if (manifest.private) continue;
+    let fixtureDependencies;
+    try {
+      fixtureDependencies = (
+        JSON.parse(
+          await readFile(join(packageDirectory, "tests/fixtures/consumer/package.json"), "utf8"),
+        ) as Manifest
+      ).dependencies;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+    inventory.push({ directory: directory.name, packageDirectory, manifest, fixtureDependencies });
+  }
+  const selected = archiveSelection(
+    inventory.map(({ manifest, fixtureDependencies }) => ({
+      ...manifest,
+      ...(fixtureDependencies ? { fixtureDependencies } : {}),
+    })),
+    requested as string[] | undefined,
+  );
+  for (const { directory, packageDirectory, manifest } of inventory) {
+    if (!selected.has(manifest.name)) continue;
     if (releaseArchives && !releaseArchives.has(manifest.name)) continue;
-    const archive = releaseArchives?.get(manifest.name) ?? join(temporary, `${directory.name}.tgz`);
+    const archive = releaseArchives?.get(manifest.name) ?? join(temporary, `${directory}.tgz`);
     if (!releaseArchives)
       run(process.execPath, ["pm", "pack", "--filename", archive], packageDirectory);
     const packed = await assertArchive(archive, manifest, packageDirectory);
-    packages.push({ directory: directory.name, packageDirectory, archive, packed });
+    packages.push({ directory, packageDirectory, archive, packed });
   }
   // Install internal dependencies from the same archives, including new packages
   // that have not been published to the registry yet.
   const packageArchives = Object.fromEntries(
     packages.map(({ packed, archive }) => [packed.name, archive]),
   );
+  if (requested)
+    for (const name of requested as string[])
+      assert.ok(packageArchives[name], `Unknown public package: ${name}`);
   for (const { directory, packageDirectory, archive, packed } of packages) {
+    if (requested && !(requested as string[]).includes(packed.name)) continue;
     const options = {
       bunBinary: process.execPath,
-      nodeBinary: node,
       compilerDependencies: {
         typescript: rootManifest.devDependencies!.typescript!,
         "@types/node": rootManifest.devDependencies!["@types/node"]!,
@@ -145,7 +182,7 @@ try {
       packageArchives,
     };
     await checkConsumer(archive, packed, join(temporary, directory), packageDirectory, options);
-    console.log(`${packed.name}@${packed.version}: tarball, Bun and Node consumers passed`);
+    console.log(`${packed.name}@${packed.version}: tarball and Bun consumer passed`);
     await checkWithoutOptionalPeers(
       archive,
       packed,

@@ -72,8 +72,8 @@
   },
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "bun --bun vp pack",
+    "dev": "bun --bun vp pack --watch",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run",
     "pack:check": "bun pm pack --dry-run",

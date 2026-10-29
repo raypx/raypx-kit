@@ -1,0 +1,70 @@
+name: Node consumer compatibility
+on:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-toolchain
+      - uses: ./.github/actions/vp-restore
+        id: cache
+      - uses: ./.github/actions/setup-node-tools
+      - run: bun run build --filter=./packages/*
+      - name: Verify Cloudflare deployment build
+        run: bun run docs:build:cloudflare
+      - run: bun scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
+      - id: matrix
+        run: |
+          matrix="$(bun scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility)"
+          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/vp-save
+        with:
+          key: ${{ steps.cache.outputs.key }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-compatibility-archives
+          path: .artifacts/compatibility/
+          include-hidden-files: true
+  consumers:
+    name: Node ${{ matrix.node }} / ${{ matrix.peers }} peers
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-toolchain
+      - uses: actions/download-artifact@v8
+        with:
+          name: node-compatibility-archives
+          path: .artifacts/compatibility
+      - name: Install isolated consumer Node
+        env:
+          CONSUMER_NODE_VERSION: ${{ matrix.node }}
+        run: bun scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
+      - name: Check exact archives on Node and supported peer bounds
+        run: >-
+          bun scripts/ci/diagnostics.ts run consumers
+          bun scripts/packages/compatibility.ts check
+          --artifacts .artifacts/compatibility
+          --node "$RUNNER_TEMP/consumer-node/node-v${{ matrix.node }}-linux-x64/bin/node"
+          --expected-node '${{ matrix.node }}'
+          --peers '${{ matrix.peers }}'
+      - uses: ./.github/actions/report-diagnostics
+        if: always()
+        with:
+          job-status: ${{ job.status }}
+          artifact-name: node-${{ matrix.node }}-${{ matrix.peers }}-diagnostics

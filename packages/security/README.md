@@ -16,7 +16,7 @@ The root entry works without Arcjet. The `/arcjet` entry requires the optional
 `@arcjet/node` peer, starting at version 1.14.1. Both SDKs remain external.
 Supported Node versions follow Nosecone and Arcjet:
 `>=22.21.0 <23 || >=24.5.0`. Repository verification uses Node 22.21.0,
-Node 24.22.0 and Bun 1.4.3. The Arcjet entry uses Node APIs and is not an edge
+Node 24.22.0 and Bun 1.4.4. The Arcjet entry uses Node APIs and is not an edge
 Worker or browser entry. There is no Next.js or TanStack runtime dependency.
 
 ## Response headers

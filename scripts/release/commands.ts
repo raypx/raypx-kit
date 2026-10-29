@@ -216,7 +216,7 @@ export async function pack(stable = false): Promise<void> {
     return;
   }
 
-  // Turbo reuses cached output, so this only rebuilds stale or missing dist files.
+  // VP reuses cached output, so this only rebuilds stale or missing dist files.
   run(["run", "build", "--filter=./packages/*"]);
 
   // Changesets packs Bun workspaces with npm, which publishes workspace: and catalog:
@@ -255,7 +255,7 @@ export async function pack(stable = false): Promise<void> {
   );
   await writeFile(planFile, `${JSON.stringify(document, null, 2)}\n`);
 
-  // Install and load the exact archives in isolated Bun and Node consumers.
+  // Install and load the exact archives in isolated Bun consumers; CI gates publishing on Node compatibility.
   run(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
   // Recorded last: publication refuses archives that did not pass the consumer checks.
   await recordCommit();
@@ -377,7 +377,7 @@ export async function snapshot(
     }
     const planPath = join(snapshotDirectory, "publish-plan.json");
     await writeFile(planPath, `${JSON.stringify({ version: 1, plan: [entries] }, null, 2)}\n`);
-    // The same archive rules and isolated Bun/Node consumers as a real release.
+    // The same archive rules and isolated Bun consumers as a real release.
     runOrThrow(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planPath });
   } finally {
     for (const [file, source] of originals) await writeFile(file, source);

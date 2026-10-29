@@ -1,0 +1,17 @@
+name: Save new successful VP artifacts
+description: Upload only when the task cache contains new successful artifacts.
+inputs:
+  key:
+    description: Unique cache key from the restore step
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      id: changes
+      run: bun scripts/ci/cache.ts changed
+    - uses: actions/cache/save@v6
+      if: steps.changes.outputs.changed == 'true'
+      with:
+        path: node_modules/.vite/task-cache
+        key: ${{ inputs.key }}

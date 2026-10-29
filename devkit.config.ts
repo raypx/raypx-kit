@@ -191,19 +191,13 @@ export default {
     },
   },
   toolchain: {
+    runtime: "bun",
     documents: [
       "README.md",
       "AGENTS.md",
       "docs/AGENTS.md",
       "docs/development/README.md",
       "docs/development/publishing.md",
-    ],
-    turboGlobalDependencies: [
-      ".nvmrc",
-      "mise.toml",
-      "devkit.config.ts",
-      "scripts/checks/toolchain.ts",
-      "packages/devkit/src/toolchain.ts",
     ],
   },
 } satisfies {

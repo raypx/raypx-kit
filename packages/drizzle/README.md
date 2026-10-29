@@ -123,7 +123,7 @@ root `docs/` directory and are not included in the npm archive.
 Tests live under `tests/`, with `diagnostics/` and `postgres/` subdirectories.
 The library build includes only production sources under `src/`.
 
-From the repository root, using Bun 1.4.3:
+From the repository root, using Bun 1.4.4:
 
 ```bash
 bun install --frozen-lockfile

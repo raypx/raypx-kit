@@ -70,7 +70,7 @@ beforeEach(() => {
   actions.checkRepositoryArchitecture.mockReturnValue([]);
   actions.assertToolchainRuntime.mockReturnValue({
     node: "24.22.0",
-    bun: "1.4.3",
+    bun: "1.4.4",
     nodeBinary: "/selected/node",
   });
   vi.spyOn(console, "log").mockImplementation(() => {});
@@ -100,9 +100,7 @@ describe("development CLI routes", () => {
   it("runs the doctor without invoking configuration or release checks", async () => {
     await runCommand(command, { rawArgs: ["doctor"] });
     expect(actions.assertToolchainRuntime).toHaveBeenCalledExactlyOnceWith(root);
-    expect(console.log).toHaveBeenCalledWith(
-      `Bun 1.4.3; Node 24.22.0 (/selected/node); ${process.platform}/${process.arch}`,
-    );
+    expect(console.log).toHaveBeenCalledWith(`Bun 1.4.4; ${process.platform}/${process.arch}`);
     expect(actions.checkToolchain).not.toHaveBeenCalled();
     expectNoRelease();
   });

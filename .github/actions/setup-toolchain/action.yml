@@ -1,20 +1,9 @@
 name: Set up repository toolchain
-description: Install the pinned Node and Bun runtimes and locked dependencies with shared Bun downloads.
-
-inputs:
-  registry-url:
-    description: Optional npm registry used by the publishing job.
-    required: false
-    default: ""
+description: Install the pinned Bun runtime and locked dependencies with shared downloads.
 
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v7
-      with:
-        node-version-file: .nvmrc
-        registry-url: ${{ inputs.registry-url }}
-        package-manager-cache: false
     - uses: oven-sh/setup-bun@v2
       id: bun
       with:

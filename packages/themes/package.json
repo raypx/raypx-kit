@@ -48,8 +48,8 @@
   "scripts": {
     "generate:theme": "bun scripts/generate-theme.ts",
     "check": "bun scripts/generate-theme.ts --check && bun --check --tsconfig-override tsconfig.json",
-    "build": "bun scripts/generate-theme.ts --check && tsdown",
-    "dev": "tsdown --watch",
+    "build": "bun scripts/generate-theme.ts --check && bun --bun vp pack",
+    "dev": "bun --bun vp pack --watch",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run",
     "pack:check": "bun pm pack --dry-run",

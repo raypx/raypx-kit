@@ -12,45 +12,46 @@
   ],
   "type": "module",
   "scripts": {
-    "prepare": "vp config --hooks --no-agent",
+    "prepare": "bun --bun vp config --hooks --no-agent",
     "raypx-kit-dev": "bun scripts/cli.ts",
     "doctor": "bun run raypx-kit-dev doctor",
     "toolchain:check": "bun run raypx-kit-dev toolchain check",
     "architecture:check": "bun run raypx-kit-dev architecture check",
     "codemod": "bun packages/codemods/src/cli.ts",
-    "build": "turbo run build",
-    "check": "bun --check --tsconfig-override tsconfig.json && turbo run check",
-    "test": "bun run test:toolchain && turbo run test --summarize",
+    "build": "bun scripts/tasks/run.ts build",
+    "check": "bun scripts/tasks/run.ts check",
+    "test": "bun scripts/tasks/run.ts test",
     "test:toolchain": "bun --bun vp test --run --config vitest.config.ts",
-    "lint": "vp check",
-    "format": "vp fmt",
-    "knip": "knip",
+    "lint": "bun --bun vp check",
+    "format": "bun --bun vp fmt",
+    "knip": "bun node_modules/knip/bin/knip.js",
     "verify:toolchain": "bun run doctor && bun run toolchain:check",
     "verify:source": "bun run licenses:check && bun run architecture:check && bun run lint && bun run check && bun run knip",
-    "verify:tests": "bun run test:toolchain && turbo run test build --summarize",
+    "verify:tests": "bun scripts/tasks/run.ts test:build",
     "verify:artifacts": "bun run pack:check && bun run release:check",
-    "verify": "bun run verify:toolchain && bun run verify:source && bun run verify:tests && bun run verify:e2e && bun run verify:artifacts",
-    "verify:quick": "bun run verify:toolchain && bun run verify:source && bun run test",
+    "verify": "bun scripts/verify/run.ts",
+    "verify:quick": "bun scripts/verify/run.ts --quick",
     "pack:check": "bun scripts/packages/check.ts",
     "compatibility:check": "bun scripts/packages/compatibility.ts",
     "release:check": "bun scripts/release/check.ts",
-    "changeset": "changeset",
+    "changeset": "bun node_modules/@changesets/cli/bin.js",
     "version-packages": "bun run changeset version && bun install && bun run licenses:update && bun run format",
     "release:plan": "bun run raypx-kit-dev release plan",
     "release:pack": "bun run raypx-kit-dev release pack",
     "release:publish": "bun run raypx-kit-dev release publish",
     "release:snapshot": "bun run raypx-kit-dev release snapshot",
     "release:ci": "bun run release:pack && bun run release:publish",
-    "docs:dev": "turbo run dev --filter=docs",
-    "docs:build": "turbo run build --filter=docs",
+    "docs:dev": "bun scripts/tasks/run.ts dev --filter=docs",
+    "docs:build": "bun scripts/tasks/run.ts build --filter=docs",
     "docs:preview": "bun run --cwd docs preview",
     "docs:check": "bun run --cwd docs check",
-    "docs:deploy": "wrangler deploy",
+    "docs:deploy": "bun run docs:build:cloudflare && TOOLKIT_DOCS_BUILT=1 node node_modules/wrangler/bin/wrangler.js deploy",
     "licenses:update": "bun run raypx-kit-dev licenses",
     "licenses:check": "bun run raypx-kit-dev licenses --check",
     "test:e2e": "bun e2e/run.ts",
-    "test:e2e:install": "playwright install chromium",
-    "verify:e2e": "bun e2e/run.ts --skip-build"
+    "test:e2e:install": "bun --bun playwright install chromium",
+    "verify:e2e": "bun e2e/run.ts --skip-build",
+    "docs:build:cloudflare": "bun run --cwd docs build:cloudflare"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
@@ -62,12 +63,11 @@
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.0.5",
     "citty": "^0.2.2",
+    "confbox": "^0.3.2",
     "knip": "^6.43.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "semver": "^7.8.5",
-    "tsdown": "^0.23.4",
-    "turbo": "^2.11.10",
     "typescript": "^7.0.2",
     "vite-plus": "^1.4.0",
     "wrangler": "^4.155.0"
@@ -78,17 +78,14 @@
   "devEngines": {
     "packageManager": {
       "name": "bun",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "onFail": "error"
     },
     "runtime": {
       "name": "bun",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "onFail": "error"
     }
   },
-  "engines": {
-    "node": "24.22.0"
-  },
-  "packageManager": "bun@1.4.3"
+  "packageManager": "bun@1.4.4"
 }

@@ -28,7 +28,7 @@ Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
 and have explicit ESM exports, a README, license, independent version and tests.
 Configuration packages export their package-root files directly instead of `dist/`.
-`pack:check` installs every public archive in isolated Bun and Node consumers and
+`pack:check` installs public archives in isolated Bun consumers and
 loads JavaScript/JSON exports and resolves and reads exported CSS assets. Internal
 runtime dependencies install from archives in the same verification batch;
 package behavior and public types belong in unit tests.
@@ -36,14 +36,15 @@ Optional `packages/<name>/tests/fixtures/consumer` declaration contracts are cop
 the isolated archive consumer by `pack:check`. Their own tsconfig checks public
 types against the installed tarball; they are excluded from source lint resolution.
 An optional `runtime.mjs` in the same fixture runs against the installed archive
-with both Bun and the pinned Node, including fixtures without a tsconfig.
+with Bun, including fixtures without a tsconfig. The separate Node workflow reuses
+the same contracts on the supported Node versions.
 Optional `without-optional-peers/runtime.mjs` and `without-optional-peers/types.ts`
 contracts use a second isolated consumer that omits optional peers and extra
-fixture dependencies. Runtime contracts run with Bun and Node; type contracts use
+fixture dependencies. Runtime contracts run with the selected consumer runtime; type contracts use
 strict NodeNext checks with `skipLibCheck: false`.
 Every workspace's TypeScript configuration extends an `@raypx-kit/tsconfig` preset,
-declared once by the internal root through `workspace:*`; Turbo's global
-dependencies include the presets. Shared test configuration lives in root
+declared once by the internal root through `workspace:*`; VP task inputs include
+the presets. Shared test configuration lives in root
 `tests/config.ts`; it is not a published runtime dependency.
 Keep unit and integration tests under their owning workspace's `tests/` directory,
 and browser scenarios in a sibling `e2e/` directory. Repository
@@ -55,7 +56,7 @@ the shared configuration from root `tests/config.ts`.
 
 Keep the internal CLI at `scripts/cli.ts`. Group maintenance modules by their
 responsibility under `scripts/checks/`, `scripts/packages/`, `scripts/release/`
-and `scripts/ci/`; keep helpers shared by these scripts in `scripts/shared/`.
+`scripts/tasks/`, `scripts/verify/` and `scripts/ci/`; keep helpers shared by these scripts in `scripts/shared/`.
 Use the directory for context instead of repeating that context in every filename.
 Keep public package entry filenames and framework-recognized configuration names stable.
 
@@ -79,85 +80,60 @@ fallbacks, localized message examples, code identifiers and source links.
 
 ## Toolchain
 
-Use Bun 1.4.3 and Node 24.22.0 for repository development. `.nvmrc` is the
-authoritative Node pin; the root `packageManager` is the authoritative Bun pin.
-Keep `engines`, `devEngines`, CI setup and documented versions consistent with
-those sources through `bun run toolchain:check`. Public package Node compatibility
-ranges are independent of the repository development pin.
-Public packages declare Node `>=22.21`; Security follows its SDK range
-`>=22.21.0 <23 || >=24.5.0`. Library builds target `node22.21.0`.
-Consumer compatibility runs at that exact floor and at the development Node pin.
-Security does not promise Node 23 or Node 24 releases before 24.5.0.
+Bun 1.4.4 is the development and default CI runtime. Root `packageManager` is the
+single development pin; `devEngines`, mise, CI and documentation follow it. There
+is no root Node pin. mise reads only Bun from package.json and has no `[tools]` pins.
+Run `mise trust && mise install`, activate mise or use `mise exec -- <command>`.
+`bun run doctor` checks the actual executable; `toolchain:check` rejects drift.
 
-mise is the recommended version manager. Its configuration only enables reading
-the two pins and must not add `[tools]` versions. Run `mise trust && mise install`,
-then activate mise in the shell or use `mise exec -- <command>`. Other version
-managers may select the same pins. `bun run doctor` checks the active executables.
+VP owns the only task graph, cache, formatting, linting, tests and builds. Root
+`scripts/tasks/` reads workspace manifests and supplies plain `run.tasks` through
+lightweight `vite.config.ts` files. Tasks use private `task:*` names, while package
+scripts remain terminal leaf commands. `scripts/tasks/leaf.ts` forwards arguments
+only to the selected task, and runtime/platform identity participates in commands.
+Keep native Bun typechecker source inputs explicit across dependency workspaces;
+filesystem tracing does not capture every native checker read. Cache real output
+files, inherit the parent environment and fingerprint outcome-affecting variables.
+Create ignored output directories before tracing to keep enumeration stable.
+Do not introduce a second task runner.
 
-Install dependencies before invoking the repository CLI. The root `raypx-kit-dev`
-script runs `bun scripts/cli.ts` using citty. Keep `doctor`,
-`toolchain:check` and `release:plan`, `release:pack`, `release:publish`,
-`release:snapshot` as aliases.
-`architecture:check` runs `raypx-kit-dev architecture check` against workspace
-source entries without requiring built output. Root `devkit.config.ts` owns all
-workspaces' platform targets, source-entry mappings and bundled dependency
-exceptions, plus toolchain document and Turbo dependency check lists. Keep it
-typed with the existing Devkit interfaces and include it in root type checking
-and Turbo global dependencies. Maintenance scripts explicitly import this trusted
-configuration and pass its pure data to Devkit; discovery must never load or
-execute an inspected repository's configuration. Supplied workspace metadata is
-complete: missing or unknown workspace paths fail, and manifest metadata is not
-a fallback. Keep package manifests free of this repository's `devkit` policy;
-exports and dependencies remain authoritative there. Bundled dependency exceptions
-must be explicit and limited to dependencies actually bundled by the package build.
-Internal bundles require app/tooling ownership and declared development dependencies;
-all export, platform and cycle constraints still apply.
-Toolchain declaration checks come from `packages/devkit` (which parses TOML and
-YAML with confbox). `scripts/checks/toolchain.ts` composes those checks with this
-repository's installed dependency checks from `scripts/checks/dependencies.ts`.
-Retain the existing process and output helpers. These internal maintenance tools
-do not change published package APIs.
+Libraries build with `bun --bun vp pack`, using the `pack` block in their
+`vite.config.ts`. Preserve ESM exports, declarations, sourcemaps, bundling rules
+and the public Node compatibility floor. Drizzle Kit keeps its byte-for-byte
+upstream extractor as its VP build leaf. TSConfig exports package-root JSON.
+Apps use `bun --bun vp build`; application plugins live in `vite.app.config.ts`
+so loading task metadata cannot start an application or import a built library.
+Email Preview packs its plugin and builds its prebuilt interface through VP.
+Themes generates package-root styles from tokens; UI scans its published dist.
+Run local binaries with Bun (`bun --bun vp`, `bun run knip`, `bun run changeset`).
 
-Bun owns installation and repository scripts. Turbo owns task orchestration and
-uses loose environment mode so tasks inherit parent variables without passthrough
-allowlists. Declare variables that affect cached outputs in `env`/`globalEnv` so
-their values participate in cache keys.
-Vite+ owns formatting, linting, unit tests and the documentation application's Vite
-commands. Direct tsdown builds Codemods, Devkit, Drizzle, Env, Intl, Analytics,
-Logger, Notifications, Security, Storage, Themes and UI, including their declarations, from each package's
-`tsdown.config.ts`; its dependency range starts at `^0.23.1`. Drizzle Kit retains its upstream extractor, and TSConfig
-exports its JSON presets directly. Package scripts invoke local `turbo`,
-`tsdown`, `changeset`, `knip`, `vp check` and `vp fmt` commands directly; these
-follow their Node shebangs. Keep `bun --bun vp` for tests because their workers
-use Bun-specific flags and the Intl jsdom preload. The internal documentation
-site retains `bun --bun vp` for its Bun development server. Its build and preview
-commands invoke `vp` directly so Wrangler runs with Node. Nitro builds a
-`cloudflare_module` Worker for deployment.
-Email Preview builds its plugin with tsdown, then its static client-side interface
-with Vite+. Its development command runs `vp dev` with the examples' Vite
-configuration; consumers never build the interface.
-Themes generates package-root styles and Tailwind mappings from its token source.
-UI exports component subpaths and CSS that scans its published distribution.
-Repository TypeScript maintenance scripts, native type checking and archive
-packing continue to use Bun explicitly. Node and npm 10.9+ are also needed for
-packaged consumer checks and registry publication.
+Public packages retain Node-compatible interfaces and existing `engines.node`
+ranges; a Bun development toolchain is not permission to introduce Bun-only APIs
+into their Node/universal exports. Library targets stay at `node22.21.0`. Independent
+Node consumer tests run through `.github/workflows/node-compatibility.yml`, manually
+or before npm publication, against exact archives and supported peer lower bounds.
+`scripts/packages/node-version` selects that workflow's upper baseline, not a
+repository development runtime. Node-only vendor tools (Cloudflare packaging and
+npm transport) use the explicit `.github/actions/setup-node-tools` exception.
+Default CI never installs Node through the repository setup action.
 
-Use `bun --check --tsconfig-override tsconfig.json` for workspace type checks.
-The flag invokes Bun's native checker without resolving the `check` package script;
-keep it free of source entrypoints so it only checks types. tsdown generates
-library declarations, and isolated package consumers retain their `tsc` check.
+Documentation defaults to Nitro's Bun target for builds, previews and browser
+verification. `docs:build:cloudflare` and `docs:deploy` explicitly select the Worker
+target using the isolated Node vendor tools; the independent compatibility workflow
+checks that build. Keep both targets working and never deploy a Bun server entry
+as a Worker. Docs and browser tests consume built public package exports.
 
-Declare third-party dependency versions directly in the owning `package.json`.
-Internal dependencies use `workspace:*`. Releases pack every archive with
-`bun pm pack`, which resolves `workspace:` and `catalog:` protocols; never publish
-with plain `changeset publish` or `npm publish <directory>`, which pack this Bun
-workspace with npm and publish those protocols verbatim. The root Vite override
-keeps plugins on Vite+'s bundled core. Do not add a second formatter or linter. Each
-test-bearing package keeps its own `vitest.config.ts`, importing `workspaceTests`
-from root `tests/config.ts`. Do not import application test preloads.
-Installed coverage providers must resolve to the same version as Vite+'s bundled
-Vitest. Verify coverage commands when updating either dependency; the normal gate
-does not enable coverage.
+`devkit.config.ts` owns complete workspace metadata and source-entry mappings.
+Repository maintenance imports this trusted configuration explicitly; discovery
+never executes an inspected repository's configuration. Keep manifests free of
+repository-only Devkit metadata. `scripts/checks/toolchain.ts` composes generic
+Devkit declaration checks with installed dependency pairing and the narrow vendor
+workflow exception. Preserve public Devkit Node/Bun checking APIs for consumers.
+
+Use `bun --check --tsconfig-override tsconfig.json` for native type checks. VP pack
+emits declarations; installed archive consumers also run strict NodeNext TypeScript
+contracts with `skipLibCheck: false`. Keep direct third-party dependencies in their
+owning manifests and internal dependencies on `workspace:*`.
 
 ## Dependency versions
 
@@ -182,9 +158,9 @@ checks in `bun run toolchain:check`:
   upstream declarations become caret ranges that include the upstream version.
 - Nitro uses the tested prerelease range `~3.0.260903-beta`.
 
-Node and Bun runtime pins remain exact in `.nvmrc` and `packageManager`.
-`@types/node` follows the pinned Node major, not the registry's newest major;
-an `@types/bun` range starts at the pinned Bun version.
+The Bun runtime pin remains exact in `packageManager`. Node type declarations
+follow the independent compatibility baseline; Bun types, when declared, start
+at the Bun pin. Do not install a development Node runtime to run checks.
 
 Range changes do not authorize upgrading copied source provenance or replacing
 bundled dependencies outside their upstream compatibility ranges. Recheck
@@ -239,46 +215,40 @@ Version PRs also require the repository's Actions PR-creation permission.
 
 ## Verification
 
-Run a changed package's narrow test first, then `bun run verify`. The root gate
-starts with `doctor`, `toolchain:check` and `architecture:check`, then checks formatting, lint, unused
-code and dependencies with Knip, strict types, tests, the documentation build,
-library tarball contents and isolated Bun/Node consumers. `build` runs package
-`check` first through Turbo.
-`verify:toolchain`, `verify:source`, `verify:tests`, `verify:e2e` and `verify:artifacts` are the
-same ordered phases used by local `verify` and the named CI steps. Keep their
-commands in the root manifest rather than duplicating verification policy in YAML.
-`verify:quick` runs toolchain, source and unit tests for daily feedback; the full
-gate retains documentation builds, browser E2E and archive checks. Turbo defaults
-to two concurrent workspace tasks with one Vitest worker per task. Documentation
-content belongs in docs' build inputs, not the global library cache dependencies.
-React workspaces own Playwright scenarios and browser consumer applications in
-`e2e/`. Keep the project inventory and shared fixture server/runner in root
-`e2e/`, with the Playwright configuration at the repository root. The unit
-runner excludes E2E files. Browser consumers import built public exports, so their
-separate tsconfig and Vite+ lint checks run after builds through `test:e2e`.
-Install Chromium with `bun run test:e2e:install` before the full gate; CI caches the
-headless shell and installs system libraries only when one is missing. Run one package with its `test:e2e` script
-or root `bun run test:e2e --project <name>`. Never replace a failing browser flow
-with an implementation mock. Keep HTTP traffic local and test-owned; no live
-analytics accounts or application credentials. Browser reports and failure traces
-belong in ignored `.artifacts/e2e/` and never in npm archives. React workspace
-inventory tests reject a new React package that lacks its own E2E project.
-CI additionally tests the same archives against minimum supported Node and peer
-versions and the pinned development Node and locked peer versions. Consumer Node
-binaries are independent of the development runtime; never relax `doctor` to run
-that matrix. Compatibility checks do not execute database tests.
-Generated CI logs, test reports and consumer artifacts live under `.artifacts/`
-and must stay out of Git and public archives. Preserve failed command exit codes;
-never upload dotenv files, credentials or whole consumer installations.
-Set `TOOLKIT_NODE_BINARY` to a Node executable matching `.nvmrc` if Node is not on
-PATH; it does not bypass the development pin. Real database tests require an
-independent CI job with a temporary PostgreSQL 17 service. Default unit tests,
-coverage, tarball checks and local `verify` remain database-free. Drizzle's
-explicit `test:integration` command requires CI and `DRIZZLE_TEST_DATABASE_URL`;
-missing either must fail rather than skip. Use only test-owned schemas and tables,
-clean them up, and close connections. Only a successful Drizzle integration job
-provides evidence of real PG17 execution; local `verify` does not provide that
-evidence. PostgreSQL 18 is outside the test matrix.
+Run a changed package's narrow tests first, then `bun run verify --full` before
+delivery. Daily `verify` selects affected workspaces from Git (including local
+changes); unknown files or an unavailable base select full coverage. `--dry-run`
+prints the exact plan. `verify:quick` runs source checks and affected unit suites.
+All paths retain doctor, toolchain checks, licenses, architecture, formatting,
+lint, Knip and strict types. Full verification additionally builds libraries/docs,
+runs browser scenarios and validates archives and release preparation with Bun.
+
+CI consumes the same plan. Source/tests/builds precede independent browser and
+archive gates; those gates restore the newly saved VP build cache. PostgreSQL runs
+in parallel only for relevant changes. The final `verify` job rejects failed,
+missing or cancelled required gates and accepts skips only when unselected.
+Shared workflow actions restore compatible VP artifacts and upload the cache only
+when a new successful artifact exists. Node matrices live outside default CI.
+
+Maintenance tests are uncached because they spawn independent VP runners; nested
+filesystem tracing is unsupported on macOS. Preserve meaningful regression tests
+for real cache hits, dependency invalidation, output restoration, changed-file
+selection and CI result aggregation. Use two workspace task slots and one Vitest
+worker by default. Documentation content invalidates docs, not unrelated libraries.
+
+React workspaces own `e2e/` scenarios and installed public-export consumers; shared
+runner/configuration live in root `e2e/` and Playwright configuration. Install the
+Chromium shell with `bun run test:e2e:install --only-shell`. Browser failures remain
+in ignored `.artifacts/e2e/`. Keep HTTP traffic local and test-owned; no live service
+accounts or application credentials. Never replace a failing browser flow with a mock.
+
+Generated evidence lives under `.artifacts/` and stays out of Git and archives.
+Preserve failure exit codes; never upload dotenv files, credentials or consumer
+installations. Default verification remains database-free. Real PostgreSQL tests
+run only in their independent CI job with a temporary PostgreSQL 17 service and
+`DRIZZLE_TEST_DATABASE_URL`; missing prerequisites fail rather than skip. Only that
+job establishes PostgreSQL execution evidence. Preserve test-owned schemas, cleanup
+and connection closure; do not expand the database/platform support matrix silently.
 
 `bun run knip` checks workspace source files, dependency usage and internal
 exports. Keep public library entry points as API roots, including APIs with no
@@ -292,14 +262,3 @@ CI job.
 
 Preserve unrelated user changes. Never reset files or rewrite Git history as
 cleanup. Do not log credentials, authorization headers, tokens, or query secrets.
-
-<!-- BEGIN:turborepo-agent-rules -->
-
-# This is NOT the Turborepo you know
-
-Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
-
-Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
-
-This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
-<!-- END:turborepo-agent-rules -->

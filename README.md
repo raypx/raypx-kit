@@ -12,7 +12,7 @@ own their schemas, secrets, business rules and runtime configuration.
 | [@raypx-kit/devkit](packages/devkit/README.md)               | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers              |
 | [@raypx-kit/drizzle](packages/drizzle/README.md)             | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics            |
 | [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md)     | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                                 |
-| [@raypx-kit/email-preview](packages/email-preview/README.md) | React Email previews as a Vite plugin or CLI, with live updates and HTML/text inspection        |
+| [@raypx-kit/email-preview](packages/email-preview/README.md) | React Email previews as a Vite plugin, with live updates and HTML/text inspection               |
 | [@raypx-kit/env](packages/env/README.md)                     | Zod environment validation, nested presets, defaults and guarded client access                  |
 | [@raypx-kit/intl](packages/intl/README.md)                   | Locale negotiation, ICU translation, formatting and controlled React providers                  |
 | [@raypx-kit/analytics](packages/analytics/README.md)         | Consent-controlled PostHog product events and sanitized browser errors                          |
@@ -34,13 +34,12 @@ Repository development uses the pin below.
 
 ## Quick start
 
-Use Bun **1.4.3** and Node **24.22.0**, pinned in the root `packageManager` and
-[.nvmrc](.nvmrc). With mise installed:
+Use Bun **1.4.4**, pinned in root `packageManager`. With mise installed:
 
 ```sh
 mise trust && mise install
 mise exec -- bun install --frozen-lockfile
-mise exec -- bun run verify
+mise exec -- bun run verify --full
 ```
 
 For development, activate mise in your shell or prefix repository commands with

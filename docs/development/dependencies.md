@@ -35,15 +35,16 @@ Its esbuild range also accepts the tested `^0.28.2` release alongside upstream's
 `^0.25.10`; archive consumers generate migrations from TypeScript configuration
 and schemas with the installed CLI under Bun and Node.
 
-Node and Bun runtime pins remain exact in `.nvmrc` and root `packageManager`.
-`@types/node` follows the pinned Node major; an `@types/bun` declaration starts at
+The Bun development pin remains exact in root `packageManager`. The separate
+Node consumer baseline lives in `scripts/packages/node-version`.
+`@types/node` follows the consumer baseline major; an `@types/bun` declaration starts at
 the pinned Bun version. Public package engine ranges describe consumer support
 independently of repository development pins.
 
 The [consumer compatibility matrix](README.md#consumer-compatibility-matrix)
-tests the exact Node and peer lower bounds alongside the development Node and
+tests the exact Node and peer lower bounds alongside the upper Node baseline and
 locked peer versions. When changing a support range, review the resulting matrix
-and its public runtime and declaration contracts. Keep the development runtime
+and its public runtime and declaration contracts. Keep the Bun development runtime
 pin unchanged when selecting additional consumer binaries.
 
 ## Peers and bundled dependencies
@@ -54,7 +55,7 @@ integration entries still require it. Env keeps Zod external as a required peer.
 Intl keeps React external and required, including for root/server usage.
 
 Intl bundles `use-intl` and its FormatJS dependencies from their public APIs.
-Its tsdown configuration restricts which dependencies may be bundled. Installing
+Its VP pack configuration restricts which dependencies may be bundled. Installing
 another `use-intl` instance does not share Intl's bundled context; applications
 import translation and provider APIs through `@raypx-kit/intl`.
 

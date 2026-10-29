@@ -9,10 +9,11 @@
   "type": "module",
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "vp build",
-    "dev": "bun --bun vp dev --host 127.0.0.1 --port 3100",
-    "preview": "vp preview --host 127.0.0.1 --port 3100",
-    "test:e2e": "bun ../e2e/run.ts --project docs"
+    "build": "bun --bun vp build --config vite.app.config.ts",
+    "dev": "bun --bun vp dev --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
+    "preview": "bun --bun vp preview --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
+    "test:e2e": "bun ../e2e/run.ts --project docs",
+    "build:cloudflare": "TOOLKIT_DOCS_PRESET=cloudflare_module node ../node_modules/vite-plus/bin/vp build --config vite.app.config.ts"
   },
   "dependencies": {
     "@fumadocs/base-ui": "^16.17.9",

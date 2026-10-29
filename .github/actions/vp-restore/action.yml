@@ -1,0 +1,19 @@
+name: Restore VP task cache
+description: Restore compatible tasks and snapshot successful artifact identities.
+outputs:
+  key:
+    description: Unique cache save key
+    value: ${{ steps.cache.outputs.cache-primary-key }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@v6
+      id: cache
+      with:
+        path: node_modules/.vite/task-cache
+        key: vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'bun.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+        restore-keys: |
+          vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'bun.lock') }}-
+          vp-v1-${{ runner.os }}-${{ runner.arch }}-
+    - shell: bash
+      run: bun scripts/ci/cache.ts snapshot

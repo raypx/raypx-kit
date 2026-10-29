@@ -9,7 +9,7 @@
     "src/**/*.tsx",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "tsdown.config.ts",
+    "vite.config.ts",
     "vitest.config.ts"
   ],
   "exclude": ["tests/fixtures/**", "e2e/**"]

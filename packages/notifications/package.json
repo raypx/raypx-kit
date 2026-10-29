@@ -42,8 +42,8 @@
     "check": "bun --check --tsconfig-override tsconfig.json",
     "test": "bun --bun vp test --run",
     "test:unit": "bun --bun vp test --run",
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "bun --bun vp pack",
+    "dev": "bun --bun vp pack --watch",
     "pack:check": "bun pm pack --dry-run",
     "test:e2e": "bun ../../e2e/run.ts --project notifications"
   },

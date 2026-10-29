@@ -1,497 +1,235 @@
 # Development
 
-This guide covers repository setup, daily checks and adding packages. See the
-[architecture guide](../architecture/README.md) for package boundaries,
-[dependency policy](dependencies.md) for upgrades, and the
-[Changesets workflow](changesets.md) for version preparation.
+The root workspace is private. Libraries under `packages/` own independent public
+versions and explicit ESM exports; `docs/` is an internal documentation application.
 
 ## Setup
 
-Use Bun **1.4.3** and Node **24.22.0**. The root `packageManager` is the
-authoritative Bun pin; `.nvmrc` is the authoritative Node pin. Published packages
-declare their own supported Node ranges independently.
-
-mise is the recommended version manager. `mise.toml` enables reading those two
-files and must not add a second set of versions under `[tools]`.
+Use Bun **1.4.4**, pinned once in root `packageManager`. mise reads that source:
 
 ```sh
 mise trust && mise install
-eval "$(mise activate zsh)" # use the matching activation command for your shell
-bun install --frozen-lockfile
-bun run doctor
-bun run toolchain:check
+mise exec -- bun install --frozen-lockfile
+mise exec -- bun run doctor
 ```
 
-Installation runs the root `prepare` script, which sets `core.hooksPath` to the
-Vite+ dispatcher in `.vite-hooks/_`. The pre-commit hook runs `vp staged`:
-formatting and lint fixes on staged files only. `VP_GIT_HOOKS=0` skips it (CI sets
-it); `verify` still owns type checks, tests and artifacts.
-
-Activate mise in your shell configuration, or prefix commands with
-`mise exec --`. Other version managers work when they select the same pins.
-Keep Node on `PATH`: direct tool binaries use their Node shebangs.
-`TOOLKIT_NODE_BINARY` selects a matching Node executable for `doctor` and isolated
-archive consumers; it does not replace Node on `PATH` for the other tools.
-
-Install dependencies before using repository commands. `doctor` checks the active
-executables; `toolchain:check` checks version declarations, CI configuration,
-documented versions and installed dependency combinations.
+Activate mise in your shell, or prefix commands with `mise exec --`. Development,
+checks, builds, browser runners and default CI use Bun. Public package Node APIs
+and engine ranges remain compatible; their independent tests are described below.
+The default setup action installs no Node runtime.
 
 ## Daily commands
 
-| Command                      | What it checks or runs                                           |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `bun run lint`               | Vite+ formatting and lint checks                                 |
-| `bun run format`             | Apply Vite+ formatting                                           |
-| `bun run check`              | Root and workspace TypeScript checks                             |
-| `bun run knip`               | Unused source files, dependencies and internal exports           |
-| `bun run architecture:check` | Workspace imports, public source entries and platform boundaries |
-| `bun run codemod list`       | List built-in migrations; the initial registry is empty          |
-| `bun run test:toolchain`     | Root maintenance tests and documentation tests                   |
-| `bun run test`               | Maintenance/documentation tests, then workspace tests            |
-| `bun run test:e2e`           | Build and run package-owned Chromium browser flows               |
-| `bun run build`              | Workspace checks and builds, including the documentation site    |
-| `bun run pack:check`         | Pack current package output and check isolated archive consumers |
-| `bun run release:check`      | Changesets versioning rules in disposable local fixtures         |
-| `bun run verify`             | The complete local gate, also used by CI                         |
-| `bun run verify:quick`       | Toolchain, source checks and unit tests for daily development    |
-
-Start with the affected package's narrow checks:
-
 ```sh
-bun run --cwd packages/drizzle check
-bun run --cwd packages/drizzle test
-bun run build --filter=@raypx-kit/drizzle
+bun run verify                 # affected workspaces and consumers
+bun run verify --dry-run       # review the selected tasks and gates
+bun run verify --full          # complete Bun gate before delivery
+bun run verify:quick           # source checks and affected unit tests
+bun run build
+bun run build --filter=@raypx-kit/intl
+bun run test --filter=@raypx-kit/devkit
+bun run check
+bun run licenses:check
+bun run docs:dev
 ```
 
-`verify` runs runtime and declaration checks, workspace architecture, lint, types,
-Knip, maintenance tests, workspace tests and builds, browser E2E, archive consumers,
-then Changesets fixtures. Its five phases (`verify:toolchain`, `verify:source`,
-`verify:tests`, `verify:e2e`, `verify:artifacts`) also provide the named CI steps. CI adds an
-archive compatibility matrix and an independent Drizzle database integration job. Local
-`verify`, default unit tests, coverage and tarball checks do not require a database;
-the normal gate does not enable coverage. Run a package's `test:coverage` after
-changing its test runtime or coverage provider.
+`verify` includes local staged, unstaged and untracked files. A missing Git base,
+shared tooling/configuration change or unknown input selects full coverage.
+`--base <ref>` selects a different comparison base. Documentation changes build
+and test the documentation site; unrelated libraries and PostgreSQL are skipped.
+Published README/license changes also validate that package's archive payload.
 
 ### Daily feedback and machine load
 
-Use `bun run verify:quick` during development. It runs the toolchain and source
-checks, maintenance/documentation tests and workspace unit tests. Dependency
-libraries are built when tests require their public exports. Documentation site
-builds, browser E2E, archive consumers and Changesets fixtures remain in the full
-`bun run verify` gate used before release and by CI.
+VP is the only task runner. `scripts/tasks/` derives private `task:*` definitions
+from workspace manifests; lightweight `vite.config.ts` files register them.
+Application plugins live in `vite.app.config.ts`; library configuration lives in
+`vite.config.ts` under `pack`. Package scripts remain direct leaf commands.
 
-Turbo runs at most two workspace tasks concurrently and each Vitest runner uses
-one worker. Tests retain per-file isolation; builds and tests can still create
-their own subprocesses. The documentation build prerenders at most two pages
-concurrently and uses an explicit IPv4 loopback preview address. On a busy machine,
-run maintenance tests followed by a
-single workspace or its consumers:
+Two workspace tasks run concurrently by default, with one Vitest worker per task.
+Set `VP_RUN_CONCURRENCY_LIMIT=1` or pass `--concurrency-limit=1` for lower load.
+Root and package tests use the same suites. Forward task-specific arguments after
+`--`; only matching leaf tasks receive them and dependency cache keys stay stable:
 
 ```sh
-bun run test:toolchain
-bunx turbo run test --filter=@raypx-kit/ui --concurrency=1 --summarize
-bunx turbo run test '--filter=...@raypx-kit/ui' --concurrency=1 --summarize
+bun run test --filter=@raypx-kit/intl -- --testNamePattern locale
+bun scripts/tasks/run.ts '@raypx-kit/intl#build' --dry-run
+bun --bun vp run --last-details
 ```
 
-Root `test` and `verify:tests` save task timings and cache results to `.turbo/runs/`.
-Cached test output contains the original test duration; consult the summary for
-the current run. Keep `.turbo/cache` between runs. Documentation content is a
-build input of the documentation workspace rather than a global dependency, so
-editing a guide does not invalidate unrelated library tests. Shared toolchain,
-test setup and TypeScript configuration still invalidate the relevant global cache.
+VP caches successful tasks in `node_modules/.vite/task-cache`, including build
+outputs and JUnit reports. Source edits in a workspace dependency invalidate its
+consumers. Native Bun typechecker source inputs are explicit because filesystem
+tracing does not observe every native read. Task commands include runtime/platform
+identity; environment inputs and private task arguments are fingerprinted. Keep
+the cache between runs. Maintenance tests spawn independent VP runners and stay
+uncached, avoiding nested filesystem tracing on macOS.
 
 ## Tool and test boundaries
 
-Bun owns installation and script orchestration. Turbo schedules workspace tasks;
-`build` depends on that workspace's `check` and dependency builds. Vite+ owns
-formatting, linting, unit tests and the documentation application's Vite commands.
-tsdown builds the ESM libraries and their declarations. Drizzle Kit copies
-upstream artifacts through its extractor; TSConfig publishes its JSON presets
-directly.
+VP owns lint, format, Vitest, library packing and application builds. Libraries
+use `bun --bun vp pack`; Drizzle Kit retains its unchanged upstream file extractor.
+Use `bun --bun vp build` for apps. Configuration packages export package-root JSON.
+Strict types use `bun --check --tsconfig-override tsconfig.json`; VP pack emits
+declarations, and installed archive consumers also run TypeScript contracts.
 
-Root `turbo.json` sets `envMode` to `loose`, so workspace tasks inherit the
-parent environment without `passThroughEnv` allowlists. Variables that affect
-cached outputs must still be declared in `env`/`globalEnv` so their values enter
-the cache keys. Turbo does not load `.env` files itself; environment loading
-remains the responsibility of the invoking runtime or framework.
-
-Package scripts invoke `turbo`, `tsdown`, `changeset`, `knip`, `vp check` and
-`vp fmt` directly. Tests retain `bun --bun vp` because workers use Bun-specific
-flags and the Intl jsdom preload. The documentation development server also uses
-`bun --bun vp` with Nitro's Bun preset. Its build and preview invoke `vp` directly
-so Wrangler runs with Node and serves the production Cloudflare Worker.
-Repository TypeScript scripts, native type checks and archive
-packing use Bun explicitly.
-
-Workspace checks use `bun --check --tsconfig-override tsconfig.json` without a
-source entrypoint. This invokes Bun's native type checker rather than resolving
-the `check` package script. Every workspace extends an `@raypx-kit/tsconfig`
-preset; the internal root declares this shared workspace dependency.
-
-Keep tests under each workspace's `tests/`. Root maintenance tests live in
-`tests/scripts/`, documentation tests in `docs/tests/`, and shared preloads in
-`tests/setup/`. Maintenance scripts are grouped by responsibility in
-`scripts/checks/`, `scripts/packages/`, `scripts/release/` and `scripts/ci/`, with
-the command entry at `scripts/cli.ts`. Root script tests mirror these directories
-where applicable. Use the directory for context instead of repeating it in
-filenames; keep public package entries and framework configuration names stable.
-Package `vitest.config.ts` files import `workspaceTests` from root
-`tests/config.ts`. Type checks include tests; library build configs include only
-`src/`.
-
-Knip reads public library roots from the explicit tsdown entries, so an API does
-not need a workspace caller to remain public. It also models maintenance scripts,
-framework routes and configuration entries. Keep exceptions in `knip.ts` narrow
-and explain the dynamic usage; do not make every source file an entry to suppress
-findings.
+Tests live under the owning workspace's `tests/`; browser scenarios belong in
+its sibling `e2e/`. Shared defaults are in root `tests/config.ts`. Tests remain
+independent of application plugins, live databases, mail or service accounts.
 
 ## Repository check configuration
 
-[devkit.config.ts](../../devkit.config.ts) is the typed source of repository
-checking policy. Its `workspaces` map contains every workspace path, with
-their kind, platform, per-entry platform overrides, explicit source entries for
-generated exports and bundled dependency exceptions. Keys are repository-relative
-paths such as `packages/env`, without `./` or a trailing slash. Its `toolchain`
-section lists documents whose runtime mentions must match the pins, and required
-Turbo global dependencies.
+`devkit.config.ts` owns complete workspace metadata, platform constraints and public
+source-entry mappings. Maintenance scripts import it explicitly; package discovery
+never executes an inspected repository's configuration. Keep repository metadata
+out of published manifests. Knip uses these same source mappings as public API
+roots, retaining exports even when this repository has no caller.
 
-Maintenance scripts explicitly import this file and pass its data to Devkit.
-`discover(root, { metadata: config.workspaces })` stays synchronous and never
-loads an inspected repository's configuration. The supplied map must cover every
-discovered workspace exactly; missing or unknown paths fail, and package manifest
-metadata cannot fill gaps. This repository keeps no `devkit` fields in workspace
-manifests. Devkit's default `metadataKey` interface remains available for other
-consumers. Root type checking and Turbo cache keys include the configuration.
-
-`architecture:check` inspects source imports before building and rejects circular
-workspace dependencies, internal cross-workspace imports, undeclared runtime
-imports and incompatible platform APIs. A bundled dependency exception must also
-be declared in the workspace's `devDependencies` and actually bundled by its build.
-Extracted upstream CLI payloads retain their separate archive checks. See
-[Devkit's metadata contract](../../packages/devkit/README.md#workspace-architecture).
-
-Keep exports, dependencies and supported runtime ranges in the owning manifest;
-keep the development Node pin in `.nvmrc` and the Bun pin in root `packageManager`.
-The configuration references those declarations through checks rather than
-duplicating their values.
+Bun's version comes only from `packageManager`. The toolchain check enforces mise,
+devEngines, CI and documentation consistency, and checks installed Vite+/core,
+Vitest coverage and Fumadocs pairings. Node-only vendor tooling has one narrow
+setup action, separate from the default Bun setup.
 
 ## CI runner baseline
 
-CI and release jobs use GitHub-hosted x64 `ubuntu-24.04` runners. Keep all jobs
-on the same explicit OS label. GitHub is moving `ubuntu-latest` to Ubuntu 26.04;
-see the [runner image announcement](https://github.com/actions/runner-images/issues/14748).
-An explicit label keeps that alias change from moving the repository's OS baseline.
-GitHub still updates software within the selected image; this is not an immutable
-image pin.
+GitHub uses Ubuntu 24.04 and the same affected-workspace planner as local verification.
+The plan selects JavaScript, browser, archive and PostgreSQL gates. Source checks,
+tests and builds run once; browser and archive jobs then run independently and
+restore those VP artifacts. PostgreSQL runs in parallel only when relevant.
+The final `verify` check rejects failed, missing or cancelled required jobs and
+permits skips only for unselected gates.
 
-`actions/setup-node` and `oven-sh/setup-bun` install the repository's runtime pins
-explicitly. The Ubuntu release does not select the Node or Bun version. Native
-tool bindings and system utilities still run against the runner's OS libraries.
-Before moving the baseline, run the complete `bun run verify` gate on the proposed
-hosted image, including builds and isolated archive consumers, then update both
-workflows and this guide together.
-
-Each job checks out its source and calls `.github/actions/setup-toolchain` to
-install the pinned runtimes and locked dependencies. The publication job supplies
-its npm registry URL; checkout history, permissions and verification steps belong
-to the calling workflow. Toolchain declaration checks inspect both workflow steps
-and the local composite actions.
-
-The setup action caches Bun downloads under the runner's temporary directory and
-sets `BUN_INSTALL_CACHE_DIR` for the rest of the job, including isolated consumer
-installations. Cache keys include the OS, architecture, Bun version and lockfile
-hash; a fallback reuses downloads from the same Bun version. Every job still runs
-`bun install --frozen-lockfile`, including on a cache hit.
+Shared actions cache Bun downloads and VP artifacts. Every job performs a frozen
+install; cached downloads never replace dependency verification. VP cache uploads
+occur only when new successful artifact identities appear, avoiding uploads caused
+by cache database timestamps. Browser downloads use the pinned Playwright revision;
+CI installs system libraries only when one is missing.
 
 ## Browser E2E by workspace
 
-Install the locked browser once after installing dependencies:
-
 ```sh
-bun run test:e2e:install
+bun run test:e2e:install --only-shell
 bun run test:e2e
-bun run test:e2e --project themes
-bun run --cwd packages/ui test:e2e
-bun run --cwd docs test:e2e
+bun run test:e2e --project docs
+bun run test:e2e --project intl --project themes
 ```
 
-`test:e2e` builds the selected workspaces and their dependencies, checks browser
-fixture types and lint, then runs Playwright with Chromium. Additional Playwright
-flags such as `--headed`, `--grep` and `--list` are forwarded; multiple `--project`
-flags select a subset. `verify:e2e` uses the builds from `verify:tests` without
-rebuilding. Browser tests are deliberately uncached and do not run inside Vitest.
-CI caches Chromium's headless shell by Playwright version and runs
-`playwright install-deps` only when `ldd` reports a missing system library
-(`scripts/ci/browser.sh`), then runs the same gate.
-
-| Project         | Browser contract                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `analytics`     | React consent controls, actual PostHog formatting with local request interception, revocation and error-boundary behavior            |
-| `intl`          | SSR hydration, ICU translation, locale preferences, cookies and cross-tab synchronization                                            |
-| `notifications` | Knock-backed React feed and unread interactions against a local test API                                                             |
-| `themes`        | Pre-hydration theme script, persistent choice, cross-tab state and system color-scheme changes                                       |
-| `ui`            | Keyboard navigation, dialog focus/escape, forms, responsive layout and reduced motion                                                |
-| `email-preview` | Built plugin in a Vite server, template navigation, sandbox preview, source copy/download, shared-file hot reload and error recovery |
-| `docs`          | Built application navigation, deep links, search, theme and mobile keyboard flows                                                    |
-
-Tests live in each workspace's `e2e/`; library fixture apps import built
-public exports, while Email Preview and Docs run their actual built applications.
-The shared library server uses port 4173, Email Preview uses 4174 and Docs uses 4175. Existing servers on those ports cause a failure; tests never attach to a
-user's unrelated session. Temporary email projects are cleaned up on exit.
-The browser fixtures use local test data and do not send analytics or notifications
-to live accounts. Notifications exercises the real Knock React SDK against its
-local test-owned API; no Knock credentials or production channel configuration
-are needed for that project.
-
-Public package source checks can run on a clean checkout before `dist/` exists.
-E2E consumers have their own `e2e/tsconfig.json`, checked after builds; their
-Vite+ lint pass explicitly uses the shared E2E config and the repository's rules.
-A maintenance test requires every workspace using React or JSX source to retain a project, package
-command and scenarios. TSConfig's JSX settings and Codemods' text transformations
-do not create a React application and are outside this browser inventory.
-
-HTML/JUnit reports, failure screenshots and traces are written to
-`.artifacts/e2e/`. Open the full-suite report with
-`bunx playwright show-report .artifacts/e2e/report`. Selected-project runs write to
-`.artifacts/e2e/projects/<sorted-project-names>/` to preserve other runs' diagnostics.
-CI uploads this dedicated
-browser diagnostics directory on failure, with seven-day retention; it is excluded
-from Git and package archives. Existing unit and tarball tests remain separate.
+The runner builds prerequisites, checks and lints browser consumer sources, then
+runs Playwright with Bun against real built public exports. Artifacts and failures
+live under `.artifacts/e2e/`. Tests own local services and synthetic inputs; do not
+substitute a mock for a failing browser flow. Local verification does not establish
+PostgreSQL or unrun-platform evidence.
 
 ## CI diagnostics
 
-CI runs the five verification phases as named steps. Each command records its
-exit status, elapsed time and sanitized output under `.artifacts/ci/diagnostics/`;
-a failed command still fails its step and job. All CI and release jobs have
-explicit execution limits. Job summaries list completed stages and available
-test counts, including failures and interrupted stages.
-
-Tests retain their usual console reporter and write a JUnit report at each
-workspace's `.artifacts/junit.xml`. Turbo restores the report with cached test
-results. Local reports remain ignored files; CI collects sanitized reports into
-the diagnostics directory. On failure, CI uploads those diagnostics and the
-dedicated browser reports with a seven-day retention period; dotenv files, credentials and installed consumer
-directories are excluded. These generated directories are ignored by Git.
-
-Every job calls `.github/actions/report-diagnostics` with `if: always()`, its
-original `job.status` and a unique artifact name. The action generates the summary
-for that status and uploads sanitized diagnostics if the job or summary fails.
-Verification phases remain separate named workflow steps.
+`scripts/ci/diagnostics.ts` records phase timing and failures without changing exit
+codes. The reporting action retains ignored `.artifacts/` evidence for failed jobs.
+Do not upload environment files, credentials or entire consumer installations.
 
 ## CI database integration
 
-Drizzle's real database integration suite runs only in a separate CI job, using a
-temporary PostgreSQL 17 service. That job runs
-`bun run --cwd packages/drizzle test:integration` with
-`DRIZZLE_TEST_DATABASE_URL` pointing to its test database. The command requires
-both CI and the URL and fails explicitly when either is missing; it does not
-silently skip. Local setup and `bun run verify` have no database prerequisite.
-
-The suite is configured to cover real JSONB expressions and decoding, UPSERT,
-SQLSTATE error metadata and EXPLAIN through postgres.js. Test fixtures create
-only test-owned schemas and tables, clean them up and close connections. Product
-schemas, migrations and credentials are outside this job.
-
-Only a successful Drizzle integration job provides evidence of real PG17
-execution. Passing local `verify` does not include that evidence. PostgreSQL 18
-is outside the test matrix; future version-specific features require their own
-verification evidence.
+Drizzle's real database suite runs only in GitHub Actions with an isolated
+PostgreSQL 17 service and `DRIZZLE_TEST_DATABASE_URL`. Default local verification,
+unit tests, coverage and archive checks are database-free. Missing explicit
+integration prerequisites fail rather than silently skipping tests. Keep fixtures
+inside owned temporary schemas, clean them up and close all connections.
 
 ## Dependency license records
 
-UI, Themes and Email Preview keep their own Apache license in `LICENSE`. Each
-package README contains a generated index of its direct runtime and peer
-dependencies, with the dependency name, installed version and license link.
-Ordinary external dependencies carry their full license texts in their own
-packages; these texts are not duplicated in the consuming package's `LICENSE`.
-
-Run `bun run licenses:update` after changing these dependencies or their installed
-versions. `bun run licenses:check` runs at the start of `verify:source` and rejects
-stale README indexes without requiring build output. These commands maintain the
-indexes and never rewrite package `LICENSE` files.
-
-Copied and bundled code retains complete license texts and applicable notices.
-UI preserves the full shadcn MIT license in `THIRD_PARTY_LICENSES.txt` and its
-provenance in `NOTICE.md`; Themes preserves its original source `NOTICE`.
-Email Preview's build generates `dist/THIRD_PARTY_LICENSES.txt` from the actual
-bundled module graphs, including complete upstream license and notice texts.
-This file stays out of Git with the rest of `dist/`, is restored by the normal
-build cache and ships in the published archive. Rebuild before checking or packing
-artifacts after changing bundled dependencies.
+UI, Themes, Email Preview, Notifications and Security retain their own Apache
+licenses, source provenance and complete notices. README dependency indexes are
+generated from installed runtime/peer dependencies by `bun run licenses:update`;
+`licenses:check` rejects drift. Email Preview's build also emits complete notices
+for bundled modules into its archive. Ordinary external dependencies carry their
+own license texts; never replace or truncate copied upstream notices.
 
 ## Archive consumers
 
-`pack:check` does not build packages. Run `bun run build` first when invoking it
-outside `verify`. It packs each public package with `bun pm pack`, checks export
-targets, required license files and resolved dependency protocols, then installs
-the tarball outside the workspace with fresh consumer dependencies. All archives
-are packed first; overrides resolve internal dependencies to the same batch of
-archives, including packages awaiting their first publication.
+`pack:check` does not build first. Outside verification, run `bun run build` before
+`bun run pack:check`. Bun packs public archives and checks export targets, metadata,
+legal files and resolved dependency protocols, then installs them outside this
+checkout. Internal runtime dependencies resolve from the same archive batch.
+Affected verification selects consumer checks only for relevant public packages.
 
-Consumers load JavaScript and JSON exports with Bun and the pinned Node. CSS
-exports must resolve to readable, nonempty installed assets; package fixtures
-verify their Tailwind integration where applicable. The runner also checks
-declared CommonJS exports and CLI help where present, and uses `tsc` with NodeNext
-resolution for JavaScript exports. The generated declaration smoke check uses
-`skipLibCheck: true`; focused consumer fixtures can enforce stricter public type
-contracts.
-
-Optional contracts live in `packages/<name>/tests/fixtures/consumer/`:
-
-- `package.json` adds dependencies for the full consumer.
-- `tsconfig.json` enables the fixture's declaration contract.
-- `runtime.mjs` runs with both Bun and Node, including without a fixture tsconfig.
-- `without-optional-peers/runtime.mjs` and `without-optional-peers/types.ts`
-  enable a separate consumer that omits optional peers and extra fixture
-  dependencies. Its runtime runs on both runtimes; its type contract uses strict
-  NodeNext with `skipLibCheck: false`.
-
-These fixtures resolve installed tarballs, so source lint and Knip exclude them
-from workspace resolution. Set `TOOLKIT_KEEP_PACK_CHECK=1` to retain disposable
-consumer directories for diagnosis. Archive checks do not publish packages.
+Optional `tests/fixtures/consumer/` contracts can add dependencies, a strict
+`tsconfig.json`, `runtime.mjs`, or `without-optional-peers/` runtime and type
+contracts. Default checks execute these with Bun; the independent Node workflow
+uses the same fixtures on its target runtime. CSS exports must resolve and contain
+actual data. Retain consumer failures with `TOOLKIT_KEEP_PACK_CHECK=1` when debugging.
+Packing and verification do not publish anything.
 
 ## Consumer compatibility matrix
 
-The verification job prepares all public package archives from its completed build and records
-their SHA-256 digests and dependency profiles. The compatibility jobs download
-those archives and verify the digests before installing them outside the
-workspace. Internal package overrides use this same verified archive batch.
-They retain the pinned development runtimes for orchestration and
-type checking, and use a separate, checksum-verified Node binary for consumer
-runtime checks. The development `doctor` requirement remains unchanged.
+Public packages retain their Node engine ranges and build targets. Node validation
+lives in `.github/workflows/node-compatibility.yml`, invoked manually or before npm
+publication. It is outside the default Bun CI path. Its current upper baseline is
+stored in `scripts/packages/node-version`; engine lower bounds come from each
+public manifest. Minimum and locked peer profiles retain exact tested versions.
+The workflow also validates the explicit Cloudflare documentation build.
 
-Public packages declare Node `>=22.21` support. Security uses Arcjet's narrower
-`>=22.21.0 <23 || >=24.5.0` range; Node 23 and earlier Node 24 releases are outside
-its support contract. Each package runs on the exact minimum version (`22.21.0`)
-and on the development Node pin. The matrix therefore contains four cells, with
-two independent dependency profiles for each runtime:
-
-- `minimum` installs exact peer lower bounds, including the admitted Drizzle
-  prerelease lower bound.
-- `current` installs exact versions from the frozen workspace installation,
-  checked against `bun.lock`; it does not select a newly published peer release.
-
-The matrix reuses export loading, supported CommonJS loading, CLI help, runtime
-fixtures and strict declaration contracts. Drizzle's separate consumer without
-optional peers also runs on each selected runtime. Compilation uses the pinned
-Bun and compiler; the selected Node binary executes the JavaScript consumers.
-These jobs do not connect to a database or publish packages.
-
-To reproduce a matrix cell after building, keep the development Node on `PATH`
-and select a separate Node executable:
+Preparation records archive SHA-256 digests and dependency profiles. Matrix jobs
+verify those digests, install the exact archives with Bun and execute public exports,
+CLI and runtime fixtures with the isolated Node binary. Compiler checks remain
+strict NodeNext contracts. Node binaries are checksum-verified independently;
+changing the consumer baseline never changes the Bun development pin.
 
 ```sh
-bun run compatibility:check prepare --artifacts .artifacts/compatibility
-bun run compatibility:check matrix --artifacts .artifacts/compatibility
-bun run compatibility:check check --artifacts .artifacts/compatibility \
-  --node /path/to/node --expected-node 22.21.0 --peers minimum
+bun run build --filter=./packages/*
+bun scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
+bun scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility
 ```
 
-The selected binary must match its exact declared matrix version. Compatibility
-testing remains separate from local `verify` so routine development does not
-download extra runtimes or depend on a database.
+Use `compatibility.ts check --artifacts <directory> --node <binary>
+--expected-node <version> --peers minimum|current` to reproduce a cell.
 
 ## Documentation site
 
 ```sh
-bun run docs:dev      # http://localhost:3100
+bun run docs:dev
 bun run docs:check
 bun run docs:build
 bun run docs:preview
 ```
 
-Edit canonical Markdown, not generated copies. The internal Fumadocs application
-compiles root documentation and package READMEs directly, with page metadata and
-navigation in `docs/src/lib/pages.ts` and content selection in
-`docs/src/lib/source.ts`. Register new pages in both places. Registered Markdown
-links become site routes; other repository files link to GitHub.
-
-The build prerenders documentation pages and bundles a search API. The site has no npm publication
-and does not change library versions. See [site ownership](../AGENTS.md) and
-[template provenance](../NOTICE.md).
+Default builds and previews use Nitro's Bun target, including prerendering, SSR and
+the locale-filtered search API. Fumadocs compiles canonical Markdown directly;
+register pages in `docs/src/lib/pages.ts` and content in `docs/src/lib/source.ts`.
+Application plugins live in `docs/vite.app.config.ts`. Docs never publish to npm or
+advance library versions. See [site ownership](../AGENTS.md) and [provenance](../NOTICE.md).
 
 ### Cloudflare deployment
 
-Nitro's `cloudflare_module` preset builds the documentation Worker in
-`docs/.output/server`, with prerendered pages and browser assets in
-`docs/.output/public`. Root `wrangler.jsonc` names the Worker `raypx-kit-docs`,
-binds its static assets as `ASSETS` and routes `/api/*` through the Worker first.
-HTML routes use URLs without trailing slashes.
+The explicit `docs:build:cloudflare` command uses the separate Node vendor baseline
+and Nitro's `cloudflare_module` target. Root `wrangler.jsonc` selects its Worker
+entry, static assets and search API routing. `docs:deploy` always builds this target
+before uploading; it never uploads a Bun server entry as a Worker. The independent
+Node workflow validates this build without deployment credentials.
 
-The TanStack Start file route `docs/src/routes/api/search.ts` handles
-`GET /api/search?query=...` with Fumadocs' `GET` handler. The search dialog uses
-`useFetchSearch` to fetch results instead of downloading the complete index.
-The search endpoint is not prerendered and needs no static response header override.
+Cloudflare Workers Builds owns automatic deployment. Recommended settings are:
 
-Cloudflare Workers Builds owns automatic deployment through the repository's
-Git integration. Configure the Worker's **Settings → Builds** with:
+| Setting           | Value                           |
+| ----------------- | ------------------------------- |
+| Worker name       | `raypx-kit-docs`                |
+| Root directory    | `/`                             |
+| Production branch | `canary`                        |
+| Build command     | `bun run docs:build:cloudflare` |
+| Deploy command    | `bun run docs:deploy`           |
 
-| Setting           | Value                 |
-| ----------------- | --------------------- |
-| Worker name       | `raypx-kit-docs`      |
-| Root directory    | `/`                   |
-| Production branch | `canary`              |
-| Build command     | `bun run docs:build`  |
-| Deploy command    | `bun run docs:deploy` |
-
-Root `wrangler.jsonc` also declares a custom build command for direct Wrangler
-deployments. It runs `bun run docs:build`, while skipping `wrangler dev` previews
-to avoid recursive builds during prerendering. It also skips custom builds when
-`WORKERS_CI=1`, since Workers Builds already runs the configured build command.
-Keep both commands in the Cloudflare Builds settings; its build configuration
-is managed separately from Wrangler's custom build hook.
-
-Cloudflare manages the deployment credentials. GitHub Actions runs source,
-test, documentation build, archive, compatibility and PostgreSQL integration
-checks without uploading or deploying the documentation output. It needs no
-Cloudflare Actions secrets or deployment environment. Cloudflare builds and
-deployments run independently of these GitHub checks.
-
-A custom domain can be configured in the Worker's Cloudflare settings.
-
-For a local deployment, authenticate with `bunx wrangler login`, then run the
-deployment command. Wrangler builds the site before uploading:
-
-```sh
-bun run docs:deploy
-```
-
-Validate the deployment configuration without publishing:
-
-```sh
-bun run docs:deploy --dry-run --outdir .artifacts/docs-deploy
-```
-
-See Nitro's [Cloudflare deployment guide](https://nitro.build/deploy/providers/cloudflare),
-Cloudflare's [static assets routing guide](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
-and [custom build hooks](https://developers.cloudflare.com/workers/wrangler/custom-builds/).
-The [Workers Builds settings](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
-are configured in the Cloudflare dashboard.
+Existing integrations using `docs:build` still get a correct Worker because the
+deploy script builds the explicit target. Updating the build setting avoids an
+extra Bun build. Wrangler's direct custom build hook selects Cloudflare too; dev
+previews and an already-built deploy skip that hook to avoid recursion. Cloudflare
+owns its own credentials. GitHub source, browser and compatibility checks never
+upload documentation or require Cloudflare application secrets.
 
 ## Adding a package
 
-1. Add `packages/<name>` with its manifest, README, license, initial changelog and
-   package instructions. Declare explicit public exports and supported engines.
-   Add its workspace path to root `devkit.config.ts`, including architecture
-   metadata and source mappings for built exports.
-   Keep reusable code independent of Raypx product workspaces and retain source
-   provenance for adapted code.
-2. Add a strict check, tests and a build suitable for the package. ESM libraries
-   use explicit entries in `tsdown.config.ts`; configuration packages export
-   package-root files. Prefer public entry files directly under `src/`, with
-   supporting implementation modules in subdirectories.
-3. Declare dependency ranges in the owning manifest and refresh `bun.lock`.
-   Follow the [dependency policy](dependencies.md), including peer and bundled
-   dependency rules.
-4. Add the workspace to `knip.ts` and the expected package list in
-   `tests/scripts/release/scope.test.ts`. `pack:check` discovers public packages
-   automatically; add focused consumer fixtures when their types or runtime
-   behavior need an installed-tarball contract.
-5. Update the root package table, [documentation index](../README.md), repository
-   ownership instructions and site registration. Run narrow checks, then
-   `bun run verify`.
-
-New packages start at `0.0.0-alpha.0`; their initial work belongs in the initial
-changelog. Follow [version preparation](changesets.md) before the first
-publication. Do not add fixed or linked Changesets version groups.
+Create an independently scoped ESM package with explicit public exports, README,
+license, tests and metadata in `devkit.config.ts`. Declare third-party dependencies
+in the owning manifest and internal dependencies with `workspace:*`. Add its public
+entry mapping, platform constraints and independent VP configuration. Libraries
+put packing options under `pack`; apps keep plugins in `vite.app.config.ts`.
+React packages also own an E2E project using built public exports. Do not introduce
+product schemas, secrets or a dependency on the Raypx application repository.
+Follow the [Changesets guide](changesets.md) and [publishing runbook](publishing.md)
+when a public release is required.
