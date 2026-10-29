@@ -73,8 +73,9 @@ instructions across the root README, architecture guide and package guides.
 The documentation site compiles canonical Markdown directly through Fumadocs.
 Keep the documentation workspace internal and outside library release versions and archives.
 Keep license texts and source notices alongside the package that ships adapted code.
-Write repository and package documentation in English. Keep localized message
-examples in their intended languages and preserve code identifiers and source links.
+Write canonical repository and package documentation in English. The documentation
+site may keep maintained translations under `docs/content/`; preserve English
+fallbacks, localized message examples, code identifiers and source links.
 
 ## Toolchain
 

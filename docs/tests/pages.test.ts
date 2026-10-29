@@ -7,7 +7,16 @@ import {
   getContentUrl,
   getSourceUrl,
   navigationMetadata,
+  getDocumentationPath,
+  getPageMetadata,
+  getPageSource,
+  getRegisteredSource,
 } from "../src/lib/pages.js";
+import { chineseContentSources, chinesePageMetadata } from "../src/lib/i18n/pages.js";
+import { compareMessageCatalogs } from "../../packages/intl/src/testing.js";
+import { getPathLocale, localizeDocumentationUrl } from "../src/lib/i18n/config.js";
+import en from "../src/lib/i18n/en.js";
+import zh from "../src/lib/i18n/zh.js";
 
 describe("documentation structure", () => {
   it("registers existing canonical sources with unique routes and navigation entries", () => {
@@ -36,6 +45,66 @@ describe("documentation structure", () => {
     expect(
       checkDocumentLinks(root, ["README.md", ...documentationPages.map((page) => page.sourcePath)]),
     ).toEqual([]);
+  });
+});
+
+describe("documentation languages", () => {
+  it("keeps translated catalogs and every page's metadata complete", () => {
+    expect(compareMessageCatalogs(en, zh, "en", "zh")).toEqual([]);
+    expect(Object.keys(chinesePageMetadata).sort()).toEqual(
+      documentationPages.map((page) => page.slug).sort(),
+    );
+  });
+
+  it("compiles existing translated files while retaining canonical English fallback", () => {
+    const root = fileURLToPath(new URL("../../", import.meta.url));
+    expect(checkDocumentLinks(root, Object.values(chineseContentSources))).toEqual([]);
+    const overview = documentationPages.find((page) => page.slug === "index")!;
+    const intl = documentationPages.find((page) => page.slug === "intl/index")!;
+    expect(getPageSource(overview, "zh")).toBe("docs/content/zh/index.md");
+    expect(getRegisteredSource(`${root}/docs/content/zh/index.md`).contentLocale).toBe("zh");
+    expect(getRegisteredSource(`${root}/packages/intl/README.md`).contentLocale).toBe("en");
+    expect(getPageSource(intl, "zh")).toBe(intl.sourcePath);
+    expect(getPageMetadata(overview, "zh").title).toBe("概览");
+    expect(getDocumentationPath(intl.slug, "zh")).toBe("/zh/docs/intl");
+  });
+
+  it.each([
+    ["/docs", "zh", "/zh/docs"],
+    ["/docs/intl?tab=api#react", "zh", "/zh/docs/intl?tab=api#react"],
+    ["/zh/docs/intl?tab=api#react", "en", "/docs/intl?tab=api#react"],
+    ["/en/docs/intl", "en", "/docs/intl"],
+    ["/zh/docs/intl", "zh", "/zh/docs/intl"],
+  ] as const)("switches %s to %s without losing its location", (href, locale, expected) => {
+    expect(localizeDocumentationUrl(href, locale)).toBe(expected);
+  });
+
+  it.each([
+    "#react",
+    "?tab=api",
+    "/docs-other",
+    "/zh/docs-other",
+    "https://example.com/docs",
+    "mailto:example@example.com",
+  ])("leaves non-documentation URLs intact: %s", (href) => {
+    expect(localizeDocumentationUrl(href, "zh")).toBe(href);
+  });
+
+  it("identifies supported language paths without accepting partial prefixes", () => {
+    expect(getPathLocale("/zh/docs/intl")).toBe("zh");
+    expect(getPathLocale("/docs/intl")).toBe("en");
+    expect(getPathLocale("/zh/docs-other")).toBe("en");
+    expect(getPathLocale("/fr/docs")).toBe("en");
+  });
+
+  it("keeps canonical and translated Markdown links inside the requested language", () => {
+    expect(
+      getContentUrl("../../../packages/intl/README.md#react", "docs/content/zh/index.md", "zh"),
+    ).toBe("/zh/docs/intl#react");
+    expect(getContentUrl("../../docs/README.md", "packages/intl/README.md", "zh")).toBe("/zh/docs");
+    expect(getContentUrl("/docs/env?tab=usage#types", "docs/content/zh/index.md", "zh")).toBe(
+      "/zh/docs/env?tab=usage#types",
+    );
   });
 });
 

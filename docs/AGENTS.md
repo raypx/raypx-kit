@@ -2,7 +2,7 @@
 
 ## Purpose
 
-An English Fumadocs site for Raypx Kit. This internal application does not
+A bilingual English/Chinese Fumadocs site for Raypx Kit. This internal application does not
 publish to npm or change the independent versions of the libraries.
 
 ## Interface
@@ -48,9 +48,28 @@ without a third-party service.
   registered pages use site routes and other repository files link to GitHub.
 - Use lazy content loading and a search API built from canonical content, with no production database,
   authentication, external search provider or application environment dependency.
+- Consume `@raypx-kit/intl` through public exports for the controlled provider and
+  typed UI catalogs. URL locales own SSR and hydration; never restore a different
+  browser preference after rendering a language-specific URL.
+- Preserve English routes at `/docs` and Chinese routes at `/zh/docs`. Language
+  changes retain the page, query and hash. Fumadocs owns locale-aware trees and
+  search; preserve the locale in canonical Markdown links at render time.
+- English Markdown remains canonical. Register maintained Chinese translations in
+  `src/lib/i18n/pages.ts` and compile them from `content/zh/`. Missing translations
+  use the English body with an explicit localized notice and body `lang`.
+- Source type checks map consumed public Intl/Themes entries to their maintained sources;
+  Vite builds and browser tests resolve the built public exports. `docs#dev` builds
+  workspace dependencies before starting the server.
+- `@raypx-kit/themes` owns theme state, first-paint initialization and persistence.
+  Keep `ThemeScript` before styles, share `src/lib/theme.ts` with the provider,
+  and retain the legacy `theme` storage key. Disable Fumadocs' default theme provider
+  and place the app's accessible three-choice control in `slots.themeSwitch`.
+  Mount the D shortcut once above both sidebars and ignore typing or open dialogs.
 - Keep prerendering at two concurrent pages and preview on IPv4 loopback so
   building documentation does not multiply the workspace test budget or depend on localhost DNS.
-- Keep the UI in English and retain localized message examples in their intended languages.
+- Keep English/Chinese UI catalogs complete and ICU-compatible. Localize Fumadocs
+  controls, search states and accessibility labels through the application catalog.
+  An `Empty` search renderer must return JSX instead of invoking hooks conditionally.
 - Respect light/dark themes, keyboard access and reduced-motion preferences.
 
 ## Verification

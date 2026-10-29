@@ -72,6 +72,40 @@ Run `bun run docs:dev` from the repository root to browse the site at
 directly, with navigation, local search and source links. Edit each page's
 canonical Markdown rather than making a second copy.
 
+### Languages and translations
+
+The site serves English at `/docs` and Simplified Chinese at `/zh/docs`. The
+language picker retains the current page, query and fragment. The URL owns the
+server/client locale snapshot, so a browser preference cannot change a shared
+link after hydration. Navigation, search, controls and accessibility labels follow
+the selected locale through the public `@raypx-kit/intl` provider.
+
+English files remain canonical. The Chinese overview lives in
+[content/zh/index.md](content/zh/index.md); other pages currently show their English
+body with a localized fallback notice. The source link always identifies the file
+actually displayed. To add a translated body, create its Markdown under
+`content/zh/`, register its canonical slug in
+[the translation map](src/lib/i18n/pages.ts), and keep it covered by the file patterns
+in [source.ts](src/lib/source.ts). Page titles and descriptions for Chinese navigation
+and search live in that same translation module. Preserve canonical heading anchors
+when translating headings, using Fumadocs' `[#heading-id]` suffix where needed.
+
+UI catalogs live under `src/lib/i18n/`. Documentation tests compare catalog keys
+and ICU arguments and check translated source links. Fumadocs uses the multilingual
+tokenizer and filters search results by locale. Browser checks cover language
+switching, Chinese search, mobile navigation, English fallback and SSR without
+JavaScript. Run `bun run test:e2e --project docs` for those scenarios.
+
+### Theme integration
+
+The site uses `@raypx-kit/themes` for first paint, React state, system appearance
+and localStorage/cookie persistence. The script and provider share the configuration
+in [theme.ts](src/lib/theme.ts), including the previous `theme` storage key so saved
+choices continue to work. Fumadocs' default theme provider is disabled; its
+`themeSwitch` slot hosts the site's light/dark/system control on desktop and mobile.
+Labels follow the active language. The D shortcut toggles appearance outside text
+inputs and dialogs, and theme choices survive language navigation and reloads.
+
 Page registration and navigation live in [pages.ts](src/lib/pages.ts); the
 [architecture guide](architecture/README.md#documentation-flow) explains how
 content becomes site pages. Documentation tests run with `bun run test:toolchain`;

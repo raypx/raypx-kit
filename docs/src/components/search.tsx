@@ -1,4 +1,6 @@
 import { useFetchSearch } from "fumadocs-core/search/client";
+import { useLocale, useTranslations } from "../lib/i18n/client";
+import { documentationPages, getDocumentationPath, getPageMetadata } from "../lib/pages";
 import {
   SearchDialog,
   SearchDialogClose,
@@ -13,22 +15,27 @@ import {
   type SharedProps,
 } from "@fumadocs/base-ui/components/dialog/search";
 
-const defaultItems: SearchItemType[] = [
-  { type: "page", id: "overview", content: "Overview", url: "/docs" },
-  { type: "page", id: "drizzle", content: "Drizzle", url: "/docs/drizzle" },
-  { type: "page", id: "intl", content: "Intl", url: "/docs/intl" },
-];
-
 function EmptySearchResults() {
+  const t = useTranslations("search");
   return (
     <p role="status" className="px-4 py-10 text-center text-sm text-fd-muted-foreground">
-      No matching pages. Try an API name or a shorter search.
+      {t("empty")}
     </p>
   );
 }
 
 export default function DocsSearchDialog(props: SharedProps) {
-  const search = useFetchSearch({ api: "/api/search" });
+  const locale = useLocale();
+  const t = useTranslations("search");
+  const search = useFetchSearch({ api: "/api/search", locale });
+  const defaultItems: SearchItemType[] = documentationPages
+    .filter((page) => ["index", "drizzle/index", "intl/index"].includes(page.slug))
+    .map((page) => ({
+      type: "page",
+      id: page.slug,
+      content: getPageMetadata(page, locale).title,
+      url: getDocumentationPath(page.slug, locale),
+    }));
 
   return (
     <SearchDialog {...search} {...props}>
@@ -36,27 +43,21 @@ export default function DocsSearchDialog(props: SharedProps) {
       <SearchDialogContent className="docs-search">
         <SearchDialogHeader>
           <SearchDialogIcon />
-          <SearchDialogInput aria-label="Search documentation" />
+          <SearchDialogInput aria-label={t("label")} />
           <SearchDialogClose />
         </SearchDialogHeader>
         {search.error ? (
           <p role="alert" className="px-4 py-10 text-center text-sm text-fd-muted-foreground">
-            Search is unavailable. Reload the page to try again, or browse the documentation
-            sidebar.
+            {t("error")}
           </p>
         ) : (
-          <SearchDialogList defaultItems={defaultItems} Empty={EmptySearchResults} />
+          <SearchDialogList defaultItems={defaultItems} Empty={() => <EmptySearchResults />} />
         )}
         <SearchDialogFooter>
           <p role="status" aria-live="polite" className="text-xs text-fd-muted-foreground">
-            {search.isLoading
-              ? "Searching documentation…"
-              : "Search APIs, guides, and capability inventories."}
+            {search.isLoading ? t("loading") : t("hint")}
           </p>
-          <p className="mt-2 text-xs text-fd-muted-foreground">
-            <kbd>↑</kbd> <kbd>↓</kbd> to navigate · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to
-            close
-          </p>
+          <p className="mt-2 text-xs text-fd-muted-foreground">{t("shortcuts")}</p>
         </SearchDialogFooter>
       </SearchDialogContent>
     </SearchDialog>

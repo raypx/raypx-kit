@@ -1,3 +1,6 @@
+import { localizeDocumentationUrl, type DocsLocale } from "./i18n/config";
+import { chineseContentSources, chinesePageMetadata } from "./i18n/pages";
+
 export const documentationPages = [
   {
     slug: "index",
@@ -72,7 +75,7 @@ export const documentationPages = [
     slug: "email-preview/index",
     sourcePath: "packages/email-preview/README.md",
     title: "Email Preview",
-    description: "React Email previews in a Vite dev server or a standalone CLI.",
+    description: "React Email previews through a Vite plugin with a prebuilt interface.",
   },
   {
     slug: "email-preview/vite-plugin",
@@ -219,8 +222,43 @@ export const navigationMetadata = {
   },
 };
 
-export function getDocumentationPath(slug: string) {
-  return `/docs${slug === "index" ? "" : `/${slug.replace(/\/index$/, "")}`}`;
+export function getDocumentationPath(slug: string, locale: DocsLocale = "en") {
+  return localizeDocumentationUrl(
+    `/docs${slug === "index" ? "" : `/${slug.replace(/\/index$/, "")}`}`,
+    locale,
+  );
+}
+
+export function getPageMetadata(page: (typeof documentationPages)[number], locale: DocsLocale) {
+  return { ...page, ...(locale === "zh" ? chinesePageMetadata[page.slug] : {}) };
+}
+
+export function getPageSource(page: (typeof documentationPages)[number], locale: DocsLocale) {
+  return locale === "zh" ? (chineseContentSources[page.slug] ?? page.sourcePath) : page.sourcePath;
+}
+
+export function getNavigationMetadata(locale: DocsLocale) {
+  return Object.fromEntries(
+    Object.entries(navigationMetadata).map(([path, data]) => {
+      const title =
+        locale === "zh" && path !== "meta.json"
+          ? (chinesePageMetadata[`${path.slice(0, -"meta.json".length)}index`]?.title ?? data.title)
+          : data.title;
+      return [path, { ...data, title }];
+    }),
+  );
+}
+
+export function getRegisteredSource(path: string) {
+  const normalized = path.replaceAll("\\", "/");
+  for (const page of documentationPages) {
+    const translated = chineseContentSources[page.slug];
+    if (translated && normalized.endsWith(`/${translated}`))
+      return { ...page, sourcePath: translated, contentLocale: "zh" as const };
+    if (normalized.endsWith(`/${page.sourcePath}`))
+      return { ...page, contentLocale: "en" as const };
+  }
+  throw new Error(`Unregistered documentation source: ${path}`);
 }
 
 const repositorySource = new URL("https://github.com/raypx/raypx-kit/blob/canary/");
@@ -229,14 +267,18 @@ export function getSourceUrl(sourcePath: string) {
   return `${repositorySource.href}${sourcePath.split("/").map(encodeURIComponent).join("/")}`;
 }
 
-export function getContentUrl(href: string, sourcePath: string) {
-  if (href.startsWith("#") || href.startsWith("?") || /^\/docs(?:\/|$)/.test(href)) return href;
+export function getContentUrl(href: string, sourcePath: string, locale: DocsLocale = "en") {
+  if (href.startsWith("#") || href.startsWith("?")) return href;
+  if (/^(?:\/(?:en|zh))?\/docs(?:[/?#]|$)/.test(href))
+    return localizeDocumentationUrl(href, locale);
 
   const url = new URL(href, getSourceUrl(sourcePath));
   if (url.origin !== repositorySource.origin || !url.pathname.startsWith(repositorySource.pathname))
     return href;
 
   const target = decodeURIComponent(url.pathname.slice(repositorySource.pathname.length));
-  const page = documentationPages.find((entry) => entry.sourcePath === target);
-  return page ? `${getDocumentationPath(page.slug)}${url.search}${url.hash}` : url.href;
+  const page = documentationPages.find(
+    (entry) => entry.sourcePath === target || chineseContentSources[entry.slug] === target,
+  );
+  return page ? `${getDocumentationPath(page.slug, locale)}${url.search}${url.hash}` : url.href;
 }

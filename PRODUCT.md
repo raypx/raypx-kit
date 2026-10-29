@@ -18,9 +18,12 @@ available behavior from future extension work.
 
 ## Product Purpose
 
-Present the existing English package guides and complete upstream inventories
-through a searchable Fumadocs documentation site. Repository Markdown remains
-the source of truth, and published libraries retain their own API guides.
+Present the canonical English package guides and complete upstream inventories
+through a searchable English/Chinese Fumadocs site. Maintained translations are
+optional per page; untranslated bodies show the English source with a clear notice.
+Repository Markdown remains the source of truth, and published libraries retain
+their own API guides. The site's UI uses the public `@raypx-kit/intl` and
+`@raypx-kit/themes` integrations, composed into Fumadocs' layout controls.
 
 ## Brand Personality
 
@@ -42,5 +45,6 @@ promotional landing-page copy, decorative motion, and page-wide horizontal scrol
 ## Accessibility & Inclusion
 
 Use Fumadocs keyboard-accessible navigation and search, visible focus states,
-readable light and dark themes, and reduced-motion preferences. English prose
-retains localized message examples in their intended languages.
+readable light and dark themes, and reduced-motion preferences. The URL selects
+the language before rendering; switching languages preserves the current location.
+English prose retains localized message examples in their intended languages.

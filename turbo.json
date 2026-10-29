@@ -18,6 +18,11 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "docs#dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
     }
   },
   "globalDependencies": [

@@ -7,9 +7,12 @@ import { fumadocsMdx } from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
 import { documentationPages, getContentUrl, getDocumentationPath } from "./src/lib/pages";
+import { localeConfig } from "./src/lib/i18n/config";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
-const documentationPaths = documentationPages.map((page) => getDocumentationPath(page.slug));
+const documentationPaths = localeConfig.locales.flatMap((locale) =>
+  documentationPages.map((page) => getDocumentationPath(page.slug, locale)),
+);
 
 type MarkdownNode = {
   type: string;
@@ -22,7 +25,9 @@ export default defineConfig(({ command }) => ({
   server: { port: 3100, strictPort: true },
   // Keep the preview listener and prerender fetches on the same IPv4 loopback.
   preview: { host: "127.0.0.1" },
-  ssr: { noExternal: true },
+  resolve: { dedupe: ["react", "react-dom"] },
+  // Bundle dependencies for the Worker; development uses native CJS interop.
+  ssr: { noExternal: command === "build" ? true : [] },
   plugins: [
     nitro({
       preset: command === "serve" ? "bun" : "cloudflare_module",

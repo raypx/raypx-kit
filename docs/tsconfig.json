@@ -5,7 +5,14 @@
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@raypx-kit/intl": ["../packages/intl/src/index.ts"],
+      "@raypx-kit/intl/client": ["../packages/intl/src/client.ts"],
+      "@raypx-kit/intl/types": ["../packages/intl/src/types-entry.ts"],
+      "@raypx-kit/themes": ["../packages/themes/src/index.ts"],
+      "@raypx-kit/themes/script": ["../packages/themes/src/script.ts"]
+    }
   },
   "include": [
     "scripts/**/*.ts",

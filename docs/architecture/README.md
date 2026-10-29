@@ -264,6 +264,20 @@ and notices through Fumadocs. `docs/src/lib/pages.ts` registers source paths,
 page metadata and navigation. `docs/src/lib/source.ts` supplies that registered
 content to the site; there is no synchronized Markdown copy.
 
+The documentation UI consumes `@raypx-kit/intl` through public exports. A controlled
+provider renders the URL-selected English or Chinese catalog consistently on the
+server and client. English routes stay at `/docs`; Chinese routes use `/zh/docs`.
+Fumadocs receives localized page metadata and navigation, and its multilingual
+search filters results by the requested locale. Optional translations live under
+`docs/content/zh/` and are registered by canonical slug. Untranslated bodies retain
+their English source, an explicit fallback notice and the correct body language.
+Markdown links preserve the active locale even when displaying an English fallback.
+
+`@raypx-kit/themes` owns the documentation theme provider and the first-paint script.
+Fumadocs supplies the layout slot for the light/dark/system controls; its default
+theme provider is disabled. Script and provider share the legacy `theme` storage
+key, and the app keeps a single D-key shortcut outside text inputs and dialogs.
+
 The build rewrites registered documentation links to site routes and keeps other
 repository files as GitHub source links. TanStack Start prerenders the registered
 pages; Fumadocs serves search results from the same content source through the

@@ -2,7 +2,14 @@ import { loader } from "fumadocs-core/source";
 import type { MetaData, StaticSource } from "fumadocs-core/source";
 import { defineDocs } from "fumadocs-mdx/macro";
 import { z } from "zod";
-import { documentationPages, navigationMetadata } from "./pages";
+import {
+  documentationPages,
+  getNavigationMetadata,
+  getPageMetadata,
+  getPageSource,
+  getRegisteredSource,
+} from "./pages";
+import { contentI18n, localeConfig } from "./i18n/config";
 
 export { getSourceUrl } from "./pages";
 
@@ -12,6 +19,7 @@ export const docs = defineDocs({
     async: true,
     files: [
       "docs/README.md",
+      "docs/content/zh/**/*.md",
       "docs/architecture/*.md",
       "docs/drizzle/*.md",
       "docs/email-preview/*.md",
@@ -34,14 +42,7 @@ export const docs = defineDocs({
       "packages/tsconfig/README.md",
       "packages/ui/README.md",
     ],
-    schema: ({ path }) =>
-      z.object({}).transform(() => {
-        const page = [...documentationPages]
-          .sort((left, right) => right.sourcePath.length - left.sourcePath.length)
-          .find((entry) => path.replaceAll("\\", "/").endsWith(`/${entry.sourcePath}`));
-        if (!page) throw new Error(`Unregistered documentation source: ${path}`);
-        return page;
-      }),
+    schema: ({ path }) => z.object({}).transform(() => getRegisteredSource(path)),
   },
   meta: { files: [] },
 });
@@ -50,22 +51,28 @@ const contentSource: StaticSource<{
   pageData: (typeof docs.docs)[number];
   metaData: MetaData;
 }> = {
-  files: [
-    ...docs.docs.map((page) => ({
-      type: "page" as const,
-      path: `${page.slug}.md`,
-      absolutePath: page.info.fullPath,
-      data: page,
-    })),
-    ...Object.entries(navigationMetadata).map(([path, data]) => ({
-      type: "meta" as const,
-      path,
-      data,
-    })),
-  ],
+  files: localeConfig.locales.flatMap((locale) => [
+      ...documentationPages.map((registration) => {
+        const sourcePath = getPageSource(registration, locale);
+        const page = docs.docs.find((entry) => entry.sourcePath === sourcePath);
+        if (!page) throw new Error(`Missing documentation content: ${sourcePath}`);
+        return {
+          type: "page" as const,
+          path: `${registration.slug}.${locale}.md`,
+          absolutePath: page.info.fullPath,
+          data: { ...page, ...getPageMetadata(registration, locale), sourcePath },
+        };
+      }),
+      ...Object.entries(getNavigationMetadata(locale)).map(([path, data]) => ({
+        type: "meta" as const,
+        path: path.replace(/\.json$/, `.${locale}.json`),
+        data,
+      })),
+    ]),
 };
 
 export const source = loader({
   source: contentSource,
   baseUrl: "/docs",
+  i18n: contentI18n,
 });
