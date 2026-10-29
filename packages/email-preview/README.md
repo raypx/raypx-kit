@@ -200,7 +200,7 @@ changes; `bun run licenses:check` checks this index without requiring build outp
 | prettier            | 3.9.10            | MIT     | [LICENSE](https://unpkg.com/prettier@3.9.10/LICENSE)                    |
 | react               | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react@19.3.1/LICENSE)                       |
 | react-dom           | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react-dom@19.3.1/LICENSE)                   |
-| vite                | 1.3.0             | MIT     | [LICENSE](https://unpkg.com/@voidzero-dev/vite-plus-core@1.3.0/LICENSE) |
+| vite                | 1.4.0             | MIT     | [LICENSE](https://unpkg.com/@voidzero-dev/vite-plus-core@1.4.0/LICENSE) |
 
 <!-- END GENERATED DEPENDENCY LICENSE INDEX -->
 

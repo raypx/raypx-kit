@@ -21,6 +21,10 @@ upstream's existing ranges and widen exact upstream declarations to caret ranges
 that include the upstream versions. Tests check the dependency names and range
 coverage when updating the CLI.
 
+The esbuild dependency also accepts `^0.28.2` alongside upstream's `^0.25.10`.
+Archive consumers verify TypeScript config and schema compilation by generating
+migrations with the installed CLI under both Bun and Node.
+
 | @raypx-kit/drizzle-kit | drizzle-kit          |
 | ---------------------- | -------------------- |
 | `0.0.0-alpha.0`        | `1.0.0-rc.5-5935859` |

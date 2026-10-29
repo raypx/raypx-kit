@@ -31,6 +31,9 @@ existing ranges. Exact upstream versions become caret ranges that include those
 versions; extractor tests check that upstream ranges remain supported. The copied
 CLI and declarations stay unchanged. Review these dependencies whenever the
 upstream build changes.
+Its esbuild range also accepts the tested `^0.28.2` release alongside upstream's
+`^0.25.10`; archive consumers generate migrations from TypeScript configuration
+and schemas with the installed CLI under Bun and Node.
 
 Node and Bun runtime pins remain exact in `.nvmrc` and root `packageManager`.
 `@types/node` follows the pinned Node major; an `@types/bun` declaration starts at

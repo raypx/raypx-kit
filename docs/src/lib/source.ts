@@ -52,23 +52,23 @@ const contentSource: StaticSource<{
   metaData: MetaData;
 }> = {
   files: localeConfig.locales.flatMap((locale) => [
-      ...documentationPages.map((registration) => {
-        const sourcePath = getPageSource(registration, locale);
-        const page = docs.docs.find((entry) => entry.sourcePath === sourcePath);
-        if (!page) throw new Error(`Missing documentation content: ${sourcePath}`);
-        return {
-          type: "page" as const,
-          path: `${registration.slug}.${locale}.md`,
-          absolutePath: page.info.fullPath,
-          data: { ...page, ...getPageMetadata(registration, locale), sourcePath },
-        };
-      }),
-      ...Object.entries(getNavigationMetadata(locale)).map(([path, data]) => ({
-        type: "meta" as const,
-        path: path.replace(/\.json$/, `.${locale}.json`),
-        data,
-      })),
-    ]),
+    ...documentationPages.map((registration) => {
+      const sourcePath = getPageSource(registration, locale);
+      const page = docs.docs.find((entry) => entry.sourcePath === sourcePath);
+      if (!page) throw new Error(`Missing documentation content: ${sourcePath}`);
+      return {
+        type: "page" as const,
+        path: `${registration.slug}.${locale}.md`,
+        absolutePath: page.info.fullPath,
+        data: { ...page, ...getPageMetadata(registration, locale), sourcePath },
+      };
+    }),
+    ...Object.entries(getNavigationMetadata(locale)).map(([path, data]) => ({
+      type: "meta" as const,
+      path: path.replace(/\.json$/, `.${locale}.json`),
+      data,
+    })),
+  ]),
 };
 
 export const source = loader({

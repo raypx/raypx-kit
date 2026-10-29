@@ -22,6 +22,9 @@ prebuilt API and payload bundles.
   upstream versions to caret ranges that include those versions; tests check the
   dependency names and that upstream ranges remain subsets of our declarations.
   Review these declarations with each upstream upgrade.
+- esbuild also supports `^0.28.2` alongside upstream's `^0.25.10`. Keep the archive
+  consumer's real TypeScript migration-generation check under both Bun and Node
+  when changing this dependency; loading exports or CLI help does not compile schemas.
 - Stable dependencies and coverage providers use caret ranges. Installed coverage
   providers must match Vite+'s bundled Vitest version.
 - The `drizzle-kit` and `drizzle-orm` devDependencies and the isolated archive
