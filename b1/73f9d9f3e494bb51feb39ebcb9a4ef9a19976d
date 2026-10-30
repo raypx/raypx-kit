@@ -1,0 +1,25 @@
+.github/workflows/release.yml
+  s_c8ddb790d61691::t_0a1bd90c1e68c4 130-131,134
+AGENTS.md
+  s_c8ddb790d61691::t_bbdefd4a572e84 235
+docs/development/publishing.md
+  s_c8ddb790d61691::t_6e93e7205d9cb2 172-176
+packages/devkit/src/tasks/run.ts
+  s_c8ddb790d61691::t_6e3ae40c31de99 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b173f9d9f3e494bb51feb39ebcb9a4ef9a19976d",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
