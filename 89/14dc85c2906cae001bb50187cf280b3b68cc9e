@@ -1,0 +1,18 @@
+.github/debug-flake.sh
+  h_f0766e80fd3864 2,13-26,29-34,39-40
+.github/workflows/debug-email-preview-flake.yml
+  h_f0766e80fd3864 10,17-22,31-32,35-36,41
+packages/email-preview/tests/flake.test.ts
+  h_f0766e80fd3864 141-171,246
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8914dc85c2906cae001bb50187cf280b3b68cc9e",
+  "prompts": {},
+  "humans": {
+    "h_f0766e80fd3864": {
+      "author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
