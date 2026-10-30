@@ -1,0 +1,63 @@
+README.md
+  s_6291eb9cf26850::t_0bfadb815f3ccc 51
+docs/README.md
+  s_6291eb9cf26850::t_dac4399e2311bd 71-75
+docs/vite.app.config.ts
+  s_6291eb9cf26850::t_3db0f1f3798d47 99
+docs/src/routes/index.tsx
+  s_6291eb9cf26850::t_8adbeed6b32a0f 2-3
+  s_6291eb9cf26850::t_3db0f1f3798d47 1,6-7
+docs/e2e/docs.spec.ts
+  s_6291eb9cf26850::t_243af56c8ec9c8 15-17,36-42,49-51,67-69,81-85
+  s_6291eb9cf26850::t_dac4399e2311bd 18-24,28,30-35,43-48,52-66,70-80,86-88
+  s_6291eb9cf26850::t_8adbeed6b32a0f 25-27,29
+docs/src/routes/__root.tsx
+  s_6291eb9cf26850::t_3db0f1f3798d47 22,83
+docs/src/styles/app.css
+  s_6291eb9cf26850::t_e11a039bf4bbdd 126-407
+docs/src/lib/layout.ts
+  s_6291eb9cf26850::t_8adbeed6b32a0f 2-3,13-28
+  s_6291eb9cf26850::t_3db0f1f3798d47 8
+  s_6291eb9cf26850::t_550abd4b7dd2b6 29-30
+docs/tests/pages.test.ts
+  s_6291eb9cf26850::t_dac4399e2311bd 17-22,57-72,78
+  s_6291eb9cf26850::t_e7991c2e4d5668 73-77,79-80
+docs/src/routes/zh.tsx
+  s_6291eb9cf26850::t_8adbeed6b32a0f 2-3
+  s_6291eb9cf26850::t_3db0f1f3798d47 1,4-8
+docs/src/lib/i18n/config.ts
+  s_6291eb9cf26850::t_3db0f1f3798d47 16-19,22-30
+docs/src/lib/i18n/zh.ts
+  s_6291eb9cf26850::t_8adbeed6b32a0f 7,9-10
+  s_6291eb9cf26850::t_e11a039bf4bbdd 6
+  s_6291eb9cf26850::t_3db0f1f3798d47 5,8,11-30
+docs/AGENTS.md
+  s_6291eb9cf26850::t_dac4399e2311bd 10-13
+docs/src/lib/i18n/en.ts
+  s_6291eb9cf26850::t_3db0f1f3798d47 2,4-18,20-27
+  s_6291eb9cf26850::t_e11a039bf4bbdd 3,19
+  s_6291eb9cf26850::t_7bfa67dca1b0c5 28-29
+docs/src/components/home.tsx
+  s_6291eb9cf26850::t_3db0f1f3798d47 1-6,15-32,40-72,77-79,84-87,92-100,104-120,126-137,141-156,160-162,166-171,173-179
+  s_6291eb9cf26850::t_8adbeed6b32a0f 13-14
+  s_6291eb9cf26850::t_dac4399e2311bd 33-39,73-74,76,88-91,101-103,121-125,138-140,157-159,163-165,172
+  s_6291eb9cf26850::t_66fd12d91f44a6 7-12,75,80-83
+docs/src/routeTree.gen.ts
+  s_6291eb9cf26850::t_87c0d2b0d1065c 13,22-26,41,47,54,60,62-63,68,82-88,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ab23b3dff4c309136ba993cec9a28090da68b341",
+  "prompts": {},
+  "sessions": {
+    "s_6291eb9cf26850": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18acf-dd29-7b63-88c0-81c47bb95fda",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
