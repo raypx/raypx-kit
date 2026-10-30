@@ -18,13 +18,13 @@ pairings below, including their declarations and peer ranges. Drizzle and Nitro
 also rely on constrained prerelease ranges and affected package checks. Update
 related dependencies together and commit the resulting lockfile:
 
-| Group               | Declaration and installed-version constraint                                                                                                                               |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vite+ and Vite core | Caret ranges; the root override and docs alias select Vite+'s core package. Installed Vite+ and core release versions must match.                                          |
-| Vitest coverage     | Caret ranges; every installed provider must match Vite+'s bundled Vitest and satisfy its peer range. Do not add a separate Vitest version.                                 |
-| Fumadocs            | `@fumadocs/base-ui` and `fumadocs-core` use caret ranges and must resolve to the same release while satisfying their peers. The site uses the official Base UI components. |
-| Drizzle ORM and CLI | `>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z` restricts resolution to the RC5 hash family. Validate ORM, CLI and consumer fixtures together.                                        |
-| Nitro               | `~3.0.260903-beta` preserves the tested prerelease family and the documentation site's `bun` preset.                                                                       |
+| Group               | Declaration and installed-version constraint                                                                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vite+ and Vite core | Caret ranges; the root override and docs alias select Vite+'s core package. Installed Vite+ and core release versions must match.                                      |
+| Vitest coverage     | Caret ranges; every installed provider must match Vite+'s bundled Vitest and satisfy its peer range. Do not add a separate Vitest version.                             |
+| Fumadocs            | @fumadocs/base-ui and fumadocs-core use caret ranges and must resolve to the same release while satisfying their peers. The site uses the official Base UI components. |
+| Drizzle ORM and CLI | >=1.0.0-rc.5-5935859 <1.0.0-rc.5-z restricts resolution to the RC5 hash family. Validate ORM, CLI and consumer fixtures together.                                      |
+| Nitro               | \~3.0.260903-beta preserves the tested prerelease family and the documentation site's bun preset.                                                                      |
 
 The slim Drizzle Kit distribution retains upstream runtime dependency names and
 existing ranges. Exact upstream versions become caret ranges that include those

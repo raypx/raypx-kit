@@ -6,11 +6,11 @@ controlled providers receive the active locale and messages explicitly.
 
 ## Responsibilities
 
-| Owner             | Responsibilities                                                                             |
-| ----------------- | -------------------------------------------------------------------------------------------- |
-| `use-intl`        | ICU execution, rich text, formatters, React context and caches                               |
-| `@raypx-kit/intl` | Immutable locale configuration, negotiation, typed adapters, defaults and catalog validation |
-| Application       | Messages, loading, preference state, storage, SSR data and platform initialization           |
+| Owner           | Responsibilities                                                                             |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| use-intl        | ICU execution, rich text, formatters, React context and caches                               |
+| @raypx-kit/intl | Immutable locale configuration, negotiation, typed adapters, defaults and catalog validation |
+| Application     | Messages, loading, preference state, storage, SSR data and platform initialization           |
 
 The core and server entry points have no DOM ambient type requirement. React 19
 remains a required peer, including for core and server imports. `use-intl`

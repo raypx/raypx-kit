@@ -199,6 +199,9 @@ register pages in `docs/src/lib/pages.ts` and content in `docs/src/lib/source.ts
 Application plugins live in `docs/vite.app.config.ts`. Docs never publish to npm or
 advance library versions. See [site ownership](../AGENTS.md) and [provenance](../NOTICE.md).
 
+Use the [documentation authoring guide](documentation.md) for file trees, callouts,
+opt-in steps and code tabs, including rendered examples of each Fumadocs plugin.
+
 ### Cloudflare deployment
 
 The explicit `docs:build:cloudflare` command uses the separate Node vendor baseline
@@ -209,13 +212,13 @@ Node workflow validates this build without deployment credentials.
 
 Cloudflare Workers Builds owns automatic deployment. Recommended settings are:
 
-| Setting           | Value                           |
-| ----------------- | ------------------------------- |
-| Worker name       | `raypx-kit-docs`                |
-| Root directory    | `/`                             |
-| Production branch | `canary`                        |
-| Build command     | `bun run docs:build:cloudflare` |
-| Deploy command    | `bun run docs:deploy`           |
+| Setting           | Value                         |
+| ----------------- | ----------------------------- |
+| Worker name       | raypx-kit-docs                |
+| Root directory    | /                             |
+| Production branch | canary                        |
+| Build command     | bun run docs:build:cloudflare |
+| Deploy command    | bun run docs:deploy           |
 
 Existing integrations using `docs:build` still get a correct Worker because the
 deploy script builds the explicit target. Updating the build setting avoids an

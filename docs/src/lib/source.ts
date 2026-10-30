@@ -42,7 +42,10 @@ export const docs = defineDocs({
       "packages/tsconfig/README.md",
       "packages/ui/README.md",
     ],
-    schema: ({ path }) => z.object({}).transform(() => getRegisteredSource(path)),
+    schema: ({ path }) =>
+      z
+        .object({ steps: z.boolean().optional() })
+        .transform((options) => ({ ...getRegisteredSource(path), ...options })),
   },
   meta: { files: [] },
 });

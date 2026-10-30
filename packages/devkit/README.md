@@ -13,17 +13,17 @@ ESM only, for Node 22.21+ and Bun. Each entry is independent, so a consumer load
 only the dependencies it uses. The package reads files and spawns processes; it
 contains no product rules, so repositories compose their own policy from it.
 
-| Entry            | Purpose                                                                |
-| ---------------- | ---------------------------------------------------------------------- |
-| `./workspaces`   | Discover workspaces, read boundary metadata and resolve imports        |
-| `./architecture` | Check dependencies, exports, cycles, platform targets and import leaks |
-| `./toolchain`    | Read Node/Bun pins, check every duplicated pin and the active runtimes |
-| `./catalogs`     | Read static message catalogs without executing them                    |
-| `./docs`         | Report broken relative Markdown links                                  |
-| `./process`      | Run commands, load dotenv files and run Turbo with a guarded cache     |
-| `./artifact`     | Stage a relocated output and probe a running Node server               |
-| `./lint`         | Base and opt-in strict Vite+ lint presets without repository paths     |
-| `./testing`      | Plain Vitest defaults for Bun workers                                  |
+| Entry          | Purpose                                                                |
+| -------------- | ---------------------------------------------------------------------- |
+| ./workspaces   | Discover workspaces, read boundary metadata and resolve imports        |
+| ./architecture | Check dependencies, exports, cycles, platform targets and import leaks |
+| ./toolchain    | Read Node/Bun pins, check every duplicated pin and the active runtimes |
+| ./catalogs     | Read static message catalogs without executing them                    |
+| ./docs         | Report broken relative Markdown links                                  |
+| ./process      | Run commands, load dotenv files and run Turbo with a guarded cache     |
+| ./artifact     | Stage a relocated output and probe a running Node server               |
+| ./lint         | Base and opt-in strict Vite+ lint presets without repository paths     |
+| ./testing      | Plain Vitest defaults for Bun workers                                  |
 
 ## Workspace architecture
 

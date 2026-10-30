@@ -33,11 +33,11 @@ export default defineConfig({
 Run `vite` and open `/__email/` on the dev server, for example
 `http://localhost:5173/__email/`. Options:
 
-| Option            | Default    | Description                                                |
-| ----------------- | ---------- | ---------------------------------------------------------- |
-| `dir`             | `emails`   | Template directory, relative to the Vite root or absolute. |
-| `base`            | `/__email` | URL prefix for the interface and its API.                  |
-| `renderTimeoutMs` | `10000`    | Reports renders that do not settle within this time.       |
+| Option          | Default    | Description                                                |
+| --------------- | ---------- | ---------------------------------------------------------- |
+| dir             | emails     | Template directory, relative to the Vite root or absolute. |
+| base            | /\_\_email | URL prefix for the interface and its API.                  |
+| renderTimeoutMs | 10000      | Reports renders that do not settle within this time.       |
 
 The plugin applies to `vite dev` only; production builds never include templates
 or the interface. Templates are evaluated in a dedicated Vite environment with its

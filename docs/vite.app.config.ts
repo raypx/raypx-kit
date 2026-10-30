@@ -3,8 +3,10 @@ import { fileURLToPath } from "node:url";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { remarkDirectiveAdmonition, remarkMdxFiles, remarkSteps } from "fumadocs-core/mdx-plugins";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
+import remarkDirective from "remark-directive";
 import { defineConfig, loadEnv } from "vite-plus";
 import { startEnvironment } from "../packages/devkit/src/vite.js";
 import { documentationPages, getContentUrl, getDocumentationPath } from "./src/lib/pages";
@@ -22,6 +24,21 @@ type MarkdownNode = {
   url?: string;
   children?: MarkdownNode[];
 };
+
+// Numbered inventory headings are sections, so step rendering is opt-in per page.
+function remarkDocumentationSteps() {
+  const transform = remarkSteps();
+  return (...args: Parameters<typeof transform>) => {
+    const frontmatter = args[1].data.frontmatter;
+    if (
+      frontmatter &&
+      typeof frontmatter === "object" &&
+      "steps" in frontmatter &&
+      frontmatter.steps === true
+    )
+      return transform(...args);
+  };
+}
 
 export default defineConfig(({ command }) => ({
   server: { port: 3100, strictPort: true },
@@ -60,6 +77,10 @@ export default defineConfig(({ command }) => ({
               }
               rewriteLinks(tree);
             },
+            remarkDirective,
+            remarkDirectiveAdmonition,
+            remarkMdxFiles,
+            remarkDocumentationSteps,
             ...defaults,
           ],
         },

@@ -97,14 +97,14 @@ Blank strings, including whitespace-only strings, become `undefined`. Defaults
 apply before the final schema is parsed, and Zod transforms determine output
 types. Input objects are never mutated.
 
-| Option                       | Behavior                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------- |
-| `runtimeEnv`                 | String, boolean, number or undefined values; `createEnv` merges them with host values |
-| `isServer`                   | Override automatic server/browser detection                                           |
-| `skip`                       | Skip schema parsing; declared raw/default values remain available with access guards  |
-| `transform(shape, isServer)` | Supply a final Zod schema from the composed raw shape                                 |
-| `onError(issues)`            | Replace the default validation failure handler; must throw                            |
-| `onInvalidAccess(variable)`  | Replace the default browser access failure handler; must throw                        |
+| Option                     | Behavior                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| runtimeEnv                 | String, boolean, number or undefined values; createEnv merges them with host values  |
+| isServer                   | Override automatic server/browser detection                                          |
+| skip                       | Skip schema parsing; declared raw/default values remain available with access guards |
+| transform(shape, isServer) | Supply a final Zod schema from the composed raw shape                                |
+| onError(issues)            | Replace the default validation failure handler; must throw                           |
+| onInvalidAccess(variable)  | Replace the default browser access failure handler; must throw                       |
 
 ```ts
 import { defineEnv, z } from "@raypx-kit/env";

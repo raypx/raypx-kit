@@ -13,13 +13,13 @@ ESM only, for Node 22.21+, Bun and Cloudflare Workers (every entry except `./fs`
 signing secrets. Nothing reads environment variables or creates clients at import;
 applications pass every option.
 
-| Entry      | Purpose                                                                |
-| ---------- | ---------------------------------------------------------------------- |
-| `.`        | `createStorage`, policies, key validation, `StorageError` and types    |
-| `./s3`     | `createS3Driver` for S3-compatible services, signed with SigV4         |
-| `./fs`     | `createFileSystemDriver` for a local directory                         |
-| `./memory` | `createMemoryDriver` for tests and development                         |
-| `./signed` | `createLocalSigner` and `createSignedRequestHandler` for fs and memory |
+| Entry    | Purpose                                                            |
+| -------- | ------------------------------------------------------------------ |
+| .        | createStorage, policies, key validation, StorageError and types    |
+| ./s3     | createS3Driver for S3-compatible services, signed with SigV4       |
+| ./fs     | createFileSystemDriver for a local directory                       |
+| ./memory | createMemoryDriver for tests and development                       |
+| ./signed | createLocalSigner and createSignedRequestHandler for fs and memory |
 
 ## Storage and policy
 
@@ -51,13 +51,13 @@ Bodies are `Uint8Array`, `ArrayBuffer`, `Blob`, `string` or a byte
 and `lastModified`, and string `metadata`. Lists return keys in ascending order;
 S3 lists omit content types and metadata, so call `head` when they matter.
 
-| Policy             | Default | Effect                                                         |
-| ------------------ | ------- | -------------------------------------------------------------- |
-| `maxSize`          | none    | Rejects larger bodies and signed uploads; caps unknown streams |
-| `contentTypes`     | any     | Exact types or families such as `image/*`; type then required  |
-| `defaultExpiresIn` | `900`   | Signed URL lifetime in seconds                                 |
-| `maxExpiresIn`     | `3600`  | Longest lifetime a caller may request                          |
-| `now`              | `Date`  | Clock for signed URL expiry                                    |
+| Policy           | Default | Effect                                                         |
+| ---------------- | ------- | -------------------------------------------------------------- |
+| maxSize          | none    | Rejects larger bodies and signed uploads; caps unknown streams |
+| contentTypes     | any     | Exact types or families such as image/\*; type then required   |
+| defaultExpiresIn | 900     | Signed URL lifetime in seconds                                 |
+| maxExpiresIn     | 3600    | Longest lifetime a caller may request                          |
+| now              | Date    | Clock for signed URL expiry                                    |
 
 Keys are relative slash-separated paths of at most 1024 UTF-8 bytes, without a
 leading slash, empty, `.` or `..` segments, backslashes or control characters.
@@ -118,16 +118,16 @@ both an object and a prefix (`a` and `a/b`); that throws `INVALID_KEY`.
 
 ## S3 options
 
-| Option            | Description                                                            |
-| ----------------- | ---------------------------------------------------------------------- |
-| `endpoint`        | Service origin, e.g. `https://s3.us-east-1.amazonaws.com`              |
-| `bucket`          | Bucket name                                                            |
-| `region`          | Signing region; `auto` for R2                                          |
-| `accessKeyId`     | Access key                                                             |
-| `secretAccessKey` | Secret key                                                             |
-| `sessionToken`    | Optional temporary credentials                                         |
-| `forcePathStyle`  | `true` (default) for `endpoint/bucket/key`; `false` for virtual-hosted |
-| `fetch`           | Optional fetch implementation                                          |
+| Option          | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| endpoint        | Service origin, e.g. https\://s3.us-east-1.amazonaws.com         |
+| bucket          | Bucket name                                                      |
+| region          | Signing region; auto for R2                                      |
+| accessKeyId     | Access key                                                       |
+| secretAccessKey | Secret key                                                       |
+| sessionToken    | Optional temporary credentials                                   |
+| forcePathStyle  | true (default) for endpoint/bucket/key; false for virtual-hosted |
+| fetch           | Optional fetch implementation                                    |
 
 Server-side `put` buffers the body before sending, since S3 requires a known
 length. Large files should go through signed uploads. Multipart uploads are not

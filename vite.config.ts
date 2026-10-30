@@ -6,6 +6,20 @@ export default defineConfig({
   ...workspaceTaskConfig(import.meta.url),
   fmt: {
     ignorePatterns: ["docs/src/routeTree.gen.ts"],
+    overrides: [
+      {
+        files: ["**/*.md", "**/*.mdx"],
+        options: {
+          printWidth: 100,
+          proseWrap: "preserve",
+          tabWidth: 2,
+          useTabs: false,
+          endOfLine: "lf",
+          insertFinalNewline: true,
+          embeddedLanguageFormatting: "auto",
+        },
+      },
+    ],
   },
   staged: {
     "*.{ts,tsx,mts,json,md,mdx,css,toml}": "vp fmt --write",

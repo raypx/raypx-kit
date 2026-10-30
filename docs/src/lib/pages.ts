@@ -154,6 +154,12 @@ export const documentationPages = [
     description: "Repository setup, commands, verification and adding a package.",
   },
   {
+    slug: "development/documentation",
+    sourcePath: "docs/development/documentation.md",
+    title: "Writing documentation",
+    description: "File trees, callouts, steps and code tabs using Fumadocs' Markdown plugins.",
+  },
+  {
     slug: "development/dependencies",
     sourcePath: "docs/development/dependencies.md",
     title: "Dependency maintenance",
@@ -218,7 +224,7 @@ export const navigationMetadata = {
   "tsconfig/meta.json": { title: "TSConfig", pages: ["index"] },
   "development/meta.json": {
     title: "Development",
-    pages: ["index", "dependencies", "changesets", "publishing"],
+    pages: ["index", "documentation", "dependencies", "changesets", "publishing"],
   },
 };
 

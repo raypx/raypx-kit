@@ -107,11 +107,11 @@ explicit override. A Fetch request alone cannot prove the connection's IP.
 Implement proxy trust at the server boundary; do not simply copy an arbitrary
 `X-Forwarded-For` header into this callback.
 
-| Result `status` | `allowed`         | Meaning                                                                               |
-| --------------- | ----------------- | ------------------------------------------------------------------------------------- |
-| `allow`         | `true`            | Arcjet allowed the request; includes `decision`.                                      |
-| `deny`          | `false`           | Arcjet denied or challenged the request; includes `decision`.                         |
-| `error`         | Follows `onError` | IP resolution, SDK or transport failed; includes `error` and an available `decision`. |
+| Result status | allowed         | Meaning                                                                           |
+| ------------- | --------------- | --------------------------------------------------------------------------------- |
+| allow         | true            | Arcjet allowed the request; includes decision.                                    |
+| deny          | false           | Arcjet denied or challenged the request; includes decision.                       |
+| error         | Follows onError | IP resolution, SDK or transport failed; includes error and an available decision. |
 
 `onError` is required: `"deny"` blocks on failure and `"allow"` permits handling
 to continue. There is no silent fallback for a missing key; client creation

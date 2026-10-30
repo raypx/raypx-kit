@@ -10,6 +10,7 @@ or the development guide to contribute.
 | ------------------------------------------------------ | ----------------------------------------------------- |
 | Understand package ownership and dependency boundaries | [Architecture](architecture/README.md)                |
 | Set up the repository and run checks                   | [Development](development/README.md)                  |
+| Write file trees, callouts, steps and code tabs        | [Writing documentation](development/documentation.md) |
 | Upgrade tools, runtimes or package dependencies        | [Dependency maintenance](development/dependencies.md) |
 | Prepare independent package versions                   | [Changesets workflow](development/changesets.md)      |
 | Publish or preview packages                            | [Publishing runbook](development/publishing.md)       |

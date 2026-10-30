@@ -93,6 +93,10 @@ export const chinesePageMetadata: Record<string, { title: string; description: s
     description: "适用于 ESM 库、浏览器应用和 Node 运行时的严格 TypeScript 预设。",
   },
   "development/index": { title: "开发指南", description: "仓库环境搭建、命令、验证和新增包流程。" },
+  "development/documentation": {
+    title: "编写文档",
+    description: "使用 Fumadocs Markdown 插件编写文件树、提示块、步骤和代码标签。",
+  },
   "development/dependencies": {
     title: "依赖维护",
     description: "版本范围、运行时版本、兼容性检查和升级流程。",

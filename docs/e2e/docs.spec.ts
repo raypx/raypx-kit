@@ -12,6 +12,96 @@ const test = base.extend<{ noPageErrors: void }>({
   ],
 });
 
+test("renders the repository as keyboard-operated folders without mobile overflow", async ({
+  page,
+}) => {
+  await page.goto("/docs/architecture");
+  const root = page.getByRole("button", { name: "raypx-kit/", exact: true });
+  // The top-level packages folder precedes the maintenance scripts/packages folder.
+  const packages = page.getByRole("button", { name: "packages/", exact: true }).first();
+  const codemods = page.getByRole("button", { name: "codemods/", exact: true });
+  await expect(root).toHaveAttribute("aria-expanded", "true");
+  await expect(codemods).toBeVisible();
+  await packages.focus();
+  await page.keyboard.press("Enter");
+  await expect(packages).toHaveAttribute("aria-expanded", "false");
+  await expect(codemods).toBeHidden();
+  await page.keyboard.press("Space");
+  await expect(codemods).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await expect(root).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+      ),
+    ).toBe(true);
+  }
+});
+
+test("compiles callouts, opt-in steps and code tabs through the canonical Markdown pipeline", async ({
+  page,
+  browser,
+  request,
+}) => {
+  const path = "/docs/development/documentation";
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const serverPage = await context.newPage();
+    await serverPage.goto(path);
+    await expect(serverPage.getByRole("button", { name: "example/", exact: true })).toBeVisible();
+    await expect(serverPage.locator(".fd-steps > .fd-step")).toHaveCount(3);
+    await expect(serverPage.getByRole("heading", { name: /^Select a source/ })).toHaveAttribute(
+      "id",
+      "select-a-source",
+    );
+    await expect(serverPage.getByRole("tab", { name: "Development", exact: true })).toBeVisible();
+  } finally {
+    await context.close();
+  }
+
+  await page.goto(path);
+  const callout = page.locator('#nd-page .prose div[style*="--callout-color"]');
+  await expect(callout).toContainText("Keep one source of truth");
+  await expect(
+    callout.getByRole("link", { name: "documentation checks", exact: true }),
+  ).toHaveAttribute("href", "/docs/development#documentation-site");
+  const build = page.getByRole("tab", { name: "Build", exact: true });
+  await build.click();
+  await expect(page.getByRole("tabpanel", { name: "Build", exact: true })).toContainText(
+    "bun run docs:build",
+  );
+  await build.press("ArrowLeft");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("tab", { name: "Development", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("tab", { name: "bun", exact: true }).click();
+  await expect(page.getByRole("tabpanel", { name: "bun", exact: true })).toContainText(
+    "bun add zod",
+  );
+
+  // Search indexes the Markdown body inside the generated callout.
+  const search = await request.get("/api/search?query=canonical%20guide&locale=en");
+  expect(search.ok()).toBe(true);
+  expect(await search.json()).toEqual(
+    expect.arrayContaining([expect.objectContaining({ url: `${path}#callouts` })]),
+  );
+
+  await page.goto(`/zh${path}`);
+  await expect(
+    callout.getByRole("link", { name: "documentation checks", exact: true }),
+  ).toHaveAttribute("href", "/zh/docs/development#documentation-site");
+  await page.goto("/docs/drizzle/better-drizzle");
+  await expect(page.locator(".fd-steps")).toHaveCount(0);
+  await expect(page.locator('[id="1-entrypoints-and-compatibility-boundaries"]')).toContainText(
+    "1. Entrypoints and compatibility boundaries",
+  );
+});
+
 test("loads deep links and navigates canonical package guides with browser history", async ({
   page,
 }) => {

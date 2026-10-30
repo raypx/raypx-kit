@@ -23,10 +23,10 @@ does not modify global query prototypes.
 
 ## Pinned sources and complete inventories
 
-| Source                                                        | Version / commit                                          | Original license | Integration boundary                                                                        |
-| ------------------------------------------------------------- | --------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| [drizzle-plus](https://github.com/alloc/drizzle-plus)         | `1.0.0-rc.8` / `5840bdb4c5b3c7526b7db132f0b14cbe8a89eae9` | MIT              | Selections, SQL expressions, CTEs, query extensions and type utilities                      |
-| [better-drizzle](https://github.com/almeidazs/better-drizzle) | `0.3.0` / `f93f1b7aa528fe2db4cddc92a047e7a0ae710a0d`      | Apache-2.0       | Query semantics, relations, bulk writes, prepared queries, diagnostics and optional plugins |
+| Source                                                        | Version / commit                                      | Original license | Integration boundary                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| [drizzle-plus](https://github.com/alloc/drizzle-plus)         | 1.0.0-rc.8 / 5840bdb4c5b3c7526b7db132f0b14cbe8a89eae9 | MIT              | Selections, SQL expressions, CTEs, query extensions and type utilities                      |
+| [better-drizzle](https://github.com/almeidazs/better-drizzle) | 0.3.0 / f93f1b7aa528fe2db4cddc92a047e7a0ae710a0d      | Apache-2.0       | Query semantics, relations, bulk writes, prepared queries, diagnostics and optional plugins |
 
 The itemized inventories and source evidence are in the
 [drizzle-plus inventory](drizzle-plus-capabilities.md) and
@@ -60,14 +60,14 @@ and all other drivers are outside the compatibility commitment.
 
 ## Available foundation
 
-| Subpath         | Implemented capabilities                                         | Semantics                                                                                       |
-| --------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `.`             | `withoutColumns`                                                 | Preserve Drizzle column types without modifying the table object                                |
-| `./postgres`    | `excludedColumn`, `excludedColumns`                              | Explicit update fields using physical column names and quoted identifiers                       |
-| `./postgres`    | `jsonValue`, `jsonText`, `jsonType`, `jsonNumber`, `jsonBoolean` | Bind each path segment; guard scalar conversions with CASE; distinguish SQL NULL from JSON null |
-| `./errors`      | `isUniqueViolation`                                              | Classify by SQLSTATE and exact constraint; follow nested causes with cycle protection           |
-| `./results`     | `first`, `inserted`                                              | Empty reads return null; writes that require a returned row can fail explicitly                 |
-| `./diagnostics` | `buildExplain`, `summarizePlan`                                  | Plan without execution by default; require explicit ANALYZE; emit only allowlisted metrics      |
+| Subpath       | Implemented capabilities                               | Semantics                                                                                       |
+| ------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| .             | withoutColumns                                         | Preserve Drizzle column types without modifying the table object                                |
+| ./postgres    | excludedColumn, excludedColumns                        | Explicit update fields using physical column names and quoted identifiers                       |
+| ./postgres    | jsonValue, jsonText, jsonType, jsonNumber, jsonBoolean | Bind each path segment; guard scalar conversions with CASE; distinguish SQL NULL from JSON null |
+| ./errors      | isUniqueViolation                                      | Classify by SQLSTATE and exact constraint; follow nested causes with cycle protection           |
+| ./results     | first, inserted                                        | Empty reads return null; writes that require a returned row can fail explicitly                 |
+| ./diagnostics | buildExplain, summarizePlan                            | Plan without execution by default; require explicit ANALYZE; emit only allowlisted metrics      |
 
 Builds include ESM, declarations and sourcemaps. Drizzle is a peer dependency and
 is never bundled. Its compatibility declaration is restricted to
@@ -94,16 +94,16 @@ on Raypx workspaces.
 The following future subpaths are design targets. Apart from the foundation
 exports listed above, they are not yet exported.
 
-| Module                             | Capabilities to integrate                                                                                    | Implementation approach                                                                                                           |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| `.` / `./sql`                      | Column projection, toSQL, CASE, coalesce/nullif, text/numeric/time functions and public types                | Composable pure functions using Drizzle's public SQLWrapper and explicit decoders                                                 |
-| `./postgres`                       | Casts, JSON aggregation/objects/paths/patches, excluded, VALUES, CTE materialization and UUID time functions | PostgreSQL-specific ASTs and expressions, with a declared PG version requirement for each capability                              |
-| `./query`                          | CRUD, count/exists, pagination, bulk operations, prepared queries, locks and scopes                          | Use public PostgresJsDatabase/PostgresJsTransaction capabilities directly; create an explicit local client                        |
-| `./relations`                      | include/select, some/every/none/is, relation ordering and nested connect/set/disconnect                      | One relation planner with explicit schema/relations input; reads and writes share the same transaction                            |
-| `./diagnostics`                    | PostgreSQL EXPLAIN construction, result summaries and plan comparison                                        | Separate SQL construction from pure plan processing; a postgres.js executor handles timeout/cancellation through explicit handles |
-| `./plugins/*`                      | timestamps, uuid, rules, tenant, soft-delete, cache and validation                                           | Explicit registration and independently importable plugins; optional dependencies belong only to their entry points               |
-| `./compat/plus`, `./compat/better` | Original API names and migration mappings                                                                    | Delegate to the unified implementation and document differences; do not maintain a second compiler                                |
-| `./types`, `./testing`             | Result/nullability/path/selection types, PostgreSQL capability gates and test helpers                        | Derive from the unified IR, public PG table model and postgres.js types; avoid a generic multiple-driver type system              |
+| Module                         | Capabilities to integrate                                                                                    | Implementation approach                                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| . / ./sql                      | Column projection, toSQL, CASE, coalesce/nullif, text/numeric/time functions and public types                | Composable pure functions using Drizzle's public SQLWrapper and explicit decoders                                                 |
+| ./postgres                     | Casts, JSON aggregation/objects/paths/patches, excluded, VALUES, CTE materialization and UUID time functions | PostgreSQL-specific ASTs and expressions, with a declared PG version requirement for each capability                              |
+| ./query                        | CRUD, count/exists, pagination, bulk operations, prepared queries, locks and scopes                          | Use public PostgresJsDatabase/PostgresJsTransaction capabilities directly; create an explicit local client                        |
+| ./relations                    | include/select, some/every/none/is, relation ordering and nested connect/set/disconnect                      | One relation planner with explicit schema/relations input; reads and writes share the same transaction                            |
+| ./diagnostics                  | PostgreSQL EXPLAIN construction, result summaries and plan comparison                                        | Separate SQL construction from pure plan processing; a postgres.js executor handles timeout/cancellation through explicit handles |
+| ./plugins/\*                   | timestamps, uuid, rules, tenant, soft-delete, cache and validation                                           | Explicit registration and independently importable plugins; optional dependencies belong only to their entry points               |
+| ./compat/plus, ./compat/better | Original API names and migration mappings                                                                    | Delegate to the unified implementation and document differences; do not maintain a second compiler                                |
+| ./types, ./testing             | Result/nullability/path/selection types, PostgreSQL capability gates and test helpers                        | Derive from the unified IR, public PG table model and postgres.js types; avoid a generic multiple-driver type system              |
 
 The first release remains one npm package, with subpaths separating capabilities.
 A separate npm package is justified only when a plugin has a different
@@ -113,19 +113,19 @@ independent version and dependency constraints.
 
 ## Decisions for overlapping capabilities
 
-| Overlapping area                       | Unified semantics                                                                                                                    | Treatment of the upstream implementations                                                            |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| findUnique/findFirst/findOne           | `findFirst` is nullable; `findUnique` must prove a complete unique key; `findOne` is only a compatibility alias                      | Keep one query executor; proving uniqueness for a partial unique index also requires its predicate   |
-| count/exists/findManyAndCount/paginate | Counts and data share a filter AST; offset pagination returns total, while keyset pagination does not add a count by default         | The caller explicitly selects a transaction snapshot mode for page/count consistency                 |
-| `$cursor`/cursor                       | Stable keyset pagination across multiple fields, with explicit ascending/descending order, NULL ordering and forward/backward paging | Generate predicates once; consumers inject the cursor codec and context binding                      |
-| create/createMany/upsert/upsertMany    | Single and bulk writes share an executor; update keys and conflict targets are explicit                                              | Conflict-target inference is an explicit opt-in and must not silently overwrite business fields      |
-| updateMany                             | Apply the same set to multiple rows; define where/limit/order/returning according to PostgreSQL                                      | Distinguish it from `updateEach`; plus updateMany is not a bulk update with different values per row |
-| updateEach                             | Different values per row, identified by the same matching key, using a unified CASE or VALUES/JOIN strategy                          | Define duplicate input keys, empty input, parameter budgets and transactions across chunks           |
-| orThrow/`.throw()`                     | Separate nullable results from required results; allow an injected error factory                                                     | Do not change the original Promise or execute prototypes; compatibility methods only wrap results    |
-| JSON selection/JSONB compiler          | Explicit JSON expressions, path IR and decoders; selection and filtering reuse the same rules                                        | Avoid hidden `.decoder` or `_getQuery` introspection; test SQL NULL and JSON null separately         |
-| timestamps                             | Assign UTC-aware types and default values as separate responsibilities                                                               | Schema defaults, write plugins and SQL current-time expressions must not override each other         |
-| errors                                 | Classify structured postgres.js SQLSTATE errors; consumers own business mappings                                                     | Preserve the original error for caller diagnostics; logs use a separate safe summary                 |
-| Type utilities                         | One set of value/selection/filter/returning types                                                                                    | Publish compatibility aliases without evaluating two complex recursive type systems                  |
+| Overlapping area                       | Unified semantics                                                                                                                    | Treatment of the upstream implementations                                                          |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| findUnique/findFirst/findOne           | findFirst is nullable; findUnique must prove a complete unique key; findOne is only a compatibility alias                            | Keep one query executor; proving uniqueness for a partial unique index also requires its predicate |
+| count/exists/findManyAndCount/paginate | Counts and data share a filter AST; offset pagination returns total, while keyset pagination does not add a count by default         | The caller explicitly selects a transaction snapshot mode for page/count consistency               |
+| $cursor/cursor                         | Stable keyset pagination across multiple fields, with explicit ascending/descending order, NULL ordering and forward/backward paging | Generate predicates once; consumers inject the cursor codec and context binding                    |
+| create/createMany/upsert/upsertMany    | Single and bulk writes share an executor; update keys and conflict targets are explicit                                              | Conflict-target inference is an explicit opt-in and must not silently overwrite business fields    |
+| updateMany                             | Apply the same set to multiple rows; define where/limit/order/returning according to PostgreSQL                                      | Distinguish it from updateEach; plus updateMany is not a bulk update with different values per row |
+| updateEach                             | Different values per row, identified by the same matching key, using a unified CASE or VALUES/JOIN strategy                          | Define duplicate input keys, empty input, parameter budgets and transactions across chunks         |
+| orThrow/.throw()                       | Separate nullable results from required results; allow an injected error factory                                                     | Do not change the original Promise or execute prototypes; compatibility methods only wrap results  |
+| JSON selection/JSONB compiler          | Explicit JSON expressions, path IR and decoders; selection and filtering reuse the same rules                                        | Avoid hidden .decoder or \_getQuery introspection; test SQL NULL and JSON null separately          |
+| timestamps                             | Assign UTC-aware types and default values as separate responsibilities                                                               | Schema defaults, write plugins and SQL current-time expressions must not override each other       |
+| errors                                 | Classify structured postgres.js SQLSTATE errors; consumers own business mappings                                                     | Preserve the original error for caller diagnostics; logs use a separate safe summary               |
+| Type utilities                         | One set of value/selection/filter/returning types                                                                                    | Publish compatibility aliases without evaluating two complex recursive type systems                |
 
 ## Query and relation boundaries
 

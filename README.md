@@ -11,7 +11,7 @@ own their schemas, secrets, business rules and runtime configuration.
 | [@raypx-kit/codemods](packages/codemods/README.md)           | Explicit-file migration runner and CLI; built-in migrations are added as needed                 |
 | [@raypx-kit/devkit](packages/devkit/README.md)               | Workspace boundaries, toolchain checks, catalogs, artifact probes and task helpers              |
 | [@raypx-kit/drizzle](packages/drizzle/README.md)             | PostgreSQL projections, UPSERT and JSONB expressions, result helpers and diagnostics            |
-| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md)     | Slim upstream `drizzle-kit` CLI and `defineConfig` distribution                                 |
+| [@raypx-kit/drizzle-kit](packages/drizzle-kit/README.md)     | Slim upstream drizzle-kit CLI and defineConfig distribution                                     |
 | [@raypx-kit/email-preview](packages/email-preview/README.md) | React Email previews as a Vite plugin, with live updates and HTML/text inspection               |
 | [@raypx-kit/env](packages/env/README.md)                     | Zod environment validation, nested presets, defaults and guarded client access                  |
 | [@raypx-kit/intl](packages/intl/README.md)                   | Locale negotiation, ICU translation, formatting and controlled React providers                  |

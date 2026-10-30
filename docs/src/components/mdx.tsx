@@ -1,4 +1,7 @@
 import defaultMdxComponents from "@fumadocs/base-ui/mdx";
+import { File, Files, Folder } from "@fumadocs/base-ui/components/files";
+import { Step, Steps } from "@fumadocs/base-ui/components/steps";
+import { Tab, Tabs } from "@fumadocs/base-ui/components/tabs";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
 import { useLocale, useTranslations } from "../lib/i18n/client";
@@ -28,6 +31,13 @@ function ScrollableTable(props: ComponentProps<"table">) {
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
+    File,
+    Files,
+    Folder,
+    Step,
+    Steps,
+    Tab,
+    Tabs,
     a: LocalizedLink,
     table: ScrollableTable,
     ...components,

@@ -25,9 +25,9 @@ The esbuild dependency also accepts `^0.28.2` alongside upstream's `^0.25.10`.
 Archive consumers verify TypeScript config and schema compilation by generating
 migrations with the installed CLI under both Bun and Node.
 
-| @raypx-kit/drizzle-kit | drizzle-kit          |
-| ---------------------- | -------------------- |
-| `0.0.0-alpha.0`        | `1.0.0-rc.5-5935859` |
+| @raypx-kit/drizzle-kit | drizzle-kit        |
+| ---------------------- | ------------------ |
+| 0.0.0-alpha.0          | 1.0.0-rc.5-5935859 |
 
 ## Usage
 

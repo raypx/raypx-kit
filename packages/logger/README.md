@@ -45,13 +45,13 @@ Importing this package does not initialize logging.
 
 ## Entrypoints
 
-| Entry                        | Exports                                                                                                                                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@raypx-kit/logger`          | `initLogger`, `log`, `createLogger`, `createRequestLogger`, `createError`, `EvlogError`, `parseError`, `defineEvlog`, `toLoggerConfig`; their configuration, event, logger, error, sampling and drain types |
-| `@raypx-kit/logger/context`  | `runWithLogger`, `getLogger`, `useLogger` for Node and Bun asynchronous context                                                                                                                             |
-| `@raypx-kit/logger/pipeline` | `createDrainPipeline`, `DrainPipelineOptions`, `PipelineDrainFn`                                                                                                                                            |
-| `@raypx-kit/logger/safe`     | `withEventPolicy`, `createEventPolicy`, `safeError`, `DEFAULT_SENSITIVE_KEYS` and their types; no Node APIs, so it also runs on Workers                                                                     |
-| `@raypx-kit/logger/stream`   | `createStreamDrain` for ordered JSON lines on stderr or another Node writable                                                                                                                               |
+| Entry                      | Exports                                                                                                                                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @raypx-kit/logger          | initLogger, log, createLogger, createRequestLogger, createError, EvlogError, parseError, defineEvlog, toLoggerConfig; their configuration, event, logger, error, sampling and drain types |
+| @raypx-kit/logger/context  | runWithLogger, getLogger, useLogger for Node and Bun asynchronous context                                                                                                                 |
+| @raypx-kit/logger/pipeline | createDrainPipeline, DrainPipelineOptions, PipelineDrainFn                                                                                                                                |
+| @raypx-kit/logger/safe     | withEventPolicy, createEventPolicy, safeError, DEFAULT_SENSITIVE_KEYS and their types; no Node APIs, so it also runs on Workers                                                           |
+| @raypx-kit/logger/stream   | createStreamDrain for ordered JSON lines on stderr or another Node writable                                                                                                               |
 
 Core functions retain evlog's native types and behavior. `defineEvlog` describes
 shared configuration; pass `toLoggerConfig(config)` to `initLogger` when using a

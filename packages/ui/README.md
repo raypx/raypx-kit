@@ -61,17 +61,17 @@ export function EmailOutput() {
 }
 ```
 
-| Export                                      | Included primitives                                                                                                                                            |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@raypx-kit/ui/components/ui/button`        | `Button`, `buttonVariants`, `ButtonProps`                                                                                                                      |
-| `@raypx-kit/ui/components/ui/input`         | `Input`                                                                                                                                                        |
-| `@raypx-kit/ui/components/ui/tabs`          | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `tabsListVariants`                                                                                           |
-| `@raypx-kit/ui/components/ui/badge`         | `Badge`, `badgeVariants`, `BadgeProps`, `BadgeVariant`                                                                                                         |
-| `@raypx-kit/ui/components/ui/dialog`        | `Dialog`, `DialogTrigger`, `DialogPortal`, `DialogOverlay`, `DialogContent`, `DialogHeader`, `DialogFooter`, `DialogTitle`, `DialogDescription`, `DialogClose` |
-| `@raypx-kit/ui/components/ui/skeleton`      | `Skeleton`                                                                                                                                                     |
-| `@raypx-kit/ui/components/ui/native-select` | `NativeSelect`, `NativeSelectOption`, `NativeSelectOptGroup`                                                                                                   |
-| `@raypx-kit/ui/lib/utils`                   | `cn`                                                                                                                                                           |
-| `@raypx-kit/ui`                             | All JavaScript exports above                                                                                                                                   |
+| Export                                    | Included primitives                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| @raypx-kit/ui/components/ui/button        | Button, buttonVariants, ButtonProps                                                                                                        |
+| @raypx-kit/ui/components/ui/input         | Input                                                                                                                                      |
+| @raypx-kit/ui/components/ui/tabs          | Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants                                                                                 |
+| @raypx-kit/ui/components/ui/badge         | Badge, badgeVariants, BadgeProps, BadgeVariant                                                                                             |
+| @raypx-kit/ui/components/ui/dialog        | Dialog, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose |
+| @raypx-kit/ui/components/ui/skeleton      | Skeleton                                                                                                                                   |
+| @raypx-kit/ui/components/ui/native-select | NativeSelect, NativeSelectOption, NativeSelectOptGroup                                                                                     |
+| @raypx-kit/ui/lib/utils                   | cn                                                                                                                                         |
+| @raypx-kit/ui                             | All JavaScript exports above                                                                                                               |
 
 Components accept their underlying Base UI or native element props, including
 React 19 refs. Tabs support controlled `value`/`onValueChange` and uncontrolled

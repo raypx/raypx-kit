@@ -10,13 +10,13 @@ below include every upstream capability, including features not yet implemented.
 
 ## Current API
 
-| Import                           | Exports                                                                                               | Dialect                    |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------- |
-| `@raypx-kit/drizzle`             | `withoutColumns`                                                                                      | PostgreSQL tables          |
-| `@raypx-kit/drizzle/postgres`    | `excludedColumn`, `excludedColumns`, `jsonValue`, `jsonText`, `jsonType`, `jsonNumber`, `jsonBoolean` | PostgreSQL                 |
-| `@raypx-kit/drizzle/errors`      | `isUniqueViolation`                                                                                   | postgres.js error metadata |
-| `@raypx-kit/drizzle/results`     | `first`, `inserted`                                                                                   | Promise-like row arrays    |
-| `@raypx-kit/drizzle/diagnostics` | `buildExplain`, `summarizePlan`, `DrizzleDiagnosticError`                                             | PostgreSQL                 |
+| Import                         | Exports                                                                                 | Dialect                    |
+| ------------------------------ | --------------------------------------------------------------------------------------- | -------------------------- |
+| @raypx-kit/drizzle             | withoutColumns                                                                          | PostgreSQL tables          |
+| @raypx-kit/drizzle/postgres    | excludedColumn, excludedColumns, jsonValue, jsonText, jsonType, jsonNumber, jsonBoolean | PostgreSQL                 |
+| @raypx-kit/drizzle/errors      | isUniqueViolation                                                                       | postgres.js error metadata |
+| @raypx-kit/drizzle/results     | first, inserted                                                                         | Promise-like row arrays    |
+| @raypx-kit/drizzle/diagnostics | buildExplain, summarizePlan, DrizzleDiagnosticError                                     | PostgreSQL                 |
 
 Drizzle compatibility is limited to the RC5 prerelease range
 `>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z`, with `postgres@^3.4.9` and

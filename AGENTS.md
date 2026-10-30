@@ -77,6 +77,11 @@ Keep license texts and source notices alongside the package that ships adapted c
 Write canonical repository and package documentation in English. The documentation
 site may keep maintained translations under `docs/content/`; preserve English
 fallbacks, localized message examples, code identifiers and source links.
+Keep Markdown/MDX formatting in the root `vite.config.ts` `fmt.overrides`; use
+`bun run format` for table alignment, spacing and code-example formatting.
+Write documentation table cell values as plain text, including paths and API
+names, and preserve Markdown links. Oxfmt preserves inline-code delimiters, so
+plain table values are an authoring convention rather than an automatic formatter fix.
 
 ## Toolchain
 
