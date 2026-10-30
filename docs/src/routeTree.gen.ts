@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ZhRouteImport } from './routes/zh'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as Char123LangChar125DocsSplatRouteImport } from './routes/{-$lang}/docs/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZhRoute = ZhRouteImport.update({
+  id: '/zh',
+  path: '/zh',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSearchRoute = ApiSearchRouteImport.update({
@@ -32,30 +38,34 @@ const Char123LangChar125DocsSplatRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/zh': typeof ZhRoute
   '/api/search': typeof ApiSearchRoute
   '/{-$lang}/docs/$': typeof Char123LangChar125DocsSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/zh': typeof ZhRoute
   '/api/search': typeof ApiSearchRoute
   '/{-$lang}/docs/$': typeof Char123LangChar125DocsSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/zh': typeof ZhRoute
   '/api/search': typeof ApiSearchRoute
   '/{-$lang}/docs/$': typeof Char123LangChar125DocsSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/search' | '/{-$lang}/docs/$'
+  fullPaths: '/' | '/zh' | '/api/search' | '/{-$lang}/docs/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/search' | '/{-$lang}/docs/$'
-  id: '__root__' | '/' | '/api/search' | '/{-$lang}/docs/$'
+  to: '/' | '/zh' | '/api/search' | '/{-$lang}/docs/$'
+  id: '__root__' | '/' | '/zh' | '/api/search' | '/{-$lang}/docs/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ZhRoute: typeof ZhRoute
   ApiSearchRoute: typeof ApiSearchRoute
   Char123LangChar125DocsSplatRoute: typeof Char123LangChar125DocsSplatRoute
 }
@@ -67,6 +77,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zh': {
+      id: '/zh'
+      path: '/zh'
+      fullPath: '/zh'
+      preLoaderRoute: typeof ZhRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/search': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ZhRoute: ZhRoute,
   ApiSearchRoute: ApiSearchRoute,
   Char123LangChar125DocsSplatRoute: Char123LangChar125DocsSplatRoute,
 }

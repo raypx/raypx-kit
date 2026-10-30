@@ -1,4 +1,32 @@
 export default {
+  home: {
+    metaTitle: "Raypx Kit | TypeScript libraries",
+    title: "Reusable TypeScript,",
+    titleSuffix: "package by package.",
+    description:
+      "Libraries for data access, application services and developer tooling. Independently versioned, with explicit APIs and practical guides.",
+    documentation: "Documentation",
+    packages: "Packages",
+    readDocs: "Read the docs",
+    explore: "Explore packages",
+    release: "In alpha. Pin exact prerelease versions.",
+    example: "A typed environment",
+    exampleGuide: "Read the Env guide",
+    packageTitle: "Explore the packages",
+    packageDescription:
+      "Choose a capability to find its current API, installation requirements and examples.",
+    application: "Application services",
+    interface: "Interface and messaging",
+    tooling: "Data and tooling",
+    sourceOnly: "Source only",
+    guides: "Repository guides",
+    architecture: "Understand the architecture",
+    architectureDescription:
+      "Package boundaries, public exports and how the repository fits together.",
+    development: "Work on the toolkit",
+    developmentDescription: "Set up the workspace, run checks and contribute a change.",
+    source: "View source on GitHub",
+  },
   search: {
     label: "Search documentation",
     empty: "No matching pages. Try an API name or a shorter search.",

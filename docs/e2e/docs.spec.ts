@@ -12,6 +12,80 @@ const test = base.extend<{ noPageErrors: void }>({
   ],
 });
 
+test("serves both home pages before hydration with links to the package guides", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    for (const locale of ["en", "zh"] as const) {
+      const response = await page.goto(locale === "en" ? "/" : "/zh");
+      expect(response?.status()).toBe(200);
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      await expect(page).toHaveTitle(
+        locale === "en" ? "Raypx Kit | TypeScript libraries" : "Raypx Kit | TypeScript 工具集",
+      );
+      await expect(page.getByRole("heading", { level: 1 })).toContainText(
+        locale === "en" ? "Reusable TypeScript," : "TypeScript 工具集",
+      );
+      await expect(page.locator("#packages .home-package")).toHaveCount(15);
+      await expect(page.locator("#packages .home-package").first()).toHaveAttribute(
+        "href",
+        locale === "en" ? "/docs/env" : "/zh/docs/env",
+      );
+      await expect(page.locator("pre")).toContainText(
+        'import { createEnv, z } from "@raypx-kit/env"',
+      );
+      await expect(page.locator('link[rel="alternate"][hreflang="zh"]')).toHaveAttribute(
+        "href",
+        "/zh",
+      );
+    }
+  } finally {
+    await context.close();
+  }
+});
+
+test("switches home languages with its anchor and returns home from a package guide", async ({
+  page,
+}) => {
+  await page.goto("/?view=all#packages");
+  await page.getByRole("button", { name: "Choose a language", exact: true }).click();
+  await page.getByRole("button", { name: "简体中文", exact: true }).click();
+  await expect(page).toHaveURL(/\/zh\?view=all#packages$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh");
+  await page.locator('#packages a[href="/zh/docs/env"]').click();
+  await expect(page).toHaveURL(/\/zh\/docs\/env$/);
+  await page.getByRole("link", { name: "Raypx Kit", exact: true }).click();
+  await expect(page).toHaveURL(/\/zh$/);
+  await page.getByRole("button", { name: /^搜索/ }).click();
+  await page.getByRole("combobox", { name: "搜索文档" }).fill("Env");
+  await page.getByRole("option", { name: "Raypx Kit Env Env", exact: true }).click();
+  await expect(page).toHaveURL(/\/zh\/docs\/env(?:#.*)?$/);
+});
+
+test("keeps the home page usable on a small screen with keyboard theme controls", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const menu = page.getByRole("button", { name: "Toggle Menu", exact: true });
+  await menu.press("Enter");
+  await page.getByRole("button", { name: "Dark", exact: true }).focus();
+  await page.keyboard.press("Space");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.locator("#nd-nav").getByRole("link", { name: "Packages", exact: true }).click();
+  await expect(page).toHaveURL(/\/#packages$/);
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+      ),
+    ).toBe(true);
+  }
+});
+
 test("renders the repository as keyboard-operated folders without mobile overflow", async ({
   page,
 }) => {

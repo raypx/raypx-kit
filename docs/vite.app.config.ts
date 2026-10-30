@@ -96,7 +96,7 @@ export default defineConfig(({ command }) => ({
           crawlLinks: false,
           failOnError: true,
         },
-        pages: ["/", ...documentationPaths].map((path) => ({ path })),
+        pages: ["/", "/zh", ...documentationPaths].map((path) => ({ path })),
         sitemap: { enabled: false },
       }),
       loadEnv,

@@ -2,6 +2,32 @@ import type { CatalogShape } from "@raypx-kit/intl/types";
 import type en from "./en";
 
 export default {
+  home: {
+    metaTitle: "Raypx Kit | TypeScript 工具集",
+    title: "TypeScript 工具集",
+    titleSuffix: "按包取用。",
+    description:
+      "覆盖数据访问、应用服务和开发工具的 TypeScript 库。每个包独立管理版本，提供明确的 API 和使用指南。",
+    documentation: "文档",
+    packages: "全部包",
+    readDocs: "阅读文档",
+    explore: "浏览全部包",
+    release: "当前处于 alpha 阶段，请固定准确的预发布版本。",
+    example: "具有类型约束的环境变量",
+    exampleGuide: "查看 Env 指南",
+    packageTitle: "按用途查找包",
+    packageDescription: "选择需要的能力，查看现有 API、安装要求和使用示例。",
+    application: "应用服务",
+    interface: "界面与消息",
+    tooling: "数据与开发工具",
+    sourceOnly: "仅源码",
+    guides: "仓库指南",
+    architecture: "了解仓库架构",
+    architectureDescription: "查看包的职责边界、公开入口，以及仓库各部分如何协作。",
+    development: "参与开发",
+    developmentDescription: "搭建工作区、运行检查，并向工具集贡献改动。",
+    source: "在 GitHub 查看源码",
+  },
   search: {
     label: "搜索文档",
     empty: "没有找到匹配的页面，请尝试 API 名称或更短的关键词。",

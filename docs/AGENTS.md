@@ -7,6 +7,10 @@ publish to npm or change the independent versions of the libraries.
 
 ## Interface
 
+`/` and `/zh` are the localized home pages, with a package directory and links
+to the canonical guides. Keep their language, theme and search controls shared
+with the documentation layout; the brand link returns to the current locale's home.
+
 `/docs` contains the documentation map, architecture, package guides, design
 references and maintainer documentation. `architecture/README.md` owns repository
 boundaries and build/content flow. `development/README.md` owns setup and checks;

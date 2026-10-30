@@ -14,7 +14,12 @@ import {
 } from "../src/lib/pages.js";
 import { chineseContentSources, chinesePageMetadata } from "../src/lib/i18n/pages.js";
 import { compareMessageCatalogs } from "../../packages/intl/src/testing.js";
-import { getPathLocale, localizeDocumentationUrl } from "../src/lib/i18n/config.js";
+import {
+  getHomePath,
+  getPathLocale,
+  localizeDocumentationUrl,
+  localizeSiteUrl,
+} from "../src/lib/i18n/config.js";
 import en from "../src/lib/i18n/en.js";
 import zh from "../src/lib/i18n/zh.js";
 
@@ -49,6 +54,30 @@ describe("documentation structure", () => {
 });
 
 describe("documentation languages", () => {
+  it.each([
+    ["/", "zh", "/zh"],
+    ["/?view=all#packages", "zh", "/zh?view=all#packages"],
+    ["/zh?view=all#packages", "en", "/?view=all#packages"],
+    ["/zh/#packages", "en", "/#packages"],
+    ["/docs/env#usage", "zh", "/zh/docs/env#usage"],
+    ["/zh/docs/env?view=api", "en", "/docs/env?view=api"],
+    ["https://example.com/", "zh", "https://example.com/"],
+    ["/zh/docs-other", "en", "/zh/docs-other"],
+  ] as const)(
+    "localizes the site URL %s to %s without losing its location",
+    (href, locale, expected) => {
+      expect(localizeSiteUrl(href, locale)).toBe(expected);
+    },
+  );
+
+  it("resolves localized home paths independently from documentation paths", () => {
+    expect(getHomePath()).toBe("/");
+    expect(getHomePath("zh")).toBe("/zh");
+    expect(getPathLocale("/zh")).toBe("zh");
+    expect(getPathLocale("/zh/")).toBe("zh");
+    expect(getPathLocale("/zh-other")).toBe("en");
+  });
+
   it("keeps translated catalogs and every page's metadata complete", () => {
     expect(compareMessageCatalogs(en, zh, "en", "zh")).toEqual([]);
     expect(Object.keys(chinesePageMetadata).sort()).toEqual(

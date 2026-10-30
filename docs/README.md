@@ -68,6 +68,11 @@ retain upstream features outside that scope and label them accordingly.
 
 ## Editing documentation
 
+The home pages at `/` and `/zh` introduce the toolkit and group its package guides
+by purpose. They use the site's shared language, theme and search controls; the
+Raypx Kit brand link returns to the localized home page. Package descriptions come
+from the maintained documentation metadata, while UI messages live in the catalogs.
+
 Run `bun run docs:dev` from the repository root to browse the site at
 `http://localhost:3100/docs`. Fumadocs renders these files and package guides
 directly, with navigation, local search and source links. Edit each page's

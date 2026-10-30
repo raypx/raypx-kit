@@ -19,7 +19,7 @@ import {
   useFumadocsTranslations,
   useLocale,
 } from "../lib/i18n/client";
-import { getPathLocale, localeNames, localizeDocumentationUrl } from "../lib/i18n/config";
+import { getPathLocale, localeNames, localizeSiteUrl } from "../lib/i18n/config";
 import appCss from "../styles/app.css?url";
 
 export const Route = createRootRoute({
@@ -80,7 +80,7 @@ function DocumentationProviders({ children }: { children: ReactNode }) {
         })),
         onLocaleChange: (value) => {
           if (!localeRuntime.isLocale(value)) return;
-          const href = localizeDocumentationUrl(
+          const href = localizeSiteUrl(
             `${window.location.pathname}${window.location.search}${window.location.hash}`,
             value,
           );

@@ -48,7 +48,7 @@ See the [development guide](docs/development/README.md) for setup, focused check
 and common commands.
 
 ```sh
-bun run docs:dev  # http://localhost:3100/docs
+bun run docs:dev  # http://localhost:3100/
 ```
 
 The internal Fumadocs workspace renders the canonical repository Markdown directly;
