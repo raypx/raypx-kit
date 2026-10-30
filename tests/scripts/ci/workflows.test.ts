@@ -62,6 +62,7 @@ it("runs the final required check after failures and covers every conditional ga
 it("calls publication only after successful canary verification", () => {
   const { jobs } = read<Workflow>(".github/workflows/ci.yml");
   expect(jobs.release?.needs).toBe("verify");
+  expect(jobs.release?.if).toMatch(/^always\(\) && !cancelled\(\) && /);
   expect(jobs.release?.if).toContain("needs.verify.result == 'success'");
   expect(jobs.release?.if).toContain("github.event_name == 'push'");
   expect(jobs.release?.if).toContain("refs/heads/canary");

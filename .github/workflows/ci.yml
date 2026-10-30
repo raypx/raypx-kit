@@ -162,7 +162,8 @@ jobs:
 
   release:
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/canary' && needs.verify.result == 'success'
+    # Allow intentionally skipped ancestors while still respecting cancellation.
+    if: always() && !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/canary' && needs.verify.result == 'success'
     permissions:
       contents: write
       pull-requests: write

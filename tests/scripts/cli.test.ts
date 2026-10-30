@@ -259,6 +259,13 @@ describe("release CLI arguments", () => {
     expectNoRelease();
   });
 
+  it("rejects an empty archive directory instead of falling back to local packing", async () => {
+    await expect(
+      runCommand(command, { rawArgs: ["release", "pack", "--from-compatibility", ""] }),
+    ).rejects.toThrow("requires a directory");
+    expect(actions.pack).not.toHaveBeenCalled();
+  });
+
   it("passes the exact compatibility artifact directory to release packing", async () => {
     await runCommand(command, {
       rawArgs: ["release", "pack", "--from-compatibility", ".artifacts/compatibility"],

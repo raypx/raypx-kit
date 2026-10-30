@@ -143,6 +143,8 @@ export const command = defineCommand({
           run: async ({ args }) => {
             assertArguments(args, ["stable", "from-compatibility", "fromCompatibility"]);
             const { pack } = await import("./release/commands.js");
+            if (args["from-compatibility"] === "")
+              throw new Error("--from-compatibility requires a directory");
             await pack(args.stable, args["from-compatibility"]);
           },
         }),
