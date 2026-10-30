@@ -1,0 +1,87 @@
+docs/src/lib/source.ts
+  s_6291eb9cf26850::t_b65fa74eef0ea9 46-48
+  s_6291eb9cf26850::t_17f7fa9144bdfa 45
+docs/src/components/mdx.tsx
+  s_6291eb9cf26850::t_cb02ea2febfafb 2-4,34-40
+docs/development/documentation.md
+  s_6291eb9cf26850::t_cb02ea2febfafb 1-10,25-79,81-83,85-156
+  s_6291eb9cf26850::t_8151180ea8d568 11-24,80,84
+vite.config.ts
+  s_6291eb9cf26850::t_8151180ea8d568 9-22
+AGENTS.md
+  s_6291eb9cf26850::t_8151180ea8d568 80-84
+docs/development/README.md
+  s_6291eb9cf26850::t_cb02ea2febfafb 202-204
+  s_6291eb9cf26850::t_f60b2c9adec4ba 215-221
+docs/src/lib/pages.ts
+  s_6291eb9cf26850::t_cb02ea2febfafb 157-161,227
+  s_6291eb9cf26850::t_e49faa495d0e0d 156
+docs/architecture/README.md
+  s_6291eb9cf26850::t_cb02ea2febfafb 13-44,47-63,82,90
+  s_6291eb9cf26850::t_efd4738794f9f1 108-122,166-172
+.changeset/plain-documentation-tables.md
+  s_6291eb9cf26850::t_7a15bcdc10f68b 1-14
+docs/vite.app.config.ts
+  s_6291eb9cf26850::t_cb02ea2febfafb 6,9,28-42,80-83
+docs/src/lib/i18n/pages.ts
+  s_6291eb9cf26850::t_cb02ea2febfafb 96-99
+docs/README.md
+  s_6291eb9cf26850::t_cb02ea2febfafb 13
+docs/e2e/docs.spec.ts
+  s_6291eb9cf26850::t_32acf08317f627 56-59,87-88
+  s_6291eb9cf26850::t_90328480449704 15-19,22-55,60-67,71-82,86,89-94,98-99,101-104
+  s_6291eb9cf26850::t_722a7e86d2b914 100
+  s_6291eb9cf26850::t_b65fa74eef0ea9 20-21,68-70,83-85,95-97
+README.md
+  s_6291eb9cf26850::t_d38076eed2dcb7 14
+bun.lock
+  s_6291eb9cf26850::t_5cee919eae9dbd 53,1619-1620,1659-1660,1851-1852
+docs/development/dependencies.md
+  s_6291eb9cf26850::t_8edad3fad1dcc5 21-27
+docs/drizzle/better-drizzle-capabilities.md
+  s_6291eb9cf26850::t_94405989896ada 37-52,76-92,109-124,136-144,158-169,228-231,243-250,259-271,354-366,374-386,394-446
+docs/drizzle/drizzle-plus-capabilities.md
+  s_6291eb9cf26850::t_ffde08ebc61107 32-41,89-109,113-121,133-152,163-183,208-222,233-239,267-280,302,307
+docs/drizzle/merge-plan.md
+  s_6291eb9cf26850::t_0b431c222c53a6 26-29,63-70,97-106,116-128
+docs/intl/migration.md
+  s_6291eb9cf26850::t_6c647729e09581 9-13
+docs/package.json
+  s_6291eb9cf26850::t_d37a43caa7cd3e 41
+packages/devkit/README.md
+  s_6291eb9cf26850::t_78cca1fa6bf0ba 16-26
+packages/drizzle-kit/README.md
+  s_6291eb9cf26850::t_f5a78a94a80489 28-30
+packages/drizzle/README.md
+  s_6291eb9cf26850::t_f49cce22bf372d 13-19
+packages/email-preview/README.md
+  s_6291eb9cf26850::t_1faf1f60ece038 36-40
+packages/env/README.md
+  s_6291eb9cf26850::t_72722034401bbd 100-107
+packages/logger/README.md
+  s_6291eb9cf26850::t_74841c4038960c 48-54
+packages/security/README.md
+  s_6291eb9cf26850::t_bbd7edb812491f 110-114
+packages/storage/README.md
+  s_6291eb9cf26850::t_8fb0511a0c310a 16-22,54-60,121-130
+packages/tsconfig/README.md
+  s_6291eb9cf26850::t_f283182682fe70 14-20,38-53
+packages/ui/README.md
+  s_6291eb9cf26850::t_176e48aa05da3f 64-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e5fc003725163b1a1ba246c5acc9fff0659ca97",
+  "prompts": {},
+  "sessions": {
+    "s_6291eb9cf26850": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18acf-dd29-7b63-88c0-81c47bb95fda",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
