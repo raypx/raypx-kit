@@ -1,0 +1,25 @@
+.github/workflows/ci.yml
+  s_c8ddb790d61691::t_0031c8507ddf4c 165-166
+scripts/cli.ts
+  s_c8ddb790d61691::t_92d337acb33956 146-147
+tests/scripts/ci/workflows.test.ts
+  s_c8ddb790d61691::t_66e51542fb89dc 65
+tests/scripts/cli.test.ts
+  s_c8ddb790d61691::t_11b8564365569b 262-268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ee3a9ef005da40d70082cfff93fa76789ec643a9",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
