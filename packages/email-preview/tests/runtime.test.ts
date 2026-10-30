@@ -53,6 +53,33 @@ async function fixture(timeout = 10_000, createEmails = true, installReact = tru
   });
   servers.push(server);
   const runtime = (await (plugin.api as { runtime: () => Promise<PreviewRuntime> }).runtime())!;
+  if (watch) {
+    // createServer returns before Chokidar's initial scan finishes on Linux.
+    // Observe a real watcher round trip before asserting later change notifications.
+    const probe = join(createEmails ? emails : root, ".watcher-ready");
+    let observed = false,
+      sequence = 0;
+    const ready = (_event: string, path: string) => {
+      if (path === probe) observed = true;
+    };
+    server.watcher.on("all", ready);
+    try {
+      await expect
+        .poll(
+          async () => {
+            await writeFile(probe, String(++sequence));
+            return observed;
+          },
+          { timeout: 8_000 },
+        )
+        .toBe(true);
+      // Drain the preview's debounce so readiness events cannot satisfy a later assertion.
+      if (createEmails) await changed(runtime, () => rm(probe));
+      else await rm(probe);
+    } finally {
+      server.watcher.off("all", ready);
+    }
+  }
   return { root, emails, runtime, server };
 }
 
@@ -231,7 +258,7 @@ Welcome.PreviewProps = { name: "Ada" };`,
     await changed(runtime, () => rm(join(emails, "new.tsx")));
     expect((await runtime.listTemplates()).templates).toEqual([]);
     await expect(runtime.renderTemplate("../new.tsx")).rejects.toMatchObject({ status: 404 });
-    await mkdir(join(emails, "static"));
+    await changed(runtime, () => mkdir(join(emails, "static")));
     await changed(runtime, () => writeFile(join(emails, "static", "logo.svg"), "<svg/>"));
     expect((await runtime.getStaticFile("logo.svg")).contentType).toBe("image/svg+xml");
   });

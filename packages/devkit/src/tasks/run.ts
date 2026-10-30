@@ -10,7 +10,7 @@ export interface RunTasksOptions<M extends TaskMember> {
   runtime: string;
   environment?: NodeJS.ProcessEnv;
   allowFilteredArguments?: boolean;
-  directories?(member: M): string[];
+  directories?(this: void, member: M): string[];
   prepareEnvironment?(
     invocation: TaskInvocation,
     plan: ReturnType<typeof taskPlan<M>>,

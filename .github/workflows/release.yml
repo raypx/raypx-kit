@@ -123,27 +123,15 @@ jobs:
       - uses: ./.github/actions/setup-node-tools
         with:
           registry-url: https://registry.npmjs.org/
-      - uses: ./.github/actions/vp-restore
-        id: cache
       - uses: actions/download-artifact@v8
         with:
           name: node-compatibility-archives
           path: .artifacts/compatibility
-      - name: Verify development toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
-      - name: Verify source before publication
-        run: bun scripts/ci/diagnostics.ts run source bun run verify:source
-      - name: Test and build before publication
-        run: bun scripts/ci/diagnostics.ts run tests-build bun run verify:tests
-      - name: Verify package and release artifacts
-        run: bun scripts/ci/diagnostics.ts run artifacts bun run verify:artifacts
-      - uses: ./.github/actions/vp-save
-        with:
-          key: ${{ steps.cache.outputs.key }}
+      # Main CI already verified this SHA; compatibility checked these exact archives.
+      # release:ci validates/copies them and runs Bun consumers before npm transport.
       - uses: changesets/action/publish@v2.0.0
         with:
-          # Bun packs the archives so workspace: and catalog: dependencies resolve;
-          # plain changeset publish would pack this Bun workspace with npm.
+          # Publish the exact Bun archives verified by Node and Bun consumers.
           # The action runs the script without a shell, so `&&` lives in package.json.
           script: bun scripts/ci/diagnostics.ts run publish bun run release:ci
         env:

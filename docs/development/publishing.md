@@ -169,3 +169,8 @@ pre mode ends. Further prereleases require `bun run changeset pre enter <tag>`.
   Move `latest` only intentionally.
 - `npm unpublish @raypx-kit/<package>@<version>` is limited to npm's unpublish
   window and to versions nothing depends on. Prefer fixing forward.
+
+The publication job reuses the successful main CI result for the same commit and
+the compatibility matrix's archives. It does not repeat source checks, full test
+suites or archive generation. The release command still validates SHA, versions
+and digests and runs Bun consumers before registry upload.
