@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { verifiedArchives } from "./archives.js";
 import { fileURLToPath } from "node:url";
 import { withTempDirectory } from "../shared/fs.js";
 import { assertReleasePackage, releaseScope, snapshotPackageNames } from "./scope.js";
@@ -197,7 +198,7 @@ export async function plan(stable = false): Promise<void> {
     console.log(`\nUnreleased changesets: ${pending.join(", ")}. Run bun run version-packages.`);
 }
 
-export async function pack(stable = false): Promise<void> {
+export async function pack(stable = false, fromCompatibility?: string): Promise<void> {
   assertReleaseSource();
   const pending = await pendingChangesets();
   assert.deepEqual(
@@ -216,8 +217,11 @@ export async function pack(stable = false): Promise<void> {
     return;
   }
 
-  // VP reuses cached output, so this only rebuilds stale or missing dist files.
-  run(["run", "build", "--filter=./packages/*"]);
+  const verified = fromCompatibility
+    ? await verifiedArchives(resolve(root, fromCompatibility), git("rev-parse", "HEAD"))
+    : undefined;
+  // Imported archives are the exact bytes verified by the compatibility matrix.
+  if (!verified) run(["run", "build", "--filter=./packages/*"]);
 
   // Changesets packs Bun workspaces with npm, which publishes workspace: and catalog:
   // verbatim. Bun's packer resolves them and is the packer pack:check verifies.
@@ -229,10 +233,26 @@ export async function pack(stable = false): Promise<void> {
     assert.ok(directory, `${entry.name}: no workspace under packages/`);
     const path = `packages/${entry.name.slice(1).replace("/", "-")}-${entry.version}.tgz`;
     const archive = join(packDirectory, path);
-    execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
-      cwd: directory,
-      stdio: "pipe",
-    });
+    if (verified) {
+      const source = verified.get(entry.name);
+      assert.ok(source, `${entry.name}: missing verified archive`);
+      assert.equal(
+        source.manifest.version,
+        entry.version,
+        `${entry.name}: verified version differs from publication`,
+      );
+      await copyFile(source.path, archive);
+      assert.equal(
+        await integrityOf(archive),
+        source.integrity,
+        `${entry.name}: copied archive changed`,
+      );
+    } else {
+      execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
+        cwd: directory,
+        stdio: "pipe",
+      });
+    }
     const manifest = JSON.parse(
       execFileSync("tar", ["-xOf", archive, "package/package.json"], { encoding: "utf8" }),
     ) as Manifest;

@@ -31,7 +31,8 @@ function library(name: string, engines = ">=22.21"): CompatibilityPackage {
 
 function index(): CompatibilityIndex {
   return {
-    version: 1,
+    version: 2,
+    commit: "a".repeat(40),
     developmentNode: "24.22.0",
     compilerDependencies: { typescript: "7.0.2" },
     packages: [library("env"), library("devkit", ">=22.21")],

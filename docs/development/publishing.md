@@ -130,10 +130,14 @@ CI publication:
    registry requiring tokens, set the `NPM_TOKEN` secret instead.
 2. Set the repository variable `NPM_PUBLISH_ENABLED` to `true`.
 
-On `canary`, the workflow first calls the independent Node compatibility workflow,
-then verifies with Bun and runs `release:ci`, which chains the same
+On `canary`, successful main CI calls the reusable release workflow. The release
+workflow runs Node compatibility, downloads the resulting commit-bound archives,
+and runs `release:ci`, which chains the same
 `release:pack` and `release:publish` commands for versions absent from npm,
-requesting provenance. The action runs its script without a shell.
+requesting provenance. Its artifact import validates commit, versions and SHA-256
+digests, copies the exact tested tarballs and runs Bun consumer checks. It never
+rebuilds or repacks that CI path. Manual workflow dispatch requires successful CI
+for the same canary SHA. The action runs its script without a shell.
 Pushes without new versions pass as no-ops. The separate
 [version PR setup](changesets.md#automatic-version-prs) does not enable publication.
 

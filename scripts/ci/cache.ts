@@ -1,20 +1,20 @@
-import { appendFileSync, globSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { taskCacheSnapshot } from "../../packages/devkit/src/tasks.js";
 
 /** Artifact identities avoid uploading an unchanged cache because its database was touched. */
 export function cacheChanged(root: string, mode: "snapshot" | "changed"): boolean {
   const directory = join(root, "node_modules/.vite/task-cache");
   mkdirSync(directory, { recursive: true });
-  const files = globSync("**/*.tar.zst", { cwd: directory }).sort();
+  const files = taskCacheSnapshot(directory).artifacts;
   const before = join(root, ".artifacts/ci/vp-before.json");
   mkdirSync(join(root, ".artifacts/ci"), { recursive: true });
   if (mode === "snapshot") {
     writeFileSync(before, JSON.stringify(files));
     return false;
   }
-  const previous = new Set(JSON.parse(readFileSync(before, "utf8")) as string[]);
-  return files.some((file) => !previous.has(file));
+  return taskCacheSnapshot(directory, JSON.parse(readFileSync(before, "utf8")) as string[]).changed;
 }
 
 if (import.meta.main) {

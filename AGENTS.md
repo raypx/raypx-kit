@@ -87,16 +87,16 @@ Run `mise trust && mise install`, activate mise or use `mise exec -- <command>`.
 `bun run doctor` checks the actual executable; `toolchain:check` rejects drift.
 
 VP owns the only task graph, cache, formatting, linting, tests and builds. Root
-`scripts/tasks/` reads workspace manifests and supplies plain `run.tasks` through
+`scripts/tasks/` composes shared Devkit task policies and supplies plain `run.tasks` through
 lightweight `vite.config.ts` files. Tasks use private `task:*` names, while package
 scripts remain terminal leaf commands. `scripts/tasks/leaf.ts` forwards arguments
 only to the selected task, and runtime/platform identity participates in commands.
 Keep native Bun typechecker source inputs explicit across dependency workspaces;
 filesystem tracing does not capture every native checker read. Cache real output
 files, preserve build environment values and fingerprint outcome-affecting variables.
-The private runner omits agent/job metadata: TanStack Start otherwise fingerprints
-every environment key through its unrestricted `loadEnv` hook. Keep `CI` and
-`GITHUB_ACTIONS` guards, credentials and application build inputs available.
+Start environment loading is scoped through Devkit's injected Vite adapter. Keep
+the inherited environment, CI guards, credentials and actual build inputs available;
+do not introduce global environment blacklists.
 Create ignored output directories before tracing to keep enumeration stable.
 Do not introduce a second task runner.
 
@@ -230,7 +230,10 @@ CI consumes the same plan. Source/tests/builds precede independent browser and
 archive gates; those gates restore the newly saved VP build cache. PostgreSQL runs
 in parallel only for relevant changes. The final `verify` job rejects failed,
 missing or cancelled required gates and accepts skips only when unselected.
-Shared workflow actions restore compatible VP artifacts and upload the cache only
+Publication is called only after the same canary commit passes `verify`; manual
+release dispatch requires successful CI for that SHA. Node compatibility archives
+include their commit and digests; CI publication copies those verified bytes and
+checks them with Bun instead of rebuilding or repacking. Shared workflow actions restore compatible VP artifacts and upload the cache only
 when a new successful artifact exists. Node matrices live outside default CI.
 
 Maintenance tests are uncached because they spawn independent VP runners; nested

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,6 +20,7 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
         env: {
           ...process.env,
           TOOLKIT_TASK_ROOT: root,
+          TOOLKIT_VERIFY_ROOT: root,
           TOOLKIT_VERIFY_TASKS: "",
           NO_COLOR: "1",
           ...env,
@@ -62,9 +63,9 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
       );
     }
     await mkdir(join(root, "scripts/tasks"), { recursive: true });
-    await cp(
-      fileURLToPath(new URL("../../../scripts/tasks/leaf.ts", import.meta.url)),
+    await writeFile(
       join(root, "scripts/tasks/leaf.ts"),
+      `import { runTaskLeaf } from ${JSON.stringify(fileURLToPath(new URL("../../../packages/devkit/src/tasks.ts", import.meta.url)))}; process.exitCode = await runTaskLeaf({ runtime: process.execPath });`,
     );
     execFileSync(process.execPath, ["install", "--ignore-scripts"], { cwd: root, stdio: "pipe" });
     await symlink(

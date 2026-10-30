@@ -41,7 +41,8 @@ Published README/license changes also validate that package's archive payload.
 
 ### Daily feedback and machine load
 
-VP is the only task runner. `scripts/tasks/` derives private `task:*` definitions
+VP is the only task runner. Devkit owns the shared model, task argument handling,
+configuration projection, Git change reader and dependency propagation engine. `scripts/tasks/` derives private `task:*` definitions
 from workspace manifests; lightweight `vite.config.ts` files register them.
 Application plugins live in `vite.app.config.ts`; library configuration lives in
 `vite.config.ts` under `pack`. Package scripts remain direct leaf commands.
@@ -61,9 +62,8 @@ VP caches successful tasks in `node_modules/.vite/task-cache`, including build
 outputs and JUnit reports. Source edits in a workspace dependency invalidate its
 consumers. Native Bun typechecker source inputs are explicit because filesystem
 tracing does not observe every native read. Task commands include runtime/platform
-identity; environment inputs and private task arguments are fingerprinted. The
-private runner omits changing agent and job metadata before TanStack Start loads
-environment values, retaining CI guards and application inputs. Keep
+identity; environment inputs and private task arguments are fingerprinted. Shared Devkit Start environment loading tracks dotenv keys and Vite inputs while
+preserving inherited environment values. Keep
 the cache between runs. Maintenance tests spawn independent VP runners and stay
 uncached, avoiding nested filesystem tracing on macOS.
 

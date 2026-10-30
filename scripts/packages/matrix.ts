@@ -16,7 +16,8 @@ export interface CompatibilityPackage {
 }
 
 export interface CompatibilityIndex {
-  version: 1;
+  version: 2;
+  commit: string;
   developmentNode: string;
   compilerDependencies: Dependencies;
   packages: CompatibilityPackage[];
@@ -87,7 +88,12 @@ export function peerVersions(
 
 /** Separate engine minima from the pinned runtime that builds the archives. */
 export function compatibilityMatrix(index: CompatibilityIndex) {
-  assert.equal(index.version, 1, "Unsupported compatibility artifact format");
+  assert.equal(index.version, 2, "Unsupported compatibility artifact format");
+  assert.match(
+    index.commit,
+    /^[a-f0-9]{40}$/,
+    "Compatibility artifacts require their source commit",
+  );
   assert.ok(valid(index.developmentNode), "Invalid development Node pin");
   assert.ok(index.packages.length > 0, "No public packages in compatibility matrix");
   for (const entry of index.packages) {

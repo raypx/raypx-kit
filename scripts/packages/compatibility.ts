@@ -109,7 +109,13 @@ async function prepare(): Promise<CompatibilityIndex> {
       sha256: "",
     });
   }
-  const index: CompatibilityIndex = { version: 1, developmentNode, compilerDependencies, packages };
+  const index: CompatibilityIndex = {
+    version: 2,
+    commit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
+    developmentNode,
+    compilerDependencies,
+    packages,
+  };
   compatibilityMatrix(index);
   await mkdir(artifacts, { recursive: true });
   for (const entry of index.packages) {
@@ -140,6 +146,11 @@ async function check(): Promise<void> {
   assertToolchainRuntime(root);
   const index = await readIndex();
   assertPackageInventory(index, await publicPackages());
+  assert.equal(
+    index.commit,
+    execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
+    "Compatibility artifacts belong to another commit",
+  );
   assert.equal(
     index.developmentNode,
     (await readFile(join(root, "scripts/packages/node-version"), "utf8")).trim(),

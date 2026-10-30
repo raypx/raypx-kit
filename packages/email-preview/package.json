@@ -46,7 +46,7 @@
     "test:e2e": "bun ../../e2e/run.ts --project email-preview"
   },
   "dependencies": {
-    "@react-email/render": "^2.2.0",
+    "@react-email/render": "catalog:",
     "prettier": "^3.9.10"
   },
   "devDependencies": {

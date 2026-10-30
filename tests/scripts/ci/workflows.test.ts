@@ -12,7 +12,7 @@ interface Steps {
 interface Workflow {
   jobs: Record<
     string,
-    Steps & { needs?: string[]; if?: string; permissions?: { contents?: string } }
+    Steps & { needs?: string[] | string; if?: string; permissions?: { contents?: string } }
   >;
 }
 const read = <T>(path: string) => parseYAML(readFileSync(join(root, path), "utf8")) as T;
@@ -43,10 +43,10 @@ it("grants read access when Release calls the reusable compatibility workflow", 
 it("runs the final required check after failures and covers every conditional gate", () => {
   const { jobs } = read<Workflow>(".github/workflows/ci.yml");
   expect(jobs.verify?.if).toBe("always()");
-  for (const name of Object.keys(jobs).filter((name) => name !== "verify")) {
+  for (const name of Object.keys(jobs).filter((name) => name !== "verify" && name !== "release")) {
     expect(jobs.verify?.needs).toContain(name);
     const needs = Object.fromEntries(
-      jobs.verify!.needs!.map((name) => [
+      (jobs.verify!.needs as string[]).map((name) => [
         name,
         {
           result: "success",
@@ -57,4 +57,17 @@ it("runs the final required check after failures and covers every conditional ga
     needs[name]!.result = "cancelled";
     expect(checkResults(needs), `${name} cancellation cannot pass`).toContain(`${name}: cancelled`);
   }
+});
+
+it("calls publication only after successful canary verification", () => {
+  const { jobs } = read<Workflow>(".github/workflows/ci.yml");
+  expect(jobs.release?.needs).toBe("verify");
+  expect(jobs.release?.if).toContain("needs.verify.result == 'success'");
+  expect(jobs.release?.if).toContain("github.event_name == 'push'");
+  expect(jobs.release?.if).toContain("refs/heads/canary");
+  const release = read<{ on: { push?: unknown; workflow_call?: unknown } }>(
+    ".github/workflows/release.yml",
+  );
+  expect(release.on.push).toBeUndefined();
+  expect(release.on.workflow_call).toBeDefined();
 });

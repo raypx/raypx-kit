@@ -5,7 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
-import { defineConfig } from "vite-plus";
+import { defineConfig, loadEnv } from "vite-plus";
+import { startEnvironment } from "../packages/devkit/src/vite.js";
 import { documentationPages, getContentUrl, getDocumentationPath } from "./src/lib/pages";
 import { localeConfig } from "./src/lib/i18n/config";
 
@@ -65,17 +66,20 @@ export default defineConfig(({ command }) => ({
       },
     }),
     tailwindcss(),
-    tanstackStart({
-      prerender: {
-        enabled: true,
-        concurrency: 2,
-        autoStaticPathsDiscovery: false,
-        crawlLinks: false,
-        failOnError: true,
-      },
-      pages: ["/", ...documentationPaths].map((path) => ({ path })),
-      sitemap: { enabled: false },
-    }),
+    startEnvironment(
+      tanstackStart({
+        prerender: {
+          enabled: true,
+          concurrency: 2,
+          autoStaticPathsDiscovery: false,
+          crawlLinks: false,
+          failOnError: true,
+        },
+        pages: ["/", ...documentationPaths].map((path) => ({ path })),
+        sitemap: { enabled: false },
+      }),
+      loadEnv,
+    ),
     react(),
   ],
 }));

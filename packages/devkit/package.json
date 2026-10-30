@@ -57,6 +57,18 @@
     "./testing": {
       "types": "./dist/testing.d.mts",
       "import": "./dist/testing.mjs"
+    },
+    "./tasks": {
+      "types": "./dist/tasks.d.mts",
+      "import": "./dist/tasks.mjs"
+    },
+    "./verification": {
+      "types": "./dist/verification.d.mts",
+      "import": "./dist/verification.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
     }
   },
   "publishConfig": {

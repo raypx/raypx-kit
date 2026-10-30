@@ -6,10 +6,15 @@
     "name": "Zack",
     "email": "heyloyep@gmail.com"
   },
-  "workspaces": [
-    "docs",
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "docs",
+      "packages/*"
+    ],
+    "catalog": {
+      "@react-email/render": "^2.2.0"
+    }
+  },
   "type": "module",
   "scripts": {
     "prepare": "bun --bun vp config --hooks --no-agent",
@@ -40,7 +45,7 @@
     "release:pack": "bun run raypx-kit-dev release pack",
     "release:publish": "bun run raypx-kit-dev release publish",
     "release:snapshot": "bun run raypx-kit-dev release snapshot",
-    "release:ci": "bun run release:pack && bun run release:publish",
+    "release:ci": "bun run raypx-kit-dev release pack --from-compatibility .artifacts/compatibility && bun run release:publish",
     "docs:dev": "bun scripts/tasks/run.ts dev --filter=docs",
     "docs:build": "bun scripts/tasks/run.ts build --filter=docs",
     "docs:preview": "bun run --cwd docs preview",
@@ -73,6 +78,7 @@
     "wrangler": "^4.155.0"
   },
   "overrides": {
+    "@react-email/render": "catalog:",
     "vite": "npm:@voidzero-dev/vite-plus-core@^1.4.0"
   },
   "devEngines": {

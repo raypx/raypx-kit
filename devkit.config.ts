@@ -28,6 +28,9 @@ export default {
         "./docs": "./src/docs.ts",
         "./lint": "./src/lint.ts",
         "./testing": "./src/testing.ts",
+        "./tasks": "./src/tasks.ts",
+        "./verification": "./src/verification.ts",
+        "./vite": "./src/vite.ts",
       },
     },
     "packages/drizzle": {

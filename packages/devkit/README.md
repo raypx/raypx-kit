@@ -256,3 +256,30 @@ loads dotenv files for `dev` and `build`, and unless the trusted variable is
 escape it. `probeArtifact` stages the output in a temporary directory, starts its
 entry with the given Node on a free port, waits for the health path, runs the
 check and always stops the server.
+
+## VP tasks and incremental verification
+
+`@raypx-kit/devkit/tasks` supplies `createTaskModel`, `taskConfig`, `taskRef`,
+`taskPlan`, `runTasks`, `runTaskLeaf` and `taskCacheSnapshot`. Explicit policies
+supply commands, prerequisites, cache definitions and root tasks; the shared model
+reads workspace manifests and never imports an inspected repository's config.
+Policies can extend members with native or packaging metadata. Task references
+retain `package#task:name`; VP remains the only scheduler and cache executor.
+
+`runTasks` receives an explicit Bun executable, prepares declared output folders
+and forwards arguments only to the selected leaf through task-specific environment
+keys. Set `allowFilteredArguments` only for wrappers that already support filtered
+argument forwarding. Planning and configuration also load on supported Node versions.
+`taskCacheSnapshot(directory, previous)` returns sorted artifact identities and a
+`changed` flag; cache database rewrites alone do not count as successful artifacts.
+
+`@raypx-kit/devkit/verification` supplies `changedFiles` and `affectedWorkspaces`.
+Git paths are NUL-delimited; an unavailable base returns reasons requiring full
+coverage. An explicit, monotonic scope policy merges and propagates changes through
+workspace dependencies. Repositories retain file classification and gate selection.
+
+`@raypx-kit/devkit/vite` exports `startEnvironment(plugins, loadEnv)`. Pass Start's
+plugins and Vite's loader explicitly: it retains dotenv keys, inherited environment
+precedence and `VITE_` values without tracking every inherited CI identifier.
+A changed upstream plugin name fails with a review diagnostic. No Vite runtime
+import or mandatory Vite peer is introduced by these entries.

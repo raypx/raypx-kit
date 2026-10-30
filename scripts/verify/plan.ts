@@ -1,4 +1,7 @@
-import { execFileSync } from "node:child_process";
+import {
+  changedFiles as readChanges,
+  affectedWorkspaces,
+} from "../../packages/devkit/src/verification.js";
 import { taskModel, taskRef, type TaskModel } from "../tasks/model.js";
 import { browserProjects } from "../../e2e/projects.js";
 
@@ -15,24 +18,7 @@ export interface VerificationPlan {
 }
 
 export function changedFiles(root: string, base = "origin/canary", head?: string) {
-  const git = (args: string[]) =>
-    execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-  try {
-    const from = head ? base : git(["merge-base", base, "HEAD"]).trim();
-    if (!from || /^0+$/.test(from)) throw new Error("Missing base");
-    const paths = [git(["diff", "--name-only", "-z", "--no-renames", from, head ?? "HEAD"])];
-    if (!head)
-      paths.push(
-        git(["diff", "--name-only", "-z", "--no-renames", "HEAD"]),
-        git(["ls-files", "--others", "--exclude-standard", "-z"]),
-      );
-    return {
-      files: [...new Set(paths.flatMap((text) => text.split("\0").filter(Boolean)))].sort(),
-      reasons: [] as string[],
-    };
-  } catch {
-    return { files: [] as string[], reasons: ["Git base unavailable; running full verification"] };
-  }
+  return readChanges(root, base, head ? { before: base, head } : undefined);
 }
 
 /** Reverse workspace dependencies select consumers; documentation also reaches its site. */
@@ -75,14 +61,12 @@ export function verificationPlan(
     }
   }
   if (full) for (const member of model.members) affected.add(member.name);
-  for (let changed = true; changed;) {
-    changed = false;
-    for (const member of model.members)
-      if (!affected.has(member.name) && member.dependencies.some((name) => affected.has(name))) {
-        affected.add(member.name);
-        changed = true;
-      }
-  }
+  const reached = affectedWorkspaces(
+    model.members,
+    new Map([...affected].map((name) => [name, true] as const)),
+    { merge: () => true, propagate: () => true },
+  );
+  for (const name of reached.keys()) affected.add(name);
   for (const member of model.members)
     if (affected.has(member.name) && !member.private) archives.add(member.name);
   const built = new Set([...affected, ...archives]);

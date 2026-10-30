@@ -49,3 +49,33 @@ export function repositoryConfigContract(root: string) {
   const invalid: ToolchainOptions = { runtime: "deno" };
   return { findings, bun, active, base, strict, tests, invalid };
 }
+
+import {
+  createTaskModel,
+  taskConfig,
+  taskPlan,
+  taskRef,
+  type TaskMember,
+  type TaskPolicy,
+} from "@raypx-kit/devkit/tasks";
+import { affectedWorkspaces } from "@raypx-kit/devkit/verification";
+import { startEnvironment } from "@raypx-kit/devkit/vite";
+export function taskContract(root: string, url: string) {
+  const policy: TaskPolicy<TaskMember> = {
+    member: (_, member) => member,
+    define: () => ({ command: "bun run build", dependsOn: [], cache: false }),
+    aggregateCommand: "bun leaf.ts --aggregate",
+  };
+  const model = createTaskModel(root, policy);
+  const plan = taskPlan(model, [taskRef(model.rootName, "build")]);
+  const config = defineConfig(taskConfig(model, url));
+  const reached = affectedWorkspaces(model.members, new Map<string, boolean>(), {
+    merge: () => true,
+    propagate: () => true,
+  });
+  const plugin = startEnvironment(
+    [{ name: "tanstack-start-core:load-env", configResolved() {} }],
+    () => ({}),
+  );
+  return { plan, config, reached, plugin };
+}

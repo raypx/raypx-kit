@@ -8,7 +8,8 @@ permissions:
   contents: read
 concurrency:
   group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Never interrupt a canary workflow after it enters publication.
+  cancel-in-progress: ${{ github.event_name != 'push' || github.ref != 'refs/heads/canary' }}
 jobs:
   plan:
     runs-on: ubuntu-24.04
@@ -158,3 +159,16 @@ jobs:
         env:
           GITHUB_NEEDS: ${{ toJSON(needs) }}
         run: bun scripts/ci/result.ts
+
+  release:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/canary' && needs.verify.result == 'success'
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+      id-token: write
+    uses: ./.github/workflows/release.yml
+    with:
+      verified-sha: ${{ github.sha }}
+    secrets: inherit

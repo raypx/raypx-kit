@@ -19,6 +19,12 @@ compose their own policy, CLI and product probes from these entries.
 | `./lint`         | Plain Vite+ base and opt-in strict lint presets             |
 | `./testing`      | Plain Vitest defaults for Bun workers                       |
 
+`./tasks` owns shared task discovery, graph validation, arguments, VP launch/leaf
+execution, configuration projection and artifact snapshots. `./verification` owns
+Git changes and scope propagation; `./vite` owns injected Start environment loading.
+Callers explicitly supply trusted policies. Keep product/native/packaging decisions
+in their repositories; never discover or execute inspected configuration files.
+
 The README documents the complete shipped API.
 
 ## Constraints
@@ -35,7 +41,8 @@ The README documents the complete shipped API.
   filename and repository-specific policy do not belong in this package's runtime.
 - Never execute inspected sources or catalogs; parse them with oxc-parser.
 - Never print loaded environment values or secrets.
-- Use Node APIs only; `turbo` alone requires Bun at call time.
+- Use Node APIs only. Task execution receives an explicit Bun executable; planning
+  and configuration remain loadable on supported Node versions.
 - Toolchain checks default to Node/Bun; explicit `runtime: "bun"` forbids Node
   pins without requiring a Node executable. Keep existing defaults compatible.
 - Lint/test entries export plain objects with no runtime Vite+ imports. Consumers

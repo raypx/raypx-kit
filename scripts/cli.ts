@@ -133,11 +133,17 @@ export const command = defineCommand({
         }),
         pack: defineCommand({
           meta: { name: "pack", description: "Build and verify release archives locally" },
-          args: { stable: stableArg },
+          args: {
+            stable: stableArg,
+            "from-compatibility": {
+              type: "string",
+              description: "Import exact archives verified by Node compatibility",
+            },
+          },
           run: async ({ args }) => {
-            assertArguments(args, ["stable"]);
+            assertArguments(args, ["stable", "from-compatibility", "fromCompatibility"]);
             const { pack } = await import("./release/commands.js");
-            await pack(args.stable);
+            await pack(args.stable, args["from-compatibility"]);
           },
         }),
         publish: defineCommand({

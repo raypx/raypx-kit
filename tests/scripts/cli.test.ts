@@ -173,13 +173,17 @@ describe("development CLI routes", () => {
 describe("release CLI arguments", () => {
   it.each(["plan", "pack"] as const)("defaults %s to prerelease mode", async (name) => {
     await runCommand(command, { rawArgs: ["release", name] });
-    expect(actions[name]).toHaveBeenCalledExactlyOnceWith(false);
+    expect(actions[name]).toHaveBeenCalledExactlyOnceWith(
+      ...(name === "pack" ? [false, undefined] : [false]),
+    );
     expect(actions.publish).not.toHaveBeenCalled();
   });
 
   it.each(["plan", "pack"] as const)("passes --stable to %s", async (name) => {
     await runCommand(command, { rawArgs: ["release", name, "--stable"] });
-    expect(actions[name]).toHaveBeenCalledExactlyOnceWith(true);
+    expect(actions[name]).toHaveBeenCalledExactlyOnceWith(
+      ...(name === "pack" ? [true, undefined] : [true]),
+    );
     expect(actions.publish).not.toHaveBeenCalled();
   });
 
@@ -253,6 +257,13 @@ describe("release CLI arguments", () => {
       runCommand(command, { rawArgs: ["release", "plan", "unexpected"] }),
     ).rejects.toThrow("Unexpected positional arguments");
     expectNoRelease();
+  });
+
+  it("passes the exact compatibility artifact directory to release packing", async () => {
+    await runCommand(command, {
+      rawArgs: ["release", "pack", "--from-compatibility", ".artifacts/compatibility"],
+    });
+    expect(actions.pack).toHaveBeenCalledExactlyOnceWith(false, ".artifacts/compatibility");
   });
 
   it("packs snapshots of changed packages without publishing by default", async () => {

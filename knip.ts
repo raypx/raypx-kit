@@ -32,6 +32,8 @@ const config: KnipConfig = {
         // Bun receives this preload through a computed execArgv path in Intl's test config.
         "tests/setup/jsdom-preload.ts",
         "scripts/ci/{cache,gate,plan,result}.ts",
+        // Shared Devkit generates the leaf command path in VP metadata.
+        "scripts/tasks/leaf.ts",
       ],
       // package.json scripts provide the CLI, pack and release entry points.
       project: ["scripts/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],

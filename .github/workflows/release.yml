@@ -1,8 +1,14 @@
 name: Release
 
 on:
-  push:
-    branches: [canary]
+  workflow_call:
+    inputs:
+      verified-sha:
+        required: true
+        type: string
+    secrets:
+      NPM_TOKEN:
+        required: false
   workflow_dispatch:
 
 permissions: {}
@@ -17,6 +23,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+      actions: read
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
@@ -26,6 +33,11 @@ jobs:
           fetch-depth: 0
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
+      - name: Require verified canary commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFIED_SHA: ${{ inputs.verified-sha }}
+        run: bun scripts/release/gate.ts
       - name: Verify toolchain
         run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - uses: changesets/action/select-mode@v2.0.0
@@ -113,6 +125,10 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - uses: ./.github/actions/vp-restore
         id: cache
+      - uses: actions/download-artifact@v8
+        with:
+          name: node-compatibility-archives
+          path: .artifacts/compatibility
       - name: Verify development toolchain
         run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
       - name: Verify source before publication

@@ -7,6 +7,16 @@ import { fileURLToPath } from "node:url";
 import { checkArchitecture } from "@raypx-kit/devkit/architecture";
 import { checkToolchain, readBunPin } from "@raypx-kit/devkit/toolchain";
 import { discover } from "@raypx-kit/devkit/workspaces";
+import {
+  createTaskModel,
+  taskPlan,
+  taskRef,
+  argumentKey,
+  taskArguments,
+  taskCacheSnapshot,
+} from "@raypx-kit/devkit/tasks";
+import { affectedWorkspaces } from "@raypx-kit/devkit/verification";
+import { startEnvironment } from "@raypx-kit/devkit/vite";
 
 const root = mkdtempSync(join(tmpdir(), "devkit-consumer-"));
 try {
@@ -15,7 +25,7 @@ try {
   mkdirSync(join(directory, "src"), { recursive: true });
   writeFileSync(
     join(root, "package.json"),
-    JSON.stringify({ private: true, workspaces: ["packages/*"] }),
+    JSON.stringify({ name: "consumer-fixture", private: true, workspaces: ["packages/*"] }),
   );
   writeFileSync(
     join(directory, "package.json"),
@@ -60,6 +70,28 @@ try {
   assert.ok(unknown.findings.some((finding) => finding.includes("packages/missing")));
   assert.ok(checkArchitecture(unknown).length > 0);
   assert.equal(existsSync(marker), false);
+  const model = createTaskModel(root, {
+    member: (_, member) => member,
+    define: () => ({ command: "echo fixture", dependsOn: [], cache: false }),
+    aggregateCommand: "echo aggregate",
+    rootTasks: () => ({ inspect: { command: "echo inspect", dependsOn: [], cache: false } }),
+  });
+  assert.equal(taskPlan(model, [taskRef(model.rootName, "inspect")]).length, 1);
+  assert.deepEqual(
+    taskArguments("consumer#test", { [argumentKey("consumer#task:test")]: '["space argument"]' }),
+    ["space argument"],
+  );
+  assert.deepEqual(taskCacheSnapshot(join(root, "absent-cache")).artifacts, []);
+  assert.equal(
+    affectedWorkspaces([{ name: "fixture", dependencies: [] }], new Map([["fixture", true]]), {
+      merge: () => true,
+      propagate: () => true,
+    }).size,
+    1,
+  );
+  const plugin = { name: "tanstack-start-core:load-env", configResolved() {} };
+  startEnvironment([plugin], () => ({}));
+  plugin.configResolved({ root, mode: "production" });
 
   // A consumer can use Bun policy independently of the host running this contract.
   writeFileSync(
