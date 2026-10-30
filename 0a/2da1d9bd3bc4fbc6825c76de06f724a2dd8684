@@ -1,0 +1,91 @@
+.changeset/shared-vp-foundation.md
+  s_c8ddb790d61691::t_a837901bf2f32a 1-5
+.github/workflows/ci.yml
+  s_c8ddb790d61691::t_679e9786401561 11-12,162-174
+.github/workflows/release.yml
+  s_c8ddb790d61691::t_42fad9fd77d85e 4-11,26,36-40,128-131
+AGENTS.md
+  s_c8ddb790d61691::t_b031035d139889 90,97-99,233-236
+bun.lock
+  s_c8ddb790d61691::t_c38e72bdf408b7 145,321,324-326
+devkit.config.ts
+  s_c8ddb790d61691::t_2ebcb53af953a7 31-33
+docs/development/README.md
+  s_c8ddb790d61691::t_339da41c312c9d 44-45,65-66
+docs/development/publishing.md
+  s_c8ddb790d61691::t_13c110e6a0ebf5 133-135,137-140
+knip.ts
+  s_c8ddb790d61691::t_fbaa44c3ccfb2a 35-36
+package.json
+  s_c8ddb790d61691::t_8e281eef42d07e 9-17,48,81
+packages/devkit/AGENTS.md
+  s_c8ddb790d61691::t_59d189ca0ae862 22-27,44-45
+packages/devkit/README.md
+  s_c8ddb790d61691::t_d09fe663eab613 259-285
+packages/devkit/package.json
+  s_c8ddb790d61691::t_79cc0ee09a6194 60-71
+packages/devkit/src/tasks.ts
+  s_c8ddb790d61691::t_ec819fde432864 1-6
+packages/devkit/src/tasks/config.ts
+  s_ec0bb2776ccc14::t_f6abb07c8ec1c7 1-45
+packages/devkit/src/tasks/run.ts
+  s_ec0bb2776ccc14::t_b816d6d8656cb1 1-132
+packages/devkit/src/tasks/types.ts
+  s_c8ddb790d61691::t_e22ebcdbb3af15 1-49
+packages/devkit/src/vite.ts
+  s_c8ddb790d61691::t_0a98eec12be6ee 1-40
+packages/devkit/tests/fixtures/consumer/runtime.mjs
+  s_c8ddb790d61691::t_f3bdd44323556e 10-19,28,73-94
+packages/devkit/tests/fixtures/consumer/types.ts
+  s_c8ddb790d61691::t_2b0fcebb6bb84d 52-81
+packages/devkit/tests/tasks.test.ts
+  s_ec0bb2776ccc14::t_219ca79f39cc8d 1-125
+packages/devkit/vite.config.ts
+  s_c8ddb790d61691::t_b4e4ddfea3994f 18-20
+packages/email-preview/package.json
+  s_c8ddb790d61691::t_99cb37c732a432 49
+scripts/ci/cache.ts
+  s_c8ddb790d61691::t_4be6faa496f6c9 1,4,10,17
+scripts/cli.ts
+  s_ec0bb2776ccc14::t_7903d48b69eb6e 136-142,144,146
+scripts/release/archives.ts
+  s_ec0bb2776ccc14::t_cbc9a412bdd731 1-53
+scripts/tasks/config.ts
+  s_ec0bb2776ccc14::t_44a33d420d2215 2,6-9
+scripts/tasks/leaf.ts
+  s_c8ddb790d61691::t_3c643f50d82014 1-2
+scripts/tasks/model.ts
+  s_ec0bb2776ccc14::t_a9ea3b928c8b33 2-14,17-31,33-84,86-113,116-117,119-152,154-157,159
+scripts/tasks/run.ts
+  s_ec0bb2776ccc14::t_b782a6c5bcea73 2-3,10-17
+tests/scripts/cli.test.ts
+  s_ec0bb2776ccc14::t_fbf68ae5fb2f7c 176-178,184-186,262-268
+tests/scripts/packages/matrix.test.ts
+  s_c8ddb790d61691::t_a52b4814450ca9 34-35
+tests/scripts/tasks/cache.test.ts
+  s_c8ddb790d61691::t_62cbf6e402c0a5 3,23,66,68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a2da1d9bd3bc4fbc6825c76de06f724a2dd8684",
+  "prompts": {},
+  "sessions": {
+    "s_c8ddb790d61691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18703-c385-7ca0-a1df-4dba9988959c",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    },
+    "s_ec0bb2776ccc14": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18a9d-da3e-7a33-a95c-3a5ab61ef99d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
