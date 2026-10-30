@@ -1,0 +1,23 @@
+bun.lock
+  s_ec0bb2776ccc14::t_c0564ee414af08 94
+packages/devkit/CHANGELOG.md
+  s_ec0bb2776ccc14::t_ca22c57b5321c3 3-8
+packages/devkit/package.json
+  s_ec0bb2776ccc14::t_87f01b5aebc59e 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fecd55844a9e75b6e9590c5edc14c156afc8aa94",
+  "prompts": {},
+  "sessions": {
+    "s_ec0bb2776ccc14": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18a9d-da3e-7a33-a95c-3a5ab61ef99d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zack <heyloyep@gmail.com>"
+    }
+  }
+}
