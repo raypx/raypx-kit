@@ -125,9 +125,13 @@ packages are refused, because a snapshot rewrites only its own version.
 For npm trusted publishing, first publish each new package manually, then enable
 CI publication:
 
-1. On npmjs.com, add a trusted publisher to every package: GitHub Actions,
-   repository `raypx/raypx-kit`, workflow `release.yml`, environment `npm`. For a
-   registry requiring tokens, set the `NPM_TOKEN` secret instead.
+1. On npmjs.com, configure each package's GitHub Actions trusted publisher for
+   repository `raypx/raypx-kit`, workflow `ci.yml`, environment `npm`, with direct
+   `npm publish` allowed. Keep a separate `release.yml` identity for manual releases.
+   npm validates the calling workflow for reusable workflows; see
+   [npm's OIDC troubleshooting](https://docs.npmjs.com/trusted-publishers#troubleshooting).
+   Add the `ci.yml` identity before that package's next automatic release.
+   For a registry requiring tokens, set the `NPM_TOKEN` secret instead.
 2. Set the repository variable `NPM_PUBLISH_ENABLED` to `true`.
 
 On `canary`, successful main CI calls the reusable release workflow. The release
