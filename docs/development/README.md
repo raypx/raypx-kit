@@ -39,6 +39,14 @@ shared tooling/configuration change or unknown input selects full coverage.
 and test the documentation site; unrelated libraries and PostgreSQL are skipped.
 Published README/license changes also validate that package's archive payload.
 
+`verify:quick` keeps source checks and selects each affected workspace's `test:unit`
+script, falling back to `test` when no separate unit script exists. It skips
+standalone builds, browser, archive and release gates; dependency builds needed by
+the selected tests still run. Combine `--quick --full` to check every workspace
+with this reduced scope. `bun run verify:quick --dry-run` prints the quick plan,
+including source checks and excluding the skipped gates. Task prerequisites remain
+part of the VP graph shown by `bun --bun vp run --last-details`.
+
 ### Daily feedback and machine load
 
 VP is the only task runner. Devkit owns the shared model, task argument handling,

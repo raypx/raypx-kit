@@ -25,7 +25,7 @@ export function changedFiles(root: string, base = "origin/canary", head?: string
 export function verificationPlan(
   model: TaskModel,
   files: string[],
-  options: { full?: boolean; reasons?: string[] } = {},
+  options: { full?: boolean; quick?: boolean; reasons?: string[] } = {},
 ): VerificationPlan {
   let full = Boolean(options.full || options.reasons?.length);
   const reasons = [...(options.reasons ?? [])];
@@ -70,9 +70,20 @@ export function verificationPlan(
   for (const member of model.members)
     if (affected.has(member.name) && !member.private) archives.add(member.name);
   const built = new Set([...affected, ...archives]);
-  const tasks = [taskRef(model.rootName, "check:root"), taskRef(model.rootName, "test:toolchain")];
+  const tasks = [
+    "toolchain:check",
+    "licenses:check",
+    "architecture:check",
+    "lint",
+    "knip",
+    "check:root",
+    "test:toolchain",
+  ].map((name) => taskRef(model.rootName, name));
   for (const member of model.members) {
-    for (const name of ["check", "test", "build"])
+    const names = options.quick
+      ? ["check", member.scripts["test:unit"] ? "test:unit" : "test"]
+      : ["check", "test", "build"];
+    for (const name of names)
       if (
         member.scripts[name] &&
         (name === "build" ? built.has(member.name) : affected.has(member.name))
@@ -85,16 +96,19 @@ export function verificationPlan(
     files,
     tasks,
     workspaces: [...affected].sort(),
-    packages: [...archives].sort(),
+    packages: options.quick ? [] : [...archives].sort(),
     browser: Object.entries(browserProjects)
-      .filter(([, project]) => affected.has(project.workspace))
+      .filter(([, project]) => !options.quick && affected.has(project.workspace))
       .map(([name]) => name),
-    postgres: full || affected.has("@raypx-kit/drizzle"),
-    release: full || release || archives.size > 0,
+    postgres: !options.quick && (full || affected.has("@raypx-kit/drizzle")),
+    release: !options.quick && (full || release || archives.size > 0),
   };
 }
 
-export function localPlan(root: string, options: { full?: boolean; base?: string } = {}) {
+export function localPlan(
+  root: string,
+  options: { full?: boolean; quick?: boolean; base?: string } = {},
+) {
   const changed = changedFiles(root, options.base);
   return verificationPlan(taskModel(root), changed.files, { ...options, reasons: changed.reasons });
 }

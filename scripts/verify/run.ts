@@ -9,7 +9,7 @@ import { localPlan, type VerificationPlan } from "./plan.js";
 export async function runVerification(
   root: string,
   plan: VerificationPlan,
-  phase: "javascript" | "browser" | "artifacts" | "full" | "quick" = "full",
+  phase: "javascript" | "browser" | "artifacts" | "full" = "full",
 ) {
   assertToolchainRuntime(root);
   const model = taskModel(root);
@@ -17,14 +17,7 @@ export async function runVerification(
     names.map((name) => taskRef(name, "build")).filter((ref) => model.tasks.has(ref));
   const execute = (tasks: string[]) =>
     runTasks(root, "verify:run", [], { TOOLKIT_VERIFY_TASKS: JSON.stringify([...new Set(tasks)]) });
-  if (["javascript", "full", "quick"].includes(phase)) {
-    const source = ["toolchain:check", "licenses:check", "architecture:check", "lint", "knip"].map(
-      (name) => taskRef(model.rootName, name),
-    );
-    const selected =
-      phase === "quick" ? plan.tasks.filter((ref) => !ref.endsWith("#task:build")) : plan.tasks;
-    await execute([...source, ...selected]);
-  }
+  if (["javascript", "full"].includes(phase)) await execute(plan.tasks);
   if (["browser", "full"].includes(phase) && plan.browser.length) {
     if (phase === "browser")
       await execute(
@@ -63,13 +56,13 @@ if (import.meta.main) {
     else if (arg === "--base" && args[index + 1]) base = args[++index];
     else throw new Error(`Unknown verification option: ${arg}`);
   }
-  const plan = localPlan(root, { full, ...(base ? { base } : {}) });
+  const plan = localPlan(root, { full, quick, ...(base ? { base } : {}) });
   if (dry) console.log(JSON.stringify(plan, null, 2));
   else {
     const started = performance.now();
-    await runVerification(root, plan, quick ? "quick" : "full");
+    await runVerification(root, plan);
     console.log(
-      `Verification passed in ${((performance.now() - started) / 1000).toFixed(1)}s (${plan.full ? "full" : "affected"}; ${plan.workspaces.length} workspaces)`,
+      `Verification${quick ? " (quick)" : ""} passed in ${((performance.now() - started) / 1000).toFixed(1)}s (${plan.full ? "full" : "affected"}; ${plan.workspaces.length} workspaces)`,
     );
   }
 }

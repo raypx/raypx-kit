@@ -37,7 +37,7 @@
   "scripts": {
     "check": "bun --check --tsconfig-override tsconfig.json",
     "test": "bun --bun vp test --run",
-    "test:unit": "bun --bun vp test --run",
+    "test:unit": "bun --bun vp test --run --passWithNoTests --exclude '**/component.test.{ts,tsx}' --exclude '**/*.component.test.{ts,tsx}' --exclude '**/*.integration.test.{ts,tsx}'",
     "build": "bun --bun vp pack",
     "dev": "bun --bun vp pack --watch",
     "pack:check": "bun pm pack --dry-run"
