@@ -1,5 +1,11 @@
 # @raypx-kit/devkit
 
+## 0.0.0-alpha.6
+
+### Patch Changes
+
+- 0a2da1d: Add portable VP task models, argument isolation, cache snapshots, incremental verification policies and a scoped TanStack Start environment adapter. Preserve existing Devkit entries and Node compatibility.
+
 ## 0.0.0-alpha.5
 
 ### Patch Changes

@@ -91,7 +91,7 @@
     },
     "packages/devkit": {
       "name": "@raypx-kit/devkit",
-      "version": "0.0.0-alpha.5",
+      "version": "0.0.0-alpha.6",
       "dependencies": {
         "@dotenvx/dotenvx": "^2.38.2",
         "confbox": "^0.3.2",
