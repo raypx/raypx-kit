@@ -17,7 +17,7 @@ runs:
       shell: bash
       env:
         DIAGNOSTICS_JOB_STATUS: ${{ inputs.job-status }}
-      run: bun scripts/ci/diagnostics.ts summary "$DIAGNOSTICS_JOB_STATUS"
+      run: node scripts/ci/diagnostics.ts summary "$DIAGNOSTICS_JOB_STATUS"
     - name: Retain failure diagnostics
       if: ${{ always() && (inputs.job-status == 'failure' || failure()) }}
       uses: actions/upload-artifact@v7

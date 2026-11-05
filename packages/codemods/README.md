@@ -10,7 +10,7 @@ Node types for the runtime environment.
 ## Install and inspect
 
 ```sh
-bun add --dev @raypx-kit/codemods
+pnpm add --dev @raypx-kit/codemods
 raypx-kit-codemod --help
 raypx-kit-codemod list
 ```
@@ -81,15 +81,15 @@ repeatable and inspect the diff in version control before committing.
 From this repository, use the source CLI without building first:
 
 ```sh
-bun run codemod list
-bun run codemod --help
-bun run --cwd packages/codemods test
-bun run --cwd packages/codemods check
-bun run build --filter=@raypx-kit/codemods
-bun run pack:check
+pnpm run codemod list
+pnpm run codemod --help
+pnpm --dir packages/codemods run test
+pnpm --dir packages/codemods run check
+pnpm run build --filter=@raypx-kit/codemods
+pnpm run pack:check
 ```
 
 Runner tests cover preview, writes, skipped files, path deduplication and failure
 before writes. CLI tests inject a test-only migration into the internal registry
 interface; they do not ship fake migrations. Archive consumers load the public
-API and execute the installed CLI with both Bun and Node.
+API and execute the installed CLI with Node.

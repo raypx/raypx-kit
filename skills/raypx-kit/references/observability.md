@@ -1,7 +1,7 @@
 # @raypx-kit/logger
 
 ```sh
-bun add @raypx-kit/logger
+pnpm add @raypx-kit/logger
 ```
 
 Built on evlog. One **wide event** per request or job: accumulate fields, emit once.

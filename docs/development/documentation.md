@@ -10,7 +10,7 @@ repository. Keep package READMEs focused on their published APIs.
 
 ## Formatting and tables
 
-Run `bun run format` from the repository root. The Markdown/MDX overrides in
+Run `pnpm run format` from the repository root. The Markdown/MDX overrides in
 [vite.config.ts](../../vite.config.ts) use a 100-column width, two-space indentation,
 LF line endings and a final newline. They preserve authored prose line breaks and
 format supported code examples automatically. Oxfmt handles table column alignment
@@ -98,7 +98,7 @@ navigation metadata in [the translation map](../src/lib/i18n/pages.ts).
 
 ### Verify the result [step]
 
-Run `bun run docs:check`, `bun run docs:build` and `bun run test:e2e --project docs`.
+Run `pnpm run docs:check`, `pnpm run docs:build` and `pnpm run test:e2e --project docs`.
 Check the rendered page in both themes and at a mobile width.
 
 ## Code tabs
@@ -109,27 +109,27 @@ highlighting and copy controls also come from the default preset.
 
 ````md
 ```sh tab="Development" title="Repository root"
-bun run docs:dev
+pnpm run docs:dev
 ```
 
 ```sh tab="Build" title="Repository root"
-bun run docs:build
+pnpm run docs:build
 ```
 ````
 
 ```sh tab="Development" title="Repository root"
-bun run docs:dev
+pnpm run docs:dev
 ```
 
 ```sh tab="Build" title="Repository root"
-bun run docs:build
+pnpm run docs:build
 ```
 
 ## Package manager tabs
 
 For consumer installation examples, a fence with the `npm` language generates
 equivalent npm, pnpm, Yarn and Bun commands automatically. Repository maintenance
-commands continue to use the pinned Bun runtime.
+commands use the pinned pnpm + Node toolchain.
 
 ````md
 ```npm

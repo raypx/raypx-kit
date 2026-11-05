@@ -38,8 +38,8 @@ README documents every preset and compiler guarantee.
 ## Verification
 
 ```bash
-bun run --cwd packages/tsconfig test
-bun run --cwd packages/tsconfig check
-bun run --cwd packages/tsconfig pack:check
-bun run pack:check
+pnpm --dir packages/tsconfig run test
+pnpm --dir packages/tsconfig run check
+pnpm --dir packages/tsconfig run pack:check
+pnpm run pack:check
 ```

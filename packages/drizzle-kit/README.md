@@ -7,7 +7,7 @@ about 7 MB; the runtime dependency names are preserved.
 The distribution supports Node 22.21+ and Bun.
 
 ```sh
-bun add -d @raypx-kit/drizzle-kit 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z'
+pnpm add -d @raypx-kit/drizzle-kit 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z'
 ```
 
 The copied files are upstream's, byte for byte. A generated `dist/package.json`
@@ -16,14 +16,14 @@ built from the lockfile's resolved drizzle-kit version. Install `drizzle-orm`
 from the supported RC5 range, which the CLI loads from the consumer project.
 
 Drizzle ORM/CLI declarations use `>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z`;
-validation tests the builds selected by `bun.lock`. Runtime dependencies preserve
+validation tests the builds selected by `pnpm-lock.yaml`. Runtime dependencies preserve
 upstream's existing ranges and widen exact upstream declarations to caret ranges
 that include the upstream versions. Tests check the dependency names and range
 coverage when updating the CLI.
 
 The esbuild dependency also accepts `^0.28.2` alongside upstream's `^0.25.10`.
 Archive consumers verify TypeScript config and schema compilation by generating
-migrations with the installed CLI under both Bun and Node.
+migrations with the installed CLI under Node.
 
 | @raypx-kit/drizzle-kit | drizzle-kit        |
 | ---------------------- | ------------------ |

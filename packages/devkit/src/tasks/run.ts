@@ -8,6 +8,8 @@ import type { TaskInvocation, TaskMember, TaskModel } from "./types.js";
 
 export interface RunTasksOptions<M extends TaskMember> {
   runtime: string;
+  /** Arguments before VP commands; defaults to Bun’s local VP launcher. */
+  runner?: string[];
   environment?: NodeJS.ProcessEnv;
   allowFilteredArguments?: boolean;
   directories?(this: void, member: M): string[];
@@ -66,8 +68,7 @@ export async function runTasks<M extends TaskMember>(
   await run(
     options.runtime,
     [
-      "--bun",
-      "vp",
+      ...(options.runner ?? ["--bun", "vp"]),
       "run",
       "--fail-if-no-match",
       "--log",

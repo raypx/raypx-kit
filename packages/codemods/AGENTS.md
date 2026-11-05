@@ -21,7 +21,7 @@ Do not add placeholder transformations or import application migration policy.
   content. Write failures can leave earlier writes applied; this is not a
   transactional filesystem API.
 - Tests belong in `tests/`; `tests/fixtures/consumer` checks the real archive's
-  public declarations, runner and CLI with both Bun and Node.
+  public declarations, runner and CLI with Node.
 
 Keep this scaffold dependency-free. Choose a parser only when a concrete
 migration needs syntax-aware rewriting; preserve comments and directives and

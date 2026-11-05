@@ -47,4 +47,4 @@ projects run it with `vite dev`.
 Run focused package tests and type checks first, then the root `verify` gate.
 The installed archive contract must run the consumer's real `vite dev` with the
 plugin, load the prebuilt interface, render consumer templates, observe changes and
-exit cleanly under both Bun and Node. Source-only tests cannot replace this packaging contract.
+exit cleanly under Node. Source-only tests cannot replace this packaging contract.

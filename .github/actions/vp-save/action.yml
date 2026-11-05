@@ -9,7 +9,7 @@ runs:
   steps:
     - shell: bash
       id: changes
-      run: bun scripts/ci/cache.ts changed
+      run: node --import tsx scripts/ci/cache.ts changed
     - uses: actions/cache/save@v6
       if: steps.changes.outputs.changed == 'true'
       with:

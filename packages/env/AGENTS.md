@@ -42,8 +42,8 @@ declarations under `dist/`. The README documents the complete shipped API.
 ## Verification
 
 ```bash
-bun run --cwd packages/env test
-bun run --cwd packages/env check
-bun run build --filter=@raypx-kit/env
-bun run --cwd packages/env pack:check
+pnpm --dir packages/env run test
+pnpm --dir packages/env run check
+pnpm run build --filter=@raypx-kit/env
+pnpm --dir packages/env run pack:check
 ```

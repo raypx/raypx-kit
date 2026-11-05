@@ -1,7 +1,7 @@
 # @raypx-kit/intl
 
 ```sh
-bun add @raypx-kit/intl react@^19.3.1
+pnpm add @raypx-kit/intl react@^19.3.1
 ```
 
 `use-intl` is bundled. Import every translation/formatting API from this package;

@@ -105,21 +105,21 @@ Public packages declare Node `>=22.21`; Security follows Arcjet's narrower
 `>=22.21.0 <23 || >=24.5.0` range. The VP pack builds target Node 22.21.0.
 The development runtime pin remains separate.
 
-| Package       | Public entries                                                                                                | Dependency boundary                                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codemods      | Root runner API; raypx-kit-codemod executable                                                                 | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                    |
-| Devkit        | /workspaces, /architecture, /toolchain, /catalogs, /docs, /process, /artifact, /lint, /testing; no root entry | Node APIs and external parser/configuration dependencies; lint/test presets contain plain data and its VP helper runs under Bun                |
-| Drizzle       | Root, /postgres, /errors, /results, /diagnostics                                                              | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                             |
-| Drizzle Kit   | Root defineConfig for ESM and CommonJS; drizzle-kit executable                                                | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                  |
-| Env           | Root, /runtime                                                                                                | Zod is a required external peer, preserving schema runtime identity                                                                            |
-| Intl          | Root, /client, /browser, /server, /types, /testing                                                            | React is a required external peer; use-intl and the explicitly allowed FormatJS-related dependencies are bundled, including their declarations |
-| Logger        | Root, /context, /pipeline                                                                                     | evlog is an external runtime dependency, not a peer or bundled copy; /context uses its Node asynchronous storage                               |
-| Notifications | Root, /react, /styles.css                                                                                     | Server root uses external Knock Node SDK; React and the Knock React SDK are optional external peers isolated under /react                      |
-| Security      | Root, /arcjet                                                                                                 | Universal headers use external Nosecone; the Node-only Arcjet entry uses an optional external SDK peer                                         |
-| TSConfig      | /base.json, /node.json, /browser.json, /library.json, /react-library.json; no root entry                      | JSON presets extend sibling presets; consumers install the compiler and ambient type packages they need                                        |
-| Email Preview | Root (emailPreview() Vite plugin), /package.json                                                              | Vite is a peer; the prebuilt interface bundles UI/Themes; template dependencies and React resolve from the consumer project                    |
-| Themes        | Root, /config, /script, /styles.css, /tailwind.css                                                            | Root React APIs use an optional peer; config, script and CSS work independently                                                                |
-| UI            | Root, /components/ui/\* (explicit exports), /lib/utils, /styles.css                                           | Base UI primitives, Themes CSS and external React/React DOM/Tailwind peers                                                                     |
+| Package       | Public entries                                                                                                | Dependency boundary                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codemods      | Root runner API; raypx-kit-codemod executable                                                                 | Node filesystem APIs, no runtime dependencies; the built-in migration registry starts empty                                                               |
+| Devkit        | /workspaces, /architecture, /toolchain, /catalogs, /docs, /process, /artifact, /lint, /testing; no root entry | Node APIs and external parser/configuration dependencies; lint/test presets contain plain data and its VP helper accepts an explicit runtime and launcher |
+| Drizzle       | Root, /postgres, /errors, /results, /diagnostics                                                              | Drizzle ORM is an optional external peer; postgres.js is installed and owned by database consumers                                                        |
+| Drizzle Kit   | Root defineConfig for ESM and CommonJS; drizzle-kit executable                                                | External upstream CLI dependencies; the CLI resolves an ORM installed in the consumer project                                                             |
+| Env           | Root, /runtime                                                                                                | Zod is a required external peer, preserving schema runtime identity                                                                                       |
+| Intl          | Root, /client, /browser, /server, /types, /testing                                                            | React is a required external peer; use-intl and the explicitly allowed FormatJS-related dependencies are bundled, including their declarations            |
+| Logger        | Root, /context, /pipeline                                                                                     | evlog is an external runtime dependency, not a peer or bundled copy; /context uses its Node asynchronous storage                                          |
+| Notifications | Root, /react, /styles.css                                                                                     | Server root uses external Knock Node SDK; React and the Knock React SDK are optional external peers isolated under /react                                 |
+| Security      | Root, /arcjet                                                                                                 | Universal headers use external Nosecone; the Node-only Arcjet entry uses an optional external SDK peer                                                    |
+| TSConfig      | /base.json, /node.json, /browser.json, /library.json, /react-library.json; no root entry                      | JSON presets extend sibling presets; consumers install the compiler and ambient type packages they need                                                   |
+| Email Preview | Root (emailPreview() Vite plugin), /package.json                                                              | Vite is a peer; the prebuilt interface bundles UI/Themes; template dependencies and React resolve from the consumer project                               |
+| Themes        | Root, /config, /script, /styles.css, /tailwind.css                                                            | Root React APIs use an optional peer; config, script and CSS work independently                                                                           |
+| UI            | Root, /components/ui/\* (explicit exports), /lib/utils, /styles.css                                           | Base UI primitives, Themes CSS and external React/React DOM/Tailwind peers                                                                                |
 
 Codemods provides a runner, not a set of automatic project upgrades. Callers pass
 a transformation and explicit file paths to `runCodemod`; previews are the default
@@ -208,7 +208,7 @@ document checks and shared VP task inputs. The scripts explicitly import it and
 pass plain data to Devkit; scanning another repository never executes its
 configuration. Workspace metadata maps must cover the discovered workspace paths
 exactly. Manifests retain exports, dependencies and supported runtime ranges;
-root `packageManager` retains the Bun development pin. The isolated Node consumer
+root `engines.node` and `packageManager` retain the Node and pnpm development pins. The isolated Node consumer
 baseline lives in `scripts/packages/node-version`.
 
 The wrappers import Devkit source directly, so
@@ -218,8 +218,8 @@ Root type checking includes the configuration, and VP shared inputs
 include it so policy changes invalidate cached workspace tasks. The TSConfig
 workspace supplies compiler presets during repository development.
 
-Bun owns installation, native type checks, repository TypeScript scripts and
-archive packing. VP orders workspace tasks; VP pack builds the ESM libraries.
+pnpm owns installation and archive packing; Node runs scripts through tsx, and
+TypeScript checks source through `tsc --noEmit`. VP orders workspace tasks; VP pack builds the ESM libraries.
 Vite+ supplies formatting, linting, tests and the documentation application's
 Vite commands. Knip treats the declared library entries as public roots while
 checking unused implementation code and dependencies. Independent Changesets
@@ -227,21 +227,21 @@ versions keep these shared development tools from linking package release cycles
 
 ## Verification boundaries
 
-| Layer                            | Contract checked                                                                                                                                                                      |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Source checks and package tests  | Strict source/test types, implementation behavior and deliberate error cases; library builds include production sources only                                                          |
-| Workspace architecture           | Explicit source entries, dependency cycles, declared runtime imports, public cross-workspace imports and platform boundaries before building                                          |
-| Knip                             | Source reachability, declared dependencies and internal exports, with public entries preserved even without workspace callers                                                         |
-| Browser E2E                      | Package-owned Playwright scenarios exercise built React exports and real applications in Chromium, with isolated contexts and local test data                                         |
-| Archive checks                   | Expected files, exported targets, binaries, complete retained notices and dependency protocols suitable for publication                                                               |
-| Isolated consumers               | Install the actual archive outside the workspace; load public exports with Bun and Node, check supported CommonJS conditions and binary links, and resolve declarations with NodeNext |
-| Package consumer fixtures        | Additional public runtime and type contracts against the installed archive, with their own dependency and compiler environments                                                       |
-| Consumers without optional peers | Independently verify Drizzle's driver-free entries and strict declarations, and confirm ORM-dependent entries still require the missing ORM                                           |
-| CI compatibility matrix          | Reuse the same archives at each package's minimum supported Node and the development pin, with minimum and locked peer versions                                                       |
-| CI database integration          | A separate job configures temporary PostgreSQL 17 and the explicit Drizzle suite for real JSONB, UPSERT, SQLSTATE and EXPLAIN behavior                                                |
+| Layer                            | Contract checked                                                                                                                                                              |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source checks and package tests  | Strict source/test types, implementation behavior and deliberate error cases; library builds include production sources only                                                  |
+| Workspace architecture           | Explicit source entries, dependency cycles, declared runtime imports, public cross-workspace imports and platform boundaries before building                                  |
+| Knip                             | Source reachability, declared dependencies and internal exports, with public entries preserved even without workspace callers                                                 |
+| Browser E2E                      | Package-owned Playwright scenarios exercise built React exports and real applications in Chromium, with isolated contexts and local test data                                 |
+| Archive checks                   | Expected files, exported targets, binaries, complete retained notices and dependency protocols suitable for publication                                                       |
+| Isolated consumers               | Install the actual archive outside the workspace; load public exports with Node, check supported CommonJS conditions and binary links, and resolve declarations with NodeNext |
+| Package consumer fixtures        | Additional public runtime and type contracts against the installed archive, with their own dependency and compiler environments                                               |
+| Consumers without optional peers | Independently verify Drizzle's driver-free entries and strict declarations, and confirm ORM-dependent entries still require the missing ORM                                   |
+| CI compatibility matrix          | Reuse the same archives at each package's minimum supported Node and the development pin, with minimum and locked peer versions                                               |
+| CI database integration          | A separate job configures temporary PostgreSQL 17 and the explicit Drizzle suite for real JSONB, UPSERT, SQLSTATE and EXPLAIN behavior                                        |
 
-Unit tests use Bun workers with Vitest's `node` or `jsdom` environment. Intl's client
-tests use a Bun-specific jsdom preload. These test-runtime choices do not make
+Unit tests use Node workers with Vitest's `node` or `jsdom` environment.
+These test-runtime choices do not make
 the published libraries depend on the repository's test setup.
 
 Ordinary archive declaration checks skip third-party declaration bodies where
@@ -269,7 +269,7 @@ export, CLI and fixture contracts with a separate consumer Node executable.
 Internal runtime dependencies install from the same batch of verified archives,
 and exported CSS assets are resolved and read without importing them as JavaScript.
 Minimum peer versions and the lockfile's tested peer versions use independent
-installations. These jobs supplement the default Bun archive checks and
+installations. These jobs supplement the default pnpm archive checks and
 do not require a local database.
 
 Drizzle's separate CI job runs `test:integration` against a temporary PostgreSQL 17
@@ -304,7 +304,7 @@ The build rewrites registered documentation links to site routes and keeps other
 repository files as GitHub source links. TanStack Start prerenders the registered
 pages; Fumadocs serves search results from the same content source through the
 TanStack Start file route at `/api/search`. Nitro builds a Cloudflare Worker for
-the API alongside static page assets, using its Bun preset during development.
+the API alongside static page assets, using its node-server preset during development.
 The application remains outside npm publication
 and library release versions. UI routing and site dependencies do not become
 library runtime dependencies.

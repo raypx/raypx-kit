@@ -17,7 +17,8 @@ interface Member extends TaskMember {
 export type TaskModel = SharedTaskModel<Member> & { tasks: Map<string, TaskDefinition> };
 const shared = [
   "package.json",
-  "bun.lock",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
   "mise.toml",
   "devkit.config.ts",
   "scripts/tasks/**",
@@ -87,9 +88,9 @@ function definition(member: Member, name: string, context: TaskContext<Member>):
     "\\",
     "/",
   );
-  const identity = `${process.platform}-${process.arch}-${String(context.manifest.packageManager)}`;
+  const identity = `${process.platform}-${process.arch}-${String(context.manifest.packageManager)}-node${process.versions.node}`;
   return {
-    command: `bun ${JSON.stringify(leaf)} ${JSON.stringify(name)} ${argumentKey(taskRef(member.name, name))} ${JSON.stringify(identity)}`,
+    command: `tsx ${JSON.stringify(leaf)} ${JSON.stringify(name)} ${argumentKey(taskRef(member.name, name))} ${JSON.stringify(identity)}`,
     dependsOn,
     cache: cached
       ? {
@@ -118,7 +119,7 @@ export function taskModel(root: string, selection?: string): TaskModel {
     {
       member: (workspace, member) => ({ ...member, private: Boolean(workspace.manifest.private) }),
       define: definition,
-      aggregateCommand: `bun scripts/tasks/leaf.ts --aggregate "${process.platform}-${process.arch}"`,
+      aggregateCommand: `tsx scripts/tasks/leaf.ts --aggregate "${process.platform}-${process.arch}"`,
       rootTasks({ rootName, members }) {
         const task = (command: string, dependsOn: string[] = []): TaskDefinition => ({
           command,
@@ -126,8 +127,8 @@ export function taskModel(root: string, selection?: string): TaskModel {
           cache: false,
         });
         const roots: Record<string, TaskDefinition> = {
-          "check:root": task("bun --check --tsconfig-override tsconfig.json"),
-          "test:toolchain": task("bun --bun vp test --run --config vitest.config.ts"),
+          "check:root": task("tsc --noEmit --project tsconfig.json"),
+          "test:toolchain": task("pnpm exec vp test --run --config vitest.config.ts"),
         };
         for (const name of [
           "toolchain:check",
@@ -136,17 +137,17 @@ export function taskModel(root: string, selection?: string): TaskModel {
           "lint",
           "knip",
         ])
-          roots[name] = task(`bun run ${name}`);
+          roots[name] = task(`pnpm run ${name}`);
         for (const name of ["check", "test"])
           if (members.some((member) => member.scripts[name]))
-            roots[name] = task("bun scripts/tasks/leaf.ts --aggregate", [
+            roots[name] = task("tsx scripts/tasks/leaf.ts --aggregate", [
               taskRef(rootName, name === "check" ? "check:root" : "test:toolchain"),
               ...members
                 .filter((member) => member.scripts[name])
                 .map((member) => taskRef(member.name, name)),
             ]);
         roots["test:build"] = task(
-          "bun scripts/tasks/leaf.ts --aggregate",
+          "tsx scripts/tasks/leaf.ts --aggregate",
           ["test", "build"]
             .filter((name) => members.some((member) => member.scripts[name]))
             .map((name) => taskRef(rootName, name)),

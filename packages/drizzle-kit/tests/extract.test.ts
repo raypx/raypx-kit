@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { satisfies, subset, validRange } from "semver";
 
@@ -140,7 +140,9 @@ assert.equal(esm.defineConfig(config), config);`,
     expect(satisfies(kit.version, range)).toBe(true);
 
     const require = createRequire(join(root, "package.json"));
-    const orm = JSON.parse(await readFile(require.resolve("drizzle-orm/package.json"), "utf8")) as {
+    const orm = JSON.parse(
+      await readFile(join(dirname(require.resolve("drizzle-orm")), "package.json"), "utf8"),
+    ) as {
       version: string;
     };
     expect(orm.version).toBe(kit.version);

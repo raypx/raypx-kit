@@ -35,7 +35,7 @@ export function verificationPlan(
   let release = false;
   for (const file of files) {
     if (
-      /^(?:package\.json|bun\.lock|mise\.toml|devkit\.config\.ts|(?:vite|vitest|tsconfig|knip|playwright)[^/]*|scripts\/|tests\/|e2e\/|packages\/devkit\/src\/|packages\/tsconfig\/[^/]+\.json$|\.github\/)/.test(
+      /^(?:package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|mise\.toml|devkit\.config\.ts|(?:vite|vitest|tsconfig|knip|playwright)[^/]*|scripts\/|tests\/|e2e\/|packages\/devkit\/src\/|packages\/tsconfig\/[^/]+\.json$|\.github\/)/.test(
         file,
       )
     ) {

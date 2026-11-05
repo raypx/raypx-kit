@@ -31,8 +31,8 @@ The README documents the complete shipped API.
 ## Verification
 
 ```bash
-bun run --cwd packages/storage test
-bun run --cwd packages/storage check
-bun run build --filter=@raypx-kit/storage
-bun run --cwd packages/storage pack:check
+pnpm --dir packages/storage run test
+pnpm --dir packages/storage run check
+pnpm run build --filter=@raypx-kit/storage
+pnpm --dir packages/storage run pack:check
 ```

@@ -1,7 +1,7 @@
 # @raypx-kit/storage
 
 ```sh
-bun add @raypx-kit/storage
+pnpm add @raypx-kit/storage
 ```
 
 Server-side object storage. Clients upload/download through short-lived signed URLs.

@@ -73,7 +73,7 @@ by purpose. They use the site's shared language, theme and search controls; the
 Raypx Kit brand link returns to the localized home page. Package descriptions come
 from the maintained documentation metadata, while UI messages live in the catalogs.
 
-Run `bun run docs:dev` from the repository root to browse the site at
+Run `pnpm run docs:dev` from the repository root to browse the site at
 `http://localhost:3100/docs`. Fumadocs renders these files and package guides
 directly, with navigation, local search and source links. Edit each page's
 canonical Markdown rather than making a second copy.
@@ -100,7 +100,7 @@ UI catalogs live under `src/lib/i18n/`. Documentation tests compare catalog keys
 and ICU arguments and check translated source links. Fumadocs uses the multilingual
 tokenizer and filters search results by locale. Browser checks cover language
 switching, Chinese search, mobile navigation, English fallback and SSR without
-JavaScript. Run `bun run test:e2e --project docs` for those scenarios.
+JavaScript. Run `pnpm run test:e2e --project docs` for those scenarios.
 
 ### Theme integration
 
@@ -114,9 +114,9 @@ inputs and dialogs, and theme choices survive language navigation and reloads.
 
 Page registration and navigation live in [pages.ts](src/lib/pages.ts); the
 [architecture guide](architecture/README.md#documentation-flow) explains how
-content becomes site pages. Documentation tests run with `bun run test:toolchain`;
-`bun run docs:build` checks compilation and prerendering. The complete
-`bun run verify` gate includes both. Keep full inventories, proposed API labels
+content becomes site pages. Documentation tests run with `pnpm run test:toolchain`;
+`pnpm run docs:build` checks compilation and prerendering. The complete
+`pnpm run verify` gate includes both. Keep full inventories, proposed API labels
 and upstream notices when editing.
 
 Repository design and maintainer guides are excluded from npm archives. See

@@ -140,12 +140,16 @@ import { strictLint } from "@raypx-kit/devkit/lint";
 export default defineConfig({ lint: strictLint });\n`,
   );
   const run = (args) =>
-    execFileSync("bun", ["--bun", "vp", ...args], {
-      cwd: probe,
-      encoding: "utf8",
-      stdio: "pipe",
-      timeout: 30_000,
-    });
+    execFileSync(
+      process.execPath,
+      [fileURLToPath(new URL("./bin/vp", import.meta.resolve("vite-plus/package.json"))), ...args],
+      {
+        cwd: probe,
+        encoding: "utf8",
+        stdio: "pipe",
+        timeout: 30_000,
+      },
+    );
   writeFileSync(
     join(probe, "src.ts"),
     "export const equals = (value: string | number) => value == 1;\n",
@@ -165,8 +169,8 @@ export default defineConfig({ lint: strictLint });\n`,
   writeFileSync(
     join(probe, "vitest.config.ts"),
     `import { defineConfig, mergeConfig } from "vite-plus/test/config";
-import { bunTestDefaults } from "@raypx-kit/devkit/testing";
-export default mergeConfig(bunTestDefaults, defineConfig({ test: { include: ["fixture.test.ts"] } }));\n`,
+import { nodeTestDefaults } from "@raypx-kit/devkit/testing";
+export default mergeConfig(nodeTestDefaults, defineConfig({ test: { include: ["fixture.test.ts"] } }));\n`,
   );
   writeFileSync(
     join(probe, "fixture.test.ts"),

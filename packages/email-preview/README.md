@@ -10,8 +10,8 @@ a template, imported helper or local asset updates the preview automatically.
 Install the preview and its peers in the project that owns your templates:
 
 ```sh
-bun add -d @raypx-kit/email-preview@0.0.0-alpha.0 vite@^8
-bun add react@^19 react-dom@^19 @react-email/components
+pnpm add -d @raypx-kit/email-preview@0.0.0-alpha.0 vite@^8
+pnpm add react@^19 react-dom@^19 @react-email/components
 ```
 
 It supports Node 22.21+ and Bun. The interface is prebuilt into the package; your
@@ -74,7 +74,7 @@ export default defineConfig({
 }
 ```
 
-Run `bun run email:dev` and open `http://127.0.0.1:3001`. Vite reports an occupied
+Run `pnpm run email:dev` and open `http://127.0.0.1:3001`. Vite reports an occupied
 port or invalid configuration as usual; a missing template directory shows an
 empty library until you create it.
 
@@ -169,12 +169,12 @@ a JSX password reset email, a local SVG asset and the `vite.config.ts` that prev
 them. From the repository root:
 
 ```sh
-bun run --cwd packages/email-preview dev
+pnpm --dir packages/email-preview run dev
 ```
 
 Tests cover discovery, rendering, live updates and HTTP behavior. The repository's
 archive checks install the actual package outside the workspace and run `vite dev`
-with the plugin under Bun and Node, including consumer dependencies and shared
+with the plugin under Node, including consumer dependencies and shared
 imports.
 See the [development guide](../../docs/development/README.md) for repository checks.
 
@@ -189,8 +189,8 @@ the npm archive. Generated build notices are not committed to Git.
 The direct external runtime dependencies below remain separate npm packages with
 their own license files. This index records installed versions and links to their
 licenses without copying the texts. Transitive dependencies retain their notices
-in their respective packages. Run `bun run licenses:update` after dependency
-changes; `bun run licenses:check` checks this index without requiring build output.
+in their respective packages. Run `pnpm run licenses:update` after dependency
+changes; `pnpm run licenses:check` checks this index without requiring build output.
 
 <!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->
 
@@ -208,7 +208,7 @@ changes; `bun run licenses:check` checks this index without requiring build outp
 
 The built plugin in a Vite server, navigation, sandbox previews, source actions and live template recovery.
 
-Run `bun run test:e2e:install` once at the repository root, then
-`bun run --cwd packages/email-preview test:e2e`. The package owns its scenarios in
+Run `pnpm run test:e2e:install` once at the repository root, then
+`pnpm --dir packages/email-preview run test:e2e`. The package owns its scenarios in
 `e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
 for project selection, reports and CI behavior.

@@ -7,16 +7,16 @@ IPs, rules and failure policy. Importing either entry does not send requests.
 ## Install
 
 ```sh
-bun add @raypx-kit/security
+pnpm add @raypx-kit/security
 # Only needed for request detection:
-bun add @arcjet/node
+pnpm add @arcjet/node
 ```
 
 The root entry works without Arcjet. The `/arcjet` entry requires the optional
 `@arcjet/node` peer, starting at version 1.14.1. Both SDKs remain external.
 Supported Node versions follow Nosecone and Arcjet:
-`>=22.21.0 <23 || >=24.5.0`. Repository verification uses Node 22.21.0,
-Node 24.22.0 and Bun 1.4.4. The Arcjet entry uses Node APIs and is not an edge
+`>=22.21.0 <23 || >=24.5.0`. Repository verification uses the pinned Node development runtime. The independent
+compatibility matrix checks Node 22.21.0 and 24.22.0. The Arcjet entry uses Node APIs and is not an edge
 Worker or browser entry. There is no Next.js or TanStack runtime dependency.
 
 ## Response headers
@@ -195,8 +195,8 @@ account or an assertion about cloud detection accuracy.
 
 [LICENSE](./LICENSE) contains this package's Apache-2.0 terms. External
 dependencies ship their own license texts; the index below links to their exact
-installed versions without duplicating those texts. Run `bun run licenses:update`
-from the repository root after dependency changes; `bun run licenses:check`
+installed versions without duplicating those texts. Run `pnpm run licenses:update`
+from the repository root after dependency changes; `pnpm run licenses:check`
 rejects a stale index.
 
 <!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->

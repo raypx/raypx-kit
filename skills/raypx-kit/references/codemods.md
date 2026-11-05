@@ -1,7 +1,7 @@
 # @raypx-kit/codemods
 
 ```sh
-bun add -d @raypx-kit/codemods
+pnpm add -d @raypx-kit/codemods
 raypx-kit-codemod list
 ```
 

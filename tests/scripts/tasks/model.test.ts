@@ -14,7 +14,7 @@ function fixture(cyclic = false) {
   roots.push(root);
   writeFileSync(
     join(root, "package.json"),
-    JSON.stringify({ name: "fixture", packageManager: "bun@1.4.4", workspaces: ["packages/*"] }),
+    JSON.stringify({ name: "fixture", packageManager: "pnpm@12.16.1", workspaces: ["packages/*"] }),
   );
   for (const name of ["base", "consumer"]) {
     const directory = join(root, "packages", name);
@@ -24,10 +24,10 @@ function fixture(cyclic = false) {
       JSON.stringify({
         name: `@fixture/${name}`,
         scripts: {
-          check: "bun --version",
-          test: "bun --version",
-          build: "bun --version",
-          dev: "bun --version",
+          check: "node --version",
+          test: "node --version",
+          build: "node --version",
+          dev: "node --version",
         },
         dependencies:
           name === "consumer"

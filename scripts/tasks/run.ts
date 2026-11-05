@@ -12,6 +12,7 @@ export async function runTasks(
     taskSelection(root, "TOOLKIT_VERIFY_TASKS", "TOOLKIT_VERIFY_ROOT");
   await execute(taskModel(root, selection), name, args, {
     runtime: process.execPath,
+    runner: [fileURLToPath(new URL("../../node_modules/vite-plus/bin/vp", import.meta.url))],
     environment: { ...environment, ...(selection ? { TOOLKIT_VERIFY_ROOT: root } : {}) },
     allowFilteredArguments: true,
   });

@@ -6,7 +6,7 @@ their file layout, path aliases and runtime-specific types.
 The package declares Node 22.21+ support; its published presets remain plain JSON.
 
 ```sh
-bun add -d @raypx-kit/tsconfig typescript
+pnpm add -d @raypx-kit/tsconfig typescript
 ```
 
 ## Presets

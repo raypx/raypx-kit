@@ -15,7 +15,7 @@ Every package is still a prerelease (`0.0.0-alpha.N`). **Pin exact versions**:
 prereleases can change public APIs between alphas.
 
 ```sh
-bun add @raypx-kit/env@0.0.0-alpha.0 zod@^4.6.7
+pnpm add @raypx-kit/env@0.0.0-alpha.0 zod@^4.6.7
 ```
 
 All packages are ESM-only and require Node 22.21+ or Bun. Security follows

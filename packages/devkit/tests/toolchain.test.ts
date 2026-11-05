@@ -17,6 +17,7 @@ vi.mock("node:child_process", () => ({ execFileSync }));
 const roots: string[] = [];
 const nodeVersion = "24.22.0";
 const bunVersion = "1.4.3";
+const bunVersionDescriptor = Object.getOwnPropertyDescriptor(process.versions, "bun");
 const workflow = [
   "jobs:",
   "  verify:",
@@ -98,6 +99,7 @@ function manifestAt(root: string) {
 beforeEach(() => {
   execFileSync.mockReset();
   vi.stubEnv("DEVKIT_NODE_BINARY", undefined);
+  Object.defineProperty(process.versions, "bun", { value: bunVersion, configurable: true });
 });
 
 describe("Bun-only repositories", () => {
@@ -254,6 +256,8 @@ describe("Bun-only repositories", () => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  if (bunVersionDescriptor) Object.defineProperty(process.versions, "bun", bunVersionDescriptor);
+  else Reflect.deleteProperty(process.versions, "bun");
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 

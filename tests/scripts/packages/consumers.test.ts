@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { parseYAML } from "confbox/yaml";
 import { afterEach, expect, it } from "vite-plus/test";
 import { checkConsumer, type Manifest } from "../../../scripts/packages/consumers.js";
 
@@ -31,7 +32,7 @@ it("resolves CSS exports and transitive dependencies from the same packed batch"
     await writeFile(join(directory, "package.json"), JSON.stringify(packed));
     await writeFile(join(directory, "styles.css"), ":root { --fixture: packed; }");
     const archive = join(root, `${packed.name.split("/").at(-1)}.tgz`);
-    execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
+    execFileSync("pnpm", ["pack", "--out", archive], {
       cwd: directory,
       stdio: "pipe",
     });
@@ -55,12 +56,15 @@ assert.match(await readFile(fromUi.resolve("@raypx-kit-test/theme/styles.css"), 
   );
   const consumer = join(root, "consumer");
   await checkConsumer(packageArchives[ui.name]!, ui, consumer, packageDirectory, {
-    bunBinary: process.execPath,
+    nodeBinary: process.execPath,
     compilerDependencies: {},
     packageArchives,
   });
   const installed = JSON.parse(await readFile(join(consumer, "package.json"), "utf8"));
-  expect(installed.overrides).toEqual(packageArchives);
+  expect(installed.overrides).toBeUndefined();
+  expect(parseYAML(await readFile(join(consumer, "pnpm-workspace.yaml"), "utf8"))).toMatchObject({
+    overrides: packageArchives,
+  });
   expect(await readFile(join(consumer, "exports.mjs"), "utf8")).toContain(
     "Empty stylesheet export",
   );

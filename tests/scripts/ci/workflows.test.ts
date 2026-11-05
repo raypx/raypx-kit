@@ -28,9 +28,13 @@ function installsNode(job: Steps): boolean {
   );
 }
 
-it("keeps Node installation outside every default CI job, including nested setup actions", () => {
+it("installs Node for every default CI job, including nested setup actions", () => {
   const ci = read<Workflow>(".github/workflows/ci.yml");
-  expect(Object.values(ci.jobs).some(installsNode)).toBe(false);
+  expect(
+    Object.values(ci.jobs)
+      .filter((job) => job.steps)
+      .every(installsNode),
+  ).toBe(true);
   const compatibility = read<Workflow>(".github/workflows/node-compatibility.yml");
   expect(installsNode(compatibility.jobs.prepare!)).toBe(true);
 });

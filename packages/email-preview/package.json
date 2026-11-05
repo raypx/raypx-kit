@@ -37,13 +37,13 @@
     "access": "public"
   },
   "scripts": {
-    "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "bun --bun vp pack && bun --bun vp build --config vite.app.config.ts",
-    "dev": "bun run build && bun --bun vp dev --config examples/vite.config.ts",
-    "test": "bun --bun vp test --run",
-    "test:unit": "bun --bun vp test --run",
-    "pack:check": "bun pm pack --dry-run",
-    "test:e2e": "bun ../../e2e/run.ts --project email-preview"
+    "check": "tsc --noEmit --project tsconfig.json",
+    "build": "vp pack && vp build --config vite.app.config.ts",
+    "dev": "pnpm run build && vp dev --config examples/vite.config.ts",
+    "test": "vp test --run",
+    "test:unit": "vp test --run",
+    "pack:check": "pnpm pack --dry-run",
+    "test:e2e": "tsx ../../e2e/run.ts --project email-preview"
   },
   "dependencies": {
     "@react-email/render": "catalog:",

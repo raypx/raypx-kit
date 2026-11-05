@@ -9,3 +9,12 @@ export const bunTestDefaults = {
     coverage: { provider: "v8", reporter: ["text", "json", "lcov"] },
   },
 } satisfies ViteUserConfig;
+
+/** Plain Vitest defaults for Node workers. */
+export const nodeTestDefaults = {
+  test: {
+    environment: "node",
+    maxWorkers: 1,
+    coverage: { provider: "v8", reporter: ["text", "json", "lcov"] },
+  },
+} satisfies ViteUserConfig;

@@ -19,4 +19,4 @@ Keep the package's Apache license separate from the README dependency license
 index. Reference upstream designs and dependencies without copying their source.
 All tests belong in `tests/`; archive consumers also cover the root without the
 optional SDK. Use mocked request protection; tests never need credentials or live
-Arcjet traffic. Run focused tests and type checks, then root `bun run verify`.
+Arcjet traffic. Run focused tests and type checks, then root `pnpm run verify`.

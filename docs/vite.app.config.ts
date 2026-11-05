@@ -49,11 +49,11 @@ export default defineConfig(({ command }) => ({
   ssr: { noExternal: command === "build" ? true : [] },
   plugins: [
     nitro({
-      preset: command === "serve" || !cloudflare ? "bun" : "cloudflare_module",
+      preset: command === "serve" || !cloudflare ? "node-server" : "cloudflare_module",
       cloudflare: { deployConfig: false },
       commands: {
         // Wraps Wrangler so a slow start or failed prerender cannot orphan workerd.
-        preview: `${cloudflare ? "node" : "bun"} scripts/preview.ts`,
+        preview: "node --import tsx scripts/preview.ts",
       },
       serverDir: false,
       serverEntry: false,

@@ -14,11 +14,5 @@ export default defineConfig({
   test: {
     ...shared.test,
     environment: "jsdom",
-    execArgv: [
-      "--no-env-file",
-      "--no-install",
-      "--preload",
-      fileURLToPath(new URL("../../tests/setup/jsdom-preload.ts", import.meta.url)),
-    ],
   },
 });

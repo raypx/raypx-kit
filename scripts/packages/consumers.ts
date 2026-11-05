@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join } from "node:path";
@@ -25,9 +25,7 @@ export interface Manifest {
 }
 
 export interface ConsumerOptions {
-  bunBinary: string;
-  nodeBinary?: string;
-  nodeOnly?: boolean;
+  nodeBinary: string;
   compilerDependencies: Dependencies;
   dependencies?: Dependencies;
   fixtureDevDependencies?: Dependencies;
@@ -35,16 +33,18 @@ export interface ConsumerOptions {
   packageArchives?: Dependencies;
 }
 
-function runtimes(options: ConsumerOptions): string[] {
-  if (options.nodeOnly) {
-    assert.ok(options.nodeBinary, "Node-only consumer checks require an explicit binary");
-    return [options.nodeBinary];
-  }
-  return [...new Set([options.bunBinary, ...(options.nodeBinary ? [options.nodeBinary] : [])])];
-}
+// pnpm's executable shims add workspace modules to NODE_PATH. Isolated consumers
+// must resolve only their own installation, including when checking absent peers.
+const consumerEnvironment = { ...process.env };
+delete consumerEnvironment.NODE_PATH;
 
 function run(binary: string, args: string[], cwd: string): string {
-  return execFileSync(binary, args, { cwd, encoding: "utf8", stdio: "pipe" });
+  return execFileSync(binary, args, {
+    cwd,
+    env: consumerEnvironment,
+    encoding: "utf8",
+    stdio: "pipe",
+  });
 }
 
 function hasRequireCondition(value: unknown): boolean {
@@ -58,7 +58,7 @@ function binaryEntries(manifest: Manifest): [string, string][] {
   return Object.entries(manifest.bin ?? {});
 }
 
-/** Installs the archive outside the workspace and loads every export with Bun and Node. */
+/** Installs the archive outside the workspace and loads every export with Node. */
 export async function checkConsumer(
   archive: string,
   packed: Manifest,
@@ -90,16 +90,21 @@ export async function checkConsumer(
         ...fixtureManifest.devDependencies,
         ...options.fixtureDevDependencies,
       },
-      overrides: options.packageArchives ?? {},
     }),
   );
-  run(options.bunBinary, ["install", "--ignore-scripts"], consumer);
+  await writeFile(
+    join(consumer, "pnpm-workspace.yaml"),
+    JSON.stringify({
+      overrides: options.packageArchives ?? {},
+      autoInstallPeers: false,
+      strictPeerDependencies: false,
+    }),
+  );
+  run("pnpm", ["install", "--ignore-scripts", "--no-frozen-lockfile"], consumer);
   if (options.dependencies) {
     const require = createRequire(join(consumer, "package.json"));
     for (const [name, expected] of Object.entries(options.dependencies)) {
-      const installed = JSON.parse(
-        await readFile(require.resolve(`${name}/package.json`), "utf8"),
-      ) as Manifest;
+      const installed = await installedManifest(require, name);
       assert.equal(
         installed.version,
         expected,
@@ -128,7 +133,7 @@ export async function checkConsumer(
       ...imports,
     ].join("\n"),
   );
-  for (const binary of runtimes(options)) run(binary, ["exports.mjs"], consumer);
+  for (const binary of [options.nodeBinary]) run(binary, ["exports.mjs"], consumer);
   const requireSpecifiers = Object.entries(packed.exports)
     .filter(([key, target]) => !key.endsWith(".css") && hasRequireCondition(target))
     .map(([key]) => packed.name + key.slice(1));
@@ -137,17 +142,26 @@ export async function checkConsumer(
       join(consumer, "exports.cjs"),
       requireSpecifiers.map((specifier) => `require(${JSON.stringify(specifier)});`).join("\n"),
     );
-    for (const binary of runtimes(options)) run(binary, ["exports.cjs"], consumer);
+    for (const binary of [options.nodeBinary]) run(binary, ["exports.cjs"], consumer);
   }
   // Exercise installed bin links outside the workspace, without a database or config.
-  for (const [name] of binaryEntries(packed)) {
-    for (const binary of runtimes(options)) {
-      const help = execFileSync(binary, [join(consumer, "node_modules/.bin", name), "--help"], {
-        cwd: consumer,
-        encoding: "utf8",
-        stdio: "pipe",
-        timeout: 30_000,
-      });
+  for (const [name, target] of binaryEntries(packed)) {
+    assert.ok(
+      existsSync(join(consumer, "node_modules/.bin", name)),
+      `${packed.name}: missing installed binary ${name}`,
+    );
+    for (const binary of [options.nodeBinary]) {
+      const help = execFileSync(
+        binary,
+        [realpathSync(join(consumer, "node_modules", packed.name, target)), "--help"],
+        {
+          cwd: consumer,
+          env: consumerEnvironment,
+          encoding: "utf8",
+          stdio: "pipe",
+          timeout: 30_000,
+        },
+      );
       assert.ok(help.trim().length > 0, `${packed.name}: ${name} --help returned no output`);
     }
   }
@@ -156,7 +170,7 @@ export async function checkConsumer(
   if (fixtureTypes || fixtureRuntime)
     await cp(fixture, join(consumer, "contract"), { recursive: true });
   if (fixtureRuntime) {
-    for (const binary of runtimes(options)) run(binary, ["contract/runtime.mjs"], consumer);
+    for (const binary of [options.nodeBinary]) run(binary, ["contract/runtime.mjs"], consumer);
   }
   if (modules.length === 0) return;
 
@@ -191,11 +205,11 @@ export async function checkConsumer(
       files: typeFiles,
     }),
   );
-  run(options.bunBinary, ["--bun", "./node_modules/typescript/bin/tsc"], consumer);
+  run(options.nodeBinary, ["./node_modules/typescript/bin/tsc"], consumer);
   if (fixtureTypes) {
     run(
-      options.bunBinary,
-      ["--bun", "./node_modules/typescript/bin/tsc", "--project", "contract/tsconfig.json"],
+      options.nodeBinary,
+      ["./node_modules/typescript/bin/tsc", "--project", "contract/tsconfig.json"],
       consumer,
     );
   }
@@ -238,13 +252,20 @@ export async function checkWithoutOptionalPeers(
       devDependencies: {
         ...options.compilerDependencies,
       },
-      overrides: options.packageArchives ?? {},
     }),
   );
-  run(options.bunBinary, ["install", "--ignore-scripts"], consumer);
+  await writeFile(
+    join(consumer, "pnpm-workspace.yaml"),
+    JSON.stringify({
+      overrides: options.packageArchives ?? {},
+      autoInstallPeers: false,
+      strictPeerDependencies: false,
+    }),
+  );
+  run("pnpm", ["install", "--ignore-scripts", "--no-frozen-lockfile"], consumer);
   await cp(fixture, join(consumer, "contract"), { recursive: true });
   if (runtime) {
-    for (const binary of runtimes(options)) run(binary, ["contract/runtime.mjs"], consumer);
+    for (const binary of [options.nodeBinary]) run(binary, ["contract/runtime.mjs"], consumer);
   }
   if (types) {
     await writeFile(
@@ -262,7 +283,16 @@ export async function checkWithoutOptionalPeers(
         files: ["contract/types.ts"],
       }),
     );
-    run(options.bunBinary, ["--bun", "./node_modules/typescript/bin/tsc"], consumer);
+    run(options.nodeBinary, ["./node_modules/typescript/bin/tsc"], consumer);
   }
   console.log(`${packed.name}@${packed.version}: without-optional-peers consumer passed`);
+}
+
+/** Read installed metadata even when a package does not export package.json. */
+export async function installedManifest(require: NodeJS.Require, name: string): Promise<Manifest> {
+  const file = (require.resolve.paths(name) ?? [])
+    .map((path) => join(path, name, "package.json"))
+    .find(existsSync);
+  assert.ok(file, `Missing installed package: ${name}`);
+  return JSON.parse(await readFile(file, "utf8")) as Manifest;
 }

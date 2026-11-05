@@ -41,24 +41,29 @@ function expectNoRelease() {
 /** Exercise the executable entry without ever loading real release operations. */
 function runCli(rawArgs: string[], env: NodeJS.ProcessEnv = {}) {
   const fixture = mkdtempSync(join(tmpdir(), "raypx-kit-cli-"));
-  const preload = join(fixture, "preload.ts");
+  const preload = join(fixture, "preload.mjs");
   try {
     writeFileSync(
       preload,
-      `import { mock } from "bun:test";
-mock.module(${JSON.stringify(join(root, "scripts/release/commands.ts"))}, () =>
-  Object.fromEntries(["plan", "pack", "publish", "snapshot"].map(name => [name,
-    (...args) => console.log(JSON.stringify({ release: name, args }))
-  ]))
-);
+      `import { registerHooks } from "node:module";
+registerHooks({ load(url, context, nextLoad) {
+  if (url.endsWith("/scripts/release/commands.ts")) return { format: "module", shortCircuit: true, source:
+    ["plan", "pack", "publish", "snapshot"].map(name => "export function " + name + "(...args) { console.log(JSON.stringify({ release: '" + name + "', args })); }").join("\\n")
+  };
+  return nextLoad(url, context);
+}});
 `,
     );
-    return spawnSync(process.execPath, ["--preload", preload, "scripts/cli.ts", ...rawArgs], {
-      cwd: root,
-      encoding: "utf8",
-      timeout: 10_000,
-      env: { ...process.env, NO_COLOR: "1", ...env },
-    });
+    return spawnSync(
+      process.execPath,
+      ["--import", "tsx", "--import", preload, "scripts/cli.ts", ...rawArgs],
+      {
+        cwd: root,
+        encoding: "utf8",
+        timeout: 10_000,
+        env: { ...process.env, NO_COLOR: "1", ...env },
+      },
+    );
   } finally {
     rmSync(fixture, { recursive: true, force: true });
   }
@@ -70,7 +75,7 @@ beforeEach(() => {
   actions.checkRepositoryArchitecture.mockReturnValue([]);
   actions.assertToolchainRuntime.mockReturnValue({
     node: "24.22.0",
-    bun: "1.4.4",
+    pnpm: "12.16.1",
     nodeBinary: "/selected/node",
   });
   vi.spyOn(console, "log").mockImplementation(() => {});
@@ -100,7 +105,9 @@ describe("development CLI routes", () => {
   it("runs the doctor without invoking configuration or release checks", async () => {
     await runCommand(command, { rawArgs: ["doctor"] });
     expect(actions.assertToolchainRuntime).toHaveBeenCalledExactlyOnceWith(root);
-    expect(console.log).toHaveBeenCalledWith(`Bun 1.4.4; ${process.platform}/${process.arch}`);
+    expect(console.log).toHaveBeenCalledWith(
+      `Node 24.22.0; pnpm 12.16.1; ${process.platform}/${process.arch}`,
+    );
     expect(actions.checkToolchain).not.toHaveBeenCalled();
     expectNoRelease();
   });

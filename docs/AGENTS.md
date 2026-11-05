@@ -33,15 +33,15 @@ without a third-party service.
 
 ## Constraints
 
-- Use TanStack Start, Fumadocs and the repository Bun/Vite+ toolchain.
+- Use TanStack Start, Fumadocs and the repository pnpm/Node/Vite+ toolchain.
 - Use the official `@fumadocs/base-ui` components and `fumadocs-core` with caret
   ranges that resolve to the same installed version. The root `toolchain:check`
   verifies this pairing. Do not reintroduce the Radix-based `fumadocs-ui` package.
-- Use Nitro's `bun` target for normal builds and previews. `build:cloudflare`
-  explicitly selects the Worker target and isolated Node vendor tooling; keep the
+- Use Nitro's `node-server` target for normal builds and previews. `build:cloudflare`
+  explicitly selects the Worker target and the Node development runtime; keep the
   deployment build working through the separate compatibility workflow.
   All commands use VP; application plugins belong in `vite.app.config.ts`.
-- Root `packageManager` is the single Bun development pin. mise enables Bun only.
+- Root `engines.node` pins Node and `packageManager` pins pnpm. mise reads Node.
   Run doctor and toolchain checks after runtime/configuration changes.
 - Preserve current versus proposed API status, source provenance and all inventory rows.
 - Resolve Markdown links against their canonical source during compilation;
@@ -82,16 +82,16 @@ entry-point boundaries; any exception must be narrowly scoped and explained.
 The existing root `verify` command runs Knip in CI alongside the other checks.
 
 ```sh
-bun run test:toolchain
-bun run docs:check
-bun run docs:build
-bun run knip
-bun run verify
+pnpm run test:toolchain
+pnpm run docs:check
+pnpm run docs:build
+pnpm run knip
+pnpm run verify
 ```
 
-Use `bun run docs:dev` for development at `http://localhost:3100`.
+Use `pnpm run docs:dev` for development at `http://localhost:3100`.
 
-Browser scenarios live in `e2e/` and run through `bun run test:e2e`. They use
-the built Bun application through the shared local preview wrapper,
+Browser scenarios live in `e2e/` and run through `pnpm run test:e2e`. They use
+the built Node application through the shared local preview wrapper,
 with Playwright Chromium and the root shared E2E runner. Keep browser cases out
 of the unit runner; root verification includes their separate post-build gate.

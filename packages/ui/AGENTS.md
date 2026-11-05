@@ -25,7 +25,7 @@ texts in `NOTICE.md`; do not replace the pinned adaptation silently.
 
 ## Verification
 
-Run `bun run test`, `bun run check`, and `bun run build` in this package, then the
-root `bun run verify`. Tests cover interactions and server rendering. The archive
+Run `pnpm run test`, `pnpm run check`, and `pnpm run build` in this package, then the
+root `pnpm run verify`. Tests cover interactions and server rendering. The archive
 consumer checks explicit subpaths, declarations, SSR and Tailwind stylesheet
 resolution against installed tarballs, without source aliases.

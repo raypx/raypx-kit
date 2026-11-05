@@ -39,13 +39,13 @@
     "access": "public"
   },
   "scripts": {
-    "check": "bun --check --tsconfig-override tsconfig.json",
-    "test": "bun --bun vp test --run",
-    "test:unit": "bun --bun vp test --run",
-    "build": "bun --bun vp pack",
-    "dev": "bun --bun vp pack --watch",
-    "pack:check": "bun pm pack --dry-run",
-    "test:e2e": "bun ../../e2e/run.ts --project notifications"
+    "check": "tsc --noEmit --project tsconfig.json",
+    "test": "vp test --run",
+    "test:unit": "vp test --run",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "pack:check": "pnpm pack --dry-run",
+    "test:e2e": "tsx ../../e2e/run.ts --project notifications"
   },
   "dependencies": {
     "@knocklabs/node": "^1.40.0"

@@ -4,7 +4,7 @@ Typed ICU translation and controlled React integration built on `use-intl`, with
 application-owned locale configuration and catalogs.
 
 ```sh
-bun add @raypx-kit/intl react@^19.3.1
+pnpm add @raypx-kit/intl react@^19.3.1
 ```
 
 ESM and declarations support Node 22.21+ and Bun. React 19 is the only external
@@ -304,7 +304,7 @@ The archive checks run the declaration contracts in `tests/fixtures/consumer`.
 
 SSR hydration, ICU translation, locale persistence, cookies and real cross-tab synchronization.
 
-Run `bun run test:e2e:install` once at the repository root, then
-`bun run --cwd packages/intl test:e2e`. The package owns its scenarios in
+Run `pnpm run test:e2e:install` once at the repository root, then
+`pnpm --dir packages/intl run test:e2e`. The package owns its scenarios in
 `e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
 for project selection, reports and CI behavior.

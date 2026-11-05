@@ -20,7 +20,7 @@ below include every upstream capability, including features not yet implemented.
 
 Drizzle compatibility is limited to the RC5 prerelease range
 `>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z`, with `postgres@^3.4.9` and
-`drizzle-orm/postgres-js`. Validation uses the builds selected by `bun.lock`;
+`drizzle-orm/postgres-js`. Validation uses the builds selected by `pnpm-lock.yaml`;
 new resolutions require the type and postgres.js PostgreSQL test matrix.
 PostgreSQL is the only supported database, and postgres.js is the only supported
 driver. npm `pg` / node-postgres and other PostgreSQL adapters are unsupported.
@@ -38,7 +38,7 @@ Drizzle's `pg-core`, `pgTable`, `PgTable` and `PgDialect` refer to the PostgreSQ
 dialect; these names are independent of the npm `pg` driver.
 
 ```bash
-bun add @raypx-kit/drizzle 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z' postgres@^3.4.9
+pnpm add @raypx-kit/drizzle 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z' postgres@^3.4.9
 ```
 
 ```ts
@@ -123,16 +123,16 @@ root `docs/` directory and are not included in the npm archive.
 Tests live under `tests/`, with `diagnostics/` and `postgres/` subdirectories.
 The library build includes only production sources under `src/`.
 
-From the repository root, using Bun 1.4.4:
+From the repository root, using the pinned Node and pnpm toolchain:
 
 ```bash
-bun install --frozen-lockfile
-bun run verify
+pnpm install --frozen-lockfile
+pnpm run verify
 ```
 
 Default unit tests, coverage, tarball checks and local `verify` do not need a
 database. CI configures a separate integration job with a temporary PostgreSQL 17
-service and runs `bun run --cwd packages/drizzle test:integration`. This explicit
+service and runs `pnpm --dir packages/drizzle run test:integration`. This explicit
 command requires CI and `DRIZZLE_TEST_DATABASE_URL`; missing either fails instead
 of skipping tests.
 

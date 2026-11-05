@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { parseYAML } from "confbox/yaml";
 import { minVersion, satisfies, valid, validRange } from "semver";
 import type { Dependencies, Manifest } from "./consumers.js";
 
@@ -63,7 +64,15 @@ export interface InstalledPackage {
  */
 export function consumerVersion(name: string, installed: InstalledPackage, lock: string): string {
   const locked = `${installed.name}@${installed.version}`;
-  assert.ok(lock.includes(JSON.stringify(locked)), `${locked}: not in bun.lock`);
+  // pnpm can prepend a separate document for its package-manager dependencies.
+  const isLocked = lock
+    .split(/^---[ \t]*\r?$/m)
+    .filter((document) => document.trim())
+    .some((document) => {
+      const packages = parseYAML<{ packages?: Record<string, unknown> }>(document).packages;
+      return packages && Object.hasOwn(packages, locked);
+    });
+  assert.ok(isLocked, `${locked}: not in pnpm-lock.yaml`);
   if (installed.name === name) return installed.version;
   const version = installed.bundledVersions?.[name];
   assert.ok(version, `${name}: alias ${locked} declares no bundled ${name} version`);

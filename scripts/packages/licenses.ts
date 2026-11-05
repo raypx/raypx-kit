@@ -162,7 +162,7 @@ export function updatePackageLicenses(root: string, check = false): void {
   // Validate every package before writing, so missing metadata never produces a partial update.
   for (const { file, original, updated } of updates) {
     if (check && updated !== original)
-      throw new Error(`${file}: license index is stale; run bun run licenses:update`);
+      throw new Error(`${file}: license index is stale; run pnpm run licenses:update`);
   }
   if (!check) {
     for (const { file, original, updated } of updates)

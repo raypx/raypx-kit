@@ -23,12 +23,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      # Planning imports only Bun/standard-library modules; no dependency install needed.
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
+      - uses: ./.github/actions/setup-toolchain
       - id: plan
-        run: bun scripts/ci/plan.ts
+        run: node --import tsx scripts/ci/plan.ts
   javascript:
     needs: plan
     runs-on: ubuntu-24.04
@@ -42,7 +39,7 @@ jobs:
       - uses: ./.github/actions/vp-restore
         id: cache
       - name: Verify affected sources, tests and builds
-        run: bun scripts/ci/diagnostics.ts run javascript bun scripts/ci/gate.ts javascript
+        run: node --import tsx scripts/ci/diagnostics.ts run javascript node --import tsx scripts/ci/gate.ts javascript
       - name: Generated sources remain reproducible
         run: git diff --exit-code
       - uses: ./.github/actions/vp-save
@@ -68,15 +65,15 @@ jobs:
         id: cache
       - name: Resolve Playwright version
         id: playwright
-        run: printf 'version=%s\n' "$(bun --bun playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+        run: printf 'version=%s\n' "$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-shell-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
       - name: Install missing browser and system libraries
-        run: bun scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
+        run: node --import tsx scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
       - name: Test affected React workspaces
-        run: bun scripts/ci/diagnostics.ts run browser bun scripts/ci/gate.ts browser
+        run: node --import tsx scripts/ci/diagnostics.ts run browser node --import tsx scripts/ci/gate.ts browser
       - uses: ./.github/actions/vp-save
         with:
           key: ${{ steps.cache.outputs.key }}
@@ -105,8 +102,8 @@ jobs:
       - uses: ./.github/actions/setup-toolchain
       - uses: ./.github/actions/vp-restore
         id: cache
-      - name: Check affected archives and Bun consumers
-        run: bun scripts/ci/diagnostics.ts run artifacts bun scripts/ci/gate.ts artifacts
+      - name: Check affected archives and Node consumers
+        run: node --import tsx scripts/ci/diagnostics.ts run artifacts node --import tsx scripts/ci/gate.ts artifacts
       - uses: ./.github/actions/vp-save
         with:
           key: ${{ steps.cache.outputs.key }}
@@ -137,7 +134,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-toolchain
       - name: Test Drizzle against isolated PostgreSQL
-        run: bun scripts/ci/diagnostics.ts run postgres bun run --cwd packages/drizzle test:integration
+        run: node --import tsx scripts/ci/diagnostics.ts run postgres pnpm --dir packages/drizzle run test:integration
         env:
           DRIZZLE_TEST_DATABASE_URL: postgresql://drizzle:drizzle@localhost:${{ job.services.postgres.ports['5432'] }}/drizzle_test
       - uses: ./.github/actions/report-diagnostics
@@ -152,13 +149,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
         with:
-          bun-version-file: package.json
+          node-version-file: package.json
       - name: Require every selected gate to pass
         env:
           GITHUB_NEEDS: ${{ toJSON(needs) }}
-        run: bun scripts/ci/result.ts
+        run: node scripts/ci/result.ts
 
   release:
     needs: verify

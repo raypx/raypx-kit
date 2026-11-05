@@ -7,17 +7,17 @@ compose their own policy, CLI and product probes from these entries.
 
 ## Interface
 
-| Path             | Purpose                                                     |
-| ---------------- | ----------------------------------------------------------- |
-| `./workspaces`   | Discovery, metadata, export and import resolution           |
-| `./architecture` | Workspace boundary checks over static imports               |
-| `./toolchain`    | Node/Bun pin reading, declaration checks and runtime checks |
-| `./catalogs`     | Static message catalog reader                               |
-| `./docs`         | Relative Markdown link check                                |
-| `./process`      | Commands, dotenv environment and guarded Turbo runs         |
-| `./artifact`     | Relocated output staging and Node server probes             |
-| `./lint`         | Plain Vite+ base and opt-in strict lint presets             |
-| `./testing`      | Plain Vitest defaults for Bun workers                       |
+| Path             | Purpose                                                    |
+| ---------------- | ---------------------------------------------------------- |
+| `./workspaces`   | Discovery, metadata, export and import resolution          |
+| `./architecture` | Workspace boundary checks over static imports              |
+| `./toolchain`    | Node/Bun and Node/pnpm pin, declaration and runtime checks |
+| `./catalogs`     | Static message catalog reader                              |
+| `./docs`         | Relative Markdown link check                               |
+| `./process`      | Commands, dotenv environment and guarded Turbo runs        |
+| `./artifact`     | Relocated output staging and Node server probes            |
+| `./lint`         | Plain Vite+ base and opt-in strict lint presets            |
+| `./testing`      | Plain Vitest defaults for Node or Bun workers              |
 
 `./tasks` owns shared task discovery, graph validation, arguments, VP launch/leaf
 execution, configuration projection and artifact snapshots. `./verification` owns
@@ -41,10 +41,12 @@ The README documents the complete shipped API.
   filename and repository-specific policy do not belong in this package's runtime.
 - Never execute inspected sources or catalogs; parse them with oxc-parser.
 - Never print loaded environment values or secrets.
-- Use Node APIs only. Task execution receives an explicit Bun executable; planning
+- Use Node APIs only. Task execution receives an explicit runtime and optional VP launcher; planning
   and configuration remain loadable on supported Node versions.
 - Toolchain checks default to Node/Bun; explicit `runtime: "bun"` forbids Node
   pins without requiring a Node executable. Keep existing defaults compatible.
+- `runtime: "node-pnpm"` reads root engines.node and packageManager; the legacy
+  Node/Bun modes retain their existing defaults.
 - Lint/test entries export plain objects with no runtime Vite+ imports. Consumers
   own paths, suites, setup, app plugins and native configuration composition.
 - Do not import other Raypx Kit packages. Keep entries independent so each loads
@@ -61,8 +63,8 @@ The README documents the complete shipped API.
 ## Verification
 
 ```bash
-bun run --cwd packages/devkit test
-bun run --cwd packages/devkit check
-bun run build --filter=@raypx-kit/devkit
-bun run --cwd packages/devkit pack:check
+pnpm --dir packages/devkit run test
+pnpm --dir packages/devkit run check
+pnpm run build --filter=@raypx-kit/devkit
+pnpm --dir packages/devkit run pack:check
 ```

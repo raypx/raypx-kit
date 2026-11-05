@@ -18,6 +18,7 @@ import {
   type PeerProfile,
 } from "./matrix.js";
 import {
+  installedManifest,
   checkConsumer,
   checkWithoutOptionalPeers,
   type Dependencies,
@@ -70,7 +71,7 @@ async function prepare(): Promise<CompatibilityIndex> {
   const developmentNode = (
     await readFile(join(root, "scripts/packages/node-version"), "utf8")
   ).trim();
-  const lock = await readFile(join(root, "bun.lock"), "utf8");
+  const lock = await readFile(join(root, "pnpm-lock.yaml"), "utf8");
   const installed = async (
     directory: string,
     declarations: Dependencies,
@@ -78,7 +79,7 @@ async function prepare(): Promise<CompatibilityIndex> {
     const require = createRequire(join(directory, "package.json"));
     const result: Dependencies = {};
     for (const name of Object.keys(declarations)) {
-      const resolved = await manifest(require.resolve(`${name}/package.json`));
+      const resolved = await installedManifest(require, name);
       result[name] = consumerVersion(name, resolved, lock);
     }
     return result;
@@ -120,7 +121,7 @@ async function prepare(): Promise<CompatibilityIndex> {
   await mkdir(artifacts, { recursive: true });
   for (const entry of index.packages) {
     const archive = join(artifacts, entry.archive);
-    execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
+    execFileSync("pnpm", ["pack", "--out", archive], {
       cwd: join(root, "packages", entry.directory),
       stdio: "pipe",
     });
@@ -189,9 +190,7 @@ async function check(): Promise<void> {
       const archive = join(artifacts, entry.archive);
       const packageDirectory = join(root, "packages", entry.directory);
       const consumerOptions = {
-        bunBinary: process.execPath,
         nodeBinary,
-        nodeOnly: true,
         compilerDependencies: index.compilerDependencies,
         dependencies: entry.profiles[peers as PeerProfile],
         fixtureDevDependencies: entry.fixtureDevDependencies,

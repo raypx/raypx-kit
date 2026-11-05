@@ -37,12 +37,12 @@ export const command = defineCommand({
   setup: assertSubcommandPosition,
   subCommands: {
     doctor: defineCommand({
-      meta: { name: "doctor", description: "Check the active Bun executable" },
+      meta: { name: "doctor", description: "Check the active Node and pnpm executables" },
       run: async ({ args }) => {
         assertArguments(args, []);
         const { assertToolchainRuntime } = await import("./checks/toolchain.js");
-        const { bun } = assertToolchainRuntime(root);
-        console.log(`Bun ${bun}; ${process.platform}/${process.arch}`);
+        const { node, pnpm } = assertToolchainRuntime(root);
+        console.log(`Node ${node}; pnpm ${pnpm}; ${process.platform}/${process.arch}`);
       },
     }),
     toolchain: defineCommand({

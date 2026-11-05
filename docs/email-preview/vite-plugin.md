@@ -175,15 +175,14 @@ to its Vite configuration to serve the interface at `http://localhost:3002/__ema
 ## Migration
 
 1. Prototype the template environment: import a template through its runner,
-   confirm React deduplication, tsconfig aliases and invalidation under Bun and
-   Node, and measure render latency against the current implementation.
+   confirm React deduplication, tsconfig aliases and invalidation under Node, and measure render latency against the current implementation.
 2. Implement the plugin and server modules, reusing discovery, static-file and
    error code from `src/server/`.
 3. Rebuild the interface as a client-only TanStack Router application and remove
    TanStack Start, Nitro, srvx, esbuild and chokidar.
 4. Remove the standalone CLI; projects run the plugin with `vite dev`.
 5. Update unit tests, the archive consumer contract (`vite dev` with the plugin
-   under Bun and Node), browser scenarios, the license index and documentation.
+   under Node), browser scenarios, the license index and documentation.
 6. Prototype the worker-hosted runner (phase 2) and adopt it if termination works
    reliably.
 

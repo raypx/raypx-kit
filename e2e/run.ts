@@ -39,7 +39,7 @@ async function run(binary: string, args: string[], env = process.env, cwd = root
 
 if (!forwarded.includes("--list")) {
   if (!skipBuild) {
-    await run(process.execPath, [
+    await run("pnpm", [
       "run",
       "build",
       ...selected.map((name) => `--filter=${browserProjects[name].workspace}`),
@@ -48,9 +48,11 @@ if (!forwarded.includes("--list")) {
   // These consumers deliberately resolve built public exports. Keep their type
   // and lint checks after builds, separate from the clean-checkout source gate.
   for (const name of selected) {
-    await run(process.execPath, [
-      "--check",
-      "--tsconfig-override",
+    await run("pnpm", [
+      "exec",
+      "tsc",
+      "--noEmit",
+      "--project",
       `${browserProjects[name].directory}/e2e/tsconfig.json`,
     ]);
   }

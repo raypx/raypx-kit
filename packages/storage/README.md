@@ -6,7 +6,7 @@ download through short-lived signed URLs, so file bytes never pass through the
 application server.
 
 ```sh
-bun add @raypx-kit/storage
+pnpm add @raypx-kit/storage
 ```
 
 ESM only, for Node 22.21+, Bun and Cloudflare Workers (every entry except `./fs`). Server-side: drivers hold credentials or

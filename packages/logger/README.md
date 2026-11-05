@@ -8,7 +8,7 @@ logger through every function.
 ## Install
 
 ```sh
-bun add @raypx-kit/logger
+pnpm add @raypx-kit/logger
 ```
 
 ESM; Node 22.21+ or Bun. evlog is an external runtime dependency (`^2.33.1`), not
@@ -213,12 +213,12 @@ enrichers must sanitize fields they add afterward. See the upstream
 ## Development
 
 ```sh
-bun run --cwd packages/logger test
-bun run --cwd packages/logger check
-bun run build --filter=@raypx-kit/logger
-bun run pack:check
+pnpm --dir packages/logger run test
+pnpm --dir packages/logger run check
+pnpm run build --filter=@raypx-kit/logger
+pnpm run pack:check
 ```
 
 Tests exercise real evlog events, redaction, sampling, pipeline delivery and
 concurrent context isolation. The archive consumer checks public declarations
-and runs the same context/drain contract in both Bun and Node outside the repo.
+and runs the same context/drain contract with Node outside the repo.

@@ -25,19 +25,26 @@ export async function runVerification(
       );
     await run(
       process.execPath,
-      ["e2e/run.ts", "--skip-build", ...plan.browser.flatMap((name) => ["--project", name])],
+      [
+        "--import",
+        "tsx",
+        "e2e/run.ts",
+        "--skip-build",
+        ...plan.browser.flatMap((name) => ["--project", name]),
+      ],
       root,
     );
   }
   if (["artifacts", "full"].includes(phase)) {
     if (plan.packages.length) {
       if (phase === "artifacts") await execute(builds(plan.packages));
-      await run(process.execPath, ["scripts/packages/check.ts"], root, {
+      await run(process.execPath, ["--import", "tsx", "scripts/packages/check.ts"], root, {
         ...process.env,
         TOOLKIT_PACKAGES: JSON.stringify(plan.packages),
       });
     }
-    if (plan.release) await run(process.execPath, ["scripts/release/check.ts"], root);
+    if (plan.release)
+      await run(process.execPath, ["--import", "tsx", "scripts/release/check.ts"], root);
   }
 }
 

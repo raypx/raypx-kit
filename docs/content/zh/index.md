@@ -61,8 +61,8 @@ Drizzle 的现有实现面向通过 postgres.js 使用 PostgreSQL 的场景。�
 
 文档站使用自己的 `@raypx-kit/intl` 包：URL 决定语言，受控 Provider 负责应用文案，Fumadocs 负责多语言页面目录与搜索。
 
-在仓库根目录运行 `bun run docs:dev`，访问 `http://localhost:3100/zh/docs`。页面注册与语言来源映射位于 [pages.ts](../../src/lib/pages.ts)，英文内容直接编译权威 Markdown，中文译文位于 `docs/content/zh/`。新增译文时登记来源映射，并保留 API 状态、完整清单和源码说明。
+在仓库根目录运行 `pnpm run docs:dev`，访问 `http://localhost:3100/zh/docs`。页面注册与语言来源映射位于 [pages.ts](../../src/lib/pages.ts)，英文内容直接编译权威 Markdown，中文译文位于 `docs/content/zh/`。新增译文时登记来源映射，并保留 API 状态、完整清单和源码说明。
 
-运行 `bun run test:toolchain` 检查文档结构与词条一致性，运行 `bun run docs:build` 检查编译和预渲染，运行 `bun run test:e2e --project docs` 验证浏览器操作。
+运行 `pnpm run test:toolchain` 检查文档结构与词条一致性，运行 `pnpm run docs:build` 检查编译和预渲染，运行 `pnpm run test:e2e --project docs` 验证浏览器操作。
 
 仓库设计与维护文档不进入 npm 包。站点职责与来源说明请见 [AGENTS.md](../../AGENTS.md) 和 [NOTICE.md](../../NOTICE.md)。

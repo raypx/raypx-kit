@@ -194,7 +194,7 @@ export default {
     },
   },
   toolchain: {
-    runtime: "bun",
+    runtime: "node-pnpm",
     documents: [
       "README.md",
       "AGENTS.md",

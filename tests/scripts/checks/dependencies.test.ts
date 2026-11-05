@@ -126,7 +126,7 @@ describe("installed dependency compatibility", () => {
         expect.stringContaining(
           "packages/library/package.json: coverage-v8 is 2.4.0, expected bundled Vitest 2.3.0",
         ),
-        expect.stringContaining("Update compatible dependencies together in bun.lock"),
+        expect.stringContaining("Update compatible dependencies together in pnpm-lock.yaml"),
       ]),
     );
   });

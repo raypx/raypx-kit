@@ -48,7 +48,7 @@ const packDirectory = join(root, ".changeset/pack/release");
 const planFile = join(packDirectory, "publish-plan.json");
 const releaseFile = join(packDirectory, "release.json");
 const changesets = join(root, "node_modules/@changesets/cli/bin.js");
-// npm is only the registry transport; it otherwise rejects the strict Bun devEngines pin.
+// npm is only the registry transport; it otherwise rejects the strict pnpm devEngines pin.
 // Keep the inherited environment intact: in CI, changesets/action passes CHANGESETS_OUTPUT,
 // where `changeset publish` records the tags the action pushes as GitHub releases.
 const npmEnvironment = { ...process.env, NPM_CONFIG_FORCE: "true" };
@@ -63,12 +63,16 @@ function git(...args: string[]): string {
 }
 
 function run(args: string[], env: NodeJS.ProcessEnv = process.env): void {
-  const result = spawnSync(process.execPath, args, { cwd: root, env, stdio: "inherit" });
+  const result = spawnSync(
+    args[0] === "run" ? "pnpm" : process.execPath,
+    args[0] === "run" ? args : ["--import", "tsx", ...args],
+    { cwd: root, env, stdio: "inherit" },
+  );
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
 function changeset(args: string[]): void {
-  run(["--bun", changesets, ...args], npmEnvironment);
+  run([changesets, ...args], npmEnvironment);
 }
 
 /** Pre mode selects the dist-tag; leaving it requires an explicit stable release. */
@@ -195,7 +199,7 @@ export async function plan(stable = false): Promise<void> {
   });
   const pending = await pendingChangesets();
   if (pending.length > 0)
-    console.log(`\nUnreleased changesets: ${pending.join(", ")}. Run bun run version-packages.`);
+    console.log(`\nUnreleased changesets: ${pending.join(", ")}. Run pnpm run version-packages.`);
 }
 
 export async function pack(stable = false, fromCompatibility?: string): Promise<void> {
@@ -204,7 +208,7 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
   assert.deepEqual(
     pending,
     [],
-    `Unreleased changesets: ${pending.join(", ")}. Run bun run version-packages and commit first.`,
+    `Unreleased changesets: ${pending.join(", ")}. Run pnpm run version-packages and commit first.`,
   );
   await rm(packDirectory, { recursive: true, force: true });
   const planned = await createPlan(planFile, stable);
@@ -223,8 +227,7 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
   // Imported archives are the exact bytes verified by the compatibility matrix.
   if (!verified) run(["run", "build", "--filter=./packages/*"]);
 
-  // Changesets packs Bun workspaces with npm, which publishes workspace: and catalog:
-  // verbatim. Bun's packer resolves them and is the packer pack:check verifies.
+  // pnpm resolves workspace: and catalog: using the same packer verified by pack:check.
   const directories = await workspaceDirectories();
   await mkdir(join(packDirectory, "packages"), { recursive: true });
   const tarballs = new Map<string, NonNullable<PlanEntry["tarball"]>>();
@@ -248,7 +251,7 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
         `${entry.name}: copied archive changed`,
       );
     } else {
-      execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
+      execFileSync("pnpm", ["pack", "--out", archive], {
         cwd: directory,
         stdio: "pipe",
       });
@@ -275,17 +278,17 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
   );
   await writeFile(planFile, `${JSON.stringify(document, null, 2)}\n`);
 
-  // Install and load the exact archives in isolated Bun consumers; CI gates publishing on Node compatibility.
+  // Install and load the exact archives in isolated Node consumers; CI gates publishing on Node compatibility.
   run(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
   // Recorded last: publication refuses archives that did not pass the consumer checks.
   await recordCommit();
   describe("Packed for publication:", planned);
-  console.log("\nInspect .changeset/pack/release, then run: bun run release:publish");
+  console.log("\nInspect .changeset/pack/release, then run: pnpm run release:publish");
 }
 
 export async function publish(stable = false, passthrough: string[] = []): Promise<void> {
   assertReleaseSource();
-  assert.ok(existsSync(releaseFile), "Run bun run release:pack before publishing.");
+  assert.ok(existsSync(releaseFile), "Run pnpm run release:pack before publishing.");
   const { commit } = await readJson<{ commit: string }>(releaseFile);
   assert.equal(git("rev-parse", "HEAD"), commit, "HEAD changed after packing; pack again.");
   const tag = await expectedTag(stable);
@@ -335,7 +338,11 @@ async function changedPackages(): Promise<string[]> {
 
 /** Like run(), but throws so callers can restore files in a finally block. */
 function runOrThrow(args: string[], env: NodeJS.ProcessEnv = process.env): void {
-  const result = spawnSync(process.execPath, args, { cwd: root, env, stdio: "inherit" });
+  const result = spawnSync(
+    args[0] === "run" ? "pnpm" : process.execPath,
+    args[0] === "run" ? args : ["--import", "tsx", ...args],
+    { cwd: root, env, stdio: "inherit" },
+  );
   if (result.status !== 0) throw new Error(`${args.join(" ")} exited with ${result.status}`);
 }
 
@@ -383,7 +390,7 @@ export async function snapshot(
       await writeFile(file, `${JSON.stringify({ ...manifest, version }, null, 2)}\n`);
       const path = `packages/${name.slice(1).replace("/", "-")}-${version}.tgz`;
       const archive = join(snapshotDirectory, path);
-      execFileSync(process.execPath, ["pm", "pack", "--filename", archive], {
+      execFileSync("pnpm", ["pack", "--out", archive], {
         cwd: directory,
         stdio: "pipe",
       });
@@ -397,7 +404,7 @@ export async function snapshot(
     }
     const planPath = join(snapshotDirectory, "publish-plan.json");
     await writeFile(planPath, `${JSON.stringify({ version: 1, plan: [entries] }, null, 2)}\n`);
-    // The same archive rules and isolated Bun consumers as a real release.
+    // The same archive rules and isolated Node consumers as a real release.
     runOrThrow(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planPath });
   } finally {
     for (const [file, source] of originals) await writeFile(file, source);

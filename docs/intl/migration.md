@@ -126,7 +126,7 @@ or their own persistence; server and native integrations own their bootstrap dat
 ## Release checks
 
 Run package tests before the repository verification gate. `pack:check` installs
-the actual archive in disposable Bun and Node consumers and runs the package's
+the actual archive in disposable Node consumers and runs the package's
 public declaration contract with `skipLibCheck: false`, no DOM libraries and no
 ambient Node types. Negative type cases must fail if their `@ts-expect-error`
 directives are removed. Source aliases are not a substitute for this check.

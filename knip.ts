@@ -29,8 +29,6 @@ const config: KnipConfig = {
   workspaces: {
     ".": {
       entry: [
-        // Bun receives this preload through a computed execArgv path in Intl's test config.
-        "tests/setup/jsdom-preload.ts",
         "scripts/ci/{cache,gate,plan,result}.ts",
         // Shared Devkit generates the leaf command path in VP metadata.
         "scripts/tasks/leaf.ts",
@@ -61,7 +59,7 @@ const config: KnipConfig = {
         // shadcn resolves this utility through components.json when generating components.
         "src/ui/lib/utils.ts",
         "examples/**/*.{tsx,jsx}",
-        // Playwright starts this fixture through the Bun executable.
+        // Playwright starts this fixture through Node.
         "e2e/serve.ts",
       ],
       project: [
@@ -99,6 +97,8 @@ const config: KnipConfig = {
     },
     "packages/drizzle-kit": {
       project: libraryProject,
+      // Copied upstream declarations reference optional drivers; archive consumers check them.
+      ignore: ["dist/**"],
       // The build script roots extract.ts; the upstream CLI loads these schema fixtures.
       entry: ["tests/fixtures/schema/{drizzle.config,schema}.ts"],
       vitest: true,

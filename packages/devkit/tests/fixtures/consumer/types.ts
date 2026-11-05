@@ -63,7 +63,7 @@ import { startEnvironment } from "@raypx-kit/devkit/vite";
 export function taskContract(root: string, url: string) {
   const policy: TaskPolicy<TaskMember> = {
     member: (_, member) => member,
-    define: () => ({ command: "bun run build", dependsOn: [], cache: false }),
+    define: () => ({ command: "pnpm run build", dependsOn: [], cache: false }),
     aggregateCommand: "bun leaf.ts --aggregate",
   };
   const model = createTaskModel(root, policy);

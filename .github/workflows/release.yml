@@ -37,14 +37,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERIFIED_SHA: ${{ inputs.verified-sha }}
-        run: bun scripts/release/gate.ts
+        run: node --import tsx scripts/release/gate.ts
       - name: Verify toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
+        run: node --import tsx scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
       - uses: changesets/action/select-mode@v2.0.0
         id: mode
         env:
-          # npm is only the registry transport; repository tooling stays on Bun.
-          # Its devEngines check otherwise rejects the strict Bun runtime pin.
+          # npm is only the registry transport; repository tooling uses pnpm and Node.
+          # Its devEngines check otherwise rejects the strict pnpm package-manager pin.
           NPM_CONFIG_FORCE: "true"
       - name: Explain pending version PR setup
         if: steps.mode.outputs.mode == 'version' && vars.VERSION_PR_ENABLED != 'true'
@@ -82,10 +82,10 @@ jobs:
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
       - name: Verify toolchain
-        run: bun scripts/ci/diagnostics.ts run toolchain bun run verify:toolchain
+        run: node --import tsx scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
       - uses: changesets/action/version@v2.0.0
         with:
-          script: bun scripts/ci/diagnostics.ts run version-packages bun run version-packages
+          script: node --import tsx scripts/ci/diagnostics.ts run version-packages pnpm run version-packages
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
       - name: Report version preparation diagnostics
@@ -120,7 +120,6 @@ jobs:
           fetch-depth: 0
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
-      - uses: ./.github/actions/setup-node-tools
         with:
           registry-url: https://registry.npmjs.org/
       - uses: actions/download-artifact@v8
@@ -128,12 +127,12 @@ jobs:
           name: node-compatibility-archives
           path: .artifacts/compatibility
       # Main CI already verified this SHA; compatibility checked these exact archives.
-      # release:ci validates/copies them and runs Bun consumers before npm transport.
+      # release:ci validates/copies them and runs Node consumers before npm transport.
       - uses: changesets/action/publish@v2.0.0
         with:
-          # Publish the exact Bun archives verified by Node and Bun consumers.
+          # Publish the exact pnpm archives verified by Node consumers.
           # The action runs the script without a shell, so `&&` lives in package.json.
-          script: bun scripts/ci/diagnostics.ts run publish bun run release:ci
+          script: node --import tsx scripts/ci/diagnostics.ts run publish pnpm run release:ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"

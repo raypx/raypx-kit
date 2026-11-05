@@ -145,7 +145,7 @@ test("compiles callouts, opt-in steps and code tabs through the canonical Markdo
   const build = page.getByRole("tab", { name: "Build", exact: true });
   await build.click();
   await expect(page.getByRole("tabpanel", { name: "Build", exact: true })).toContainText(
-    "bun run docs:build",
+    "pnpm run docs:build",
   );
   await build.press("ArrowLeft");
   await page.keyboard.press("Enter");

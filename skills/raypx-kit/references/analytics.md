@@ -1,7 +1,7 @@
 # @raypx-kit/analytics
 
 ```sh
-bun add @raypx-kit/analytics
+pnpm add @raypx-kit/analytics
 ```
 
 PostHog (no-external bundle: no CDN scripts) behind explicit consent.

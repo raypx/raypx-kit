@@ -17,14 +17,13 @@ jobs:
       - uses: ./.github/actions/setup-toolchain
       - uses: ./.github/actions/vp-restore
         id: cache
-      - uses: ./.github/actions/setup-node-tools
-      - run: bun run build --filter=./packages/*
+      - run: pnpm run build --filter=./packages/*
       - name: Verify Cloudflare deployment build
-        run: bun run docs:build:cloudflare
-      - run: bun scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
+        run: pnpm run docs:build:cloudflare
+      - run: node --import tsx scripts/packages/compatibility.ts prepare --artifacts .artifacts/compatibility
       - id: matrix
         run: |
-          matrix="$(bun scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility)"
+          matrix="$(node --import tsx scripts/packages/compatibility.ts matrix --artifacts .artifacts/compatibility)"
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
       - uses: ./.github/actions/vp-save
         with:
@@ -54,11 +53,11 @@ jobs:
       - name: Install isolated consumer Node
         env:
           CONSUMER_NODE_VERSION: ${{ matrix.node }}
-        run: bun scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
+        run: node --import tsx scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
       - name: Check exact archives on Node and supported peer bounds
         run: >-
-          bun scripts/ci/diagnostics.ts run consumers
-          bun scripts/packages/compatibility.ts check
+          node --import tsx scripts/ci/diagnostics.ts run consumers
+          node --import tsx scripts/packages/compatibility.ts check
           --artifacts .artifacts/compatibility
           --node "$RUNNER_TEMP/consumer-node/node-v${{ matrix.node }}-linux-x64/bin/node"
           --expected-node '${{ matrix.node }}'

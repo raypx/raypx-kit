@@ -1,12 +1,12 @@
 # @raypx-kit/devkit
 
-Maintenance checks and task helpers for Bun monorepos: workspace boundaries,
+Maintenance checks and task helpers for Node and Bun monorepos: workspace boundaries,
 toolchain pins, static message catalogs, documentation links and relocated build
 artifacts.
-The package also exports plain Vite+ lint presets and Bun test defaults.
+The package also exports plain Vite+ lint presets and Node/Bun test defaults.
 
 ```sh
-bun add -d @raypx-kit/devkit
+pnpm add -d @raypx-kit/devkit
 ```
 
 ESM only, for Node 22.21+ and Bun. Each entry is independent, so a consumer loads
@@ -17,13 +17,13 @@ contains no product rules, so repositories compose their own policy from it.
 | -------------- | ---------------------------------------------------------------------- |
 | ./workspaces   | Discover workspaces, read boundary metadata and resolve imports        |
 | ./architecture | Check dependencies, exports, cycles, platform targets and import leaks |
-| ./toolchain    | Read Node/Bun pins, check every duplicated pin and the active runtimes |
+| ./toolchain    | Check Node/Bun or Node/pnpm pins, declarations and active runtimes     |
 | ./catalogs     | Read static message catalogs without executing them                    |
 | ./docs         | Report broken relative Markdown links                                  |
 | ./process      | Run commands, load dotenv files and run Turbo with a guarded cache     |
 | ./artifact     | Stage a relocated output and probe a running Node server               |
 | ./lint         | Base and opt-in strict Vite+ lint presets without repository paths     |
-| ./testing      | Plain Vitest defaults for Bun workers                                  |
+| ./testing      | Plain Vitest defaults for Node or Bun workers                          |
 
 ## Workspace architecture
 
@@ -150,6 +150,24 @@ documented `Node x.y.z` and `Bun x.y.z` versions and Turbo global dependencies.
 `pinnedNode` returns the Node executable after checking its version; the binary
 variable selects an executable but never relaxes the version.
 
+### Node and pnpm repositories
+
+```ts
+import {
+  assertNodePnpmRuntime,
+  checkToolchain,
+  readNodePnpmPins,
+} from "@raypx-kit/devkit/toolchain";
+const pins = readNodePnpmPins(root);
+const findings = checkToolchain(root, { runtime: "node-pnpm" });
+assertNodePnpmRuntime(root);
+```
+
+This policy reads exact root `engines.node` and `packageManager` pins, validates
+`devEngines`, mise and CI declarations, and checks both active executables. It does
+not change public package engine ranges. `nodeTestDefaults` from `/testing` provides
+plain Vitest Node defaults without Bun worker flags.
+
 ### Bun-only repositories
 
 The default policy still requires Node and Bun. Repositories that run JavaScript
@@ -210,7 +228,7 @@ export default mergeConfig(
 
 `bunTestDefaults` selects the Node environment, one worker, Bun's `--no-env-file`
 and `--no-install` flags, and V8 coverage with text/JSON/LCOV reporters. Execute
-tests with `bun --bun vp test --run`; install the matching coverage provider when
+tests with `pnpm exec vp test --run`; install the matching coverage provider when
 requesting coverage. Suites, DOM environments, setup files, React deduplication
 and application fixtures remain consumer-owned. Use native `mergeConfig` for
 overrides; no configuration factory or custom option schema is required.
@@ -266,7 +284,7 @@ reads workspace manifests and never imports an inspected repository's config.
 Policies can extend members with native or packaging metadata. Task references
 retain `package#task:name`; VP remains the only scheduler and cache executor.
 
-`runTasks` receives an explicit Bun executable, prepares declared output folders
+`runTasks` receives an explicit runtime executable and optional `runner` arguments, prepares declared output folders
 and forwards arguments only to the selected leaf through task-specific environment
 keys. Set `allowFilteredArguments` only for wrappers that already support filtered
 argument forwarding. Planning and configuration also load on supported Node versions.

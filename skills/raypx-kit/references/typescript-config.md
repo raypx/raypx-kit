@@ -1,7 +1,7 @@
 # @raypx-kit/tsconfig
 
 ```sh
-bun add -d @raypx-kit/tsconfig typescript
+pnpm add -d @raypx-kit/tsconfig typescript
 ```
 
 | Preset                                   | For                                        |

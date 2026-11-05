@@ -1,5 +1,5 @@
 /**
- * Preview server for Nitro's Bun and Cloudflare prerender steps.
+ * Preview server for Nitro's Node and Cloudflare prerender steps.
  *
  * Nitro waits only ten seconds for the preview port and never stops the child when
  * that wait fails, so a slow Wrangler start under parallel builds both fails the
@@ -133,7 +133,7 @@ async function proxy(incoming: IncomingMessage, outgoing: ServerResponse): Promi
   incoming.pipe(upstream);
 }
 
-// Bun's localhost listener can fall back to the other address family when one
+// A localhost listener can fall back to the other address family when one
 // is busy. Nitro detects readiness by binding localhost, so reserve both loopback
 // addresses to make that check observe the running proxy.
 const servers = (host === "localhost" ? ["127.0.0.1", "::1"] : [host]).map((address) => {

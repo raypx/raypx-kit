@@ -6,14 +6,14 @@ tested release. Peer ranges describe supported consumer versions; do not narrow
 them merely to match the development install. Internal dependencies use
 `workspace:*`.
 
-The committed `bun.lock` records the tested resolution. CI installs it with
-`bun install --frozen-lockfile`. Changing a range does not
+The committed `pnpm-lock.yaml` records the tested resolution. CI installs it with
+`pnpm install --frozen-lockfile`. Changing a range does not
 authorize silently replacing copied source or changing bundled dependency
 provenance.
 
 ## Compatibility requirements
 
-`bun run toolchain:check` enforces the installed Vite+/core, coverage and Fumadocs
+`pnpm run toolchain:check` enforces the installed Vite+/core, coverage and Fumadocs
 pairings below, including their declarations and peer ranges. Drizzle and Nitro
 also rely on constrained prerelease ranges and affected package checks. Update
 related dependencies together and commit the resulting lockfile:
@@ -24,7 +24,7 @@ related dependencies together and commit the resulting lockfile:
 | Vitest coverage     | Caret ranges; every installed provider must match Vite+'s bundled Vitest and satisfy its peer range. Do not add a separate Vitest version.                             |
 | Fumadocs            | @fumadocs/base-ui and fumadocs-core use caret ranges and must resolve to the same release while satisfying their peers. The site uses the official Base UI components. |
 | Drizzle ORM and CLI | >=1.0.0-rc.5-5935859 <1.0.0-rc.5-z restricts resolution to the RC5 hash family. Validate ORM, CLI and consumer fixtures together.                                      |
-| Nitro               | \~3.0.260903-beta preserves the tested prerelease family and the documentation site's bun preset.                                                                      |
+| Nitro               | \~3.0.260903-beta preserves the tested prerelease family and the documentation site's node-server preset.                                                              |
 
 The slim Drizzle Kit distribution retains upstream runtime dependency names and
 existing ranges. Exact upstream versions become caret ranges that include those
@@ -33,18 +33,17 @@ CLI and declarations stay unchanged. Review these dependencies whenever the
 upstream build changes.
 Its esbuild range also accepts the tested `^0.28.2` release alongside upstream's
 `^0.25.10`; archive consumers generate migrations from TypeScript configuration
-and schemas with the installed CLI under Bun and Node.
+and schemas with the installed CLI under Node.
 
-The Bun development pin remains exact in root `packageManager`. The separate
+Node and pnpm development pins remain exact in root `engines.node` and `packageManager`. The separate
 Node consumer baseline lives in `scripts/packages/node-version`.
-`@types/node` follows the consumer baseline major; an `@types/bun` declaration starts at
-the pinned Bun version. Public package engine ranges describe consumer support
+`@types/node` follows the development Node major. Public package engine ranges describe consumer support
 independently of repository development pins.
 
 The [consumer compatibility matrix](README.md#consumer-compatibility-matrix)
 tests the exact Node and peer lower bounds alongside the upper Node baseline and
 locked peer versions. When changing a support range, review the resulting matrix
-and its public runtime and declaration contracts. Keep the Bun development runtime
+and its public runtime and declaration contracts. Keep the Node development runtime
 pin unchanged when selecting additional consumer binaries.
 
 ## Peers and bundled dependencies
@@ -68,12 +67,12 @@ complete upstream licenses and pinned provenance.
 1. Review the affected manifests, upstream compatibility requirements and copied
    source constraints. Keep related groups compatible rather than widening ranges
    independently.
-2. Refresh the Bun lockfile and run `bun run doctor` and
-   `bun run toolchain:check` against the installed resolution.
+2. Refresh the pnpm lockfile and run `pnpm run doctor` and
+   `pnpm run toolchain:check` against the installed resolution.
 3. Run affected workspace checks, tests and builds. If Vite+, the test runtime or
    coverage changes, run affected `test:coverage` commands as well: the normal
    verification gate does not enable coverage.
-4. Run `bun run verify`, which includes documentation, archive consumers and
+4. Run `pnpm run verify`, which includes documentation, archive consumers and
    Changesets fixtures. Review the manifest and lockfile changes with these results.
 
 For a runtime upgrade, change its authoritative pin first, then update dependent

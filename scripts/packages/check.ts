@@ -103,7 +103,7 @@ async function assertArchive(
       entries.has(`package/${target.replace(/^\.\//, "")}`),
       `${packed.name}: missing ${name} binary ${target}`,
     );
-  // Releases pack with Bun, as here; npm would publish these protocols verbatim.
+  // Releases pack with pnpm, as here; npm would publish these protocols verbatim.
   for (const dependencies of [
     packed.dependencies,
     packed.devDependencies,
@@ -158,8 +158,7 @@ try {
     if (!selected.has(manifest.name)) continue;
     if (releaseArchives && !releaseArchives.has(manifest.name)) continue;
     const archive = releaseArchives?.get(manifest.name) ?? join(temporary, `${directory}.tgz`);
-    if (!releaseArchives)
-      run(process.execPath, ["pm", "pack", "--filename", archive], packageDirectory);
+    if (!releaseArchives) run("pnpm", ["pack", "--out", archive], packageDirectory);
     const packed = await assertArchive(archive, manifest, packageDirectory);
     packages.push({ directory, packageDirectory, archive, packed });
   }
@@ -174,7 +173,7 @@ try {
   for (const { directory, packageDirectory, archive, packed } of packages) {
     if (requested && !(requested as string[]).includes(packed.name)) continue;
     const options = {
-      bunBinary: process.execPath,
+      nodeBinary: process.execPath,
       compilerDependencies: {
         typescript: rootManifest.devDependencies!.typescript!,
         "@types/node": rootManifest.devDependencies!["@types/node"]!,
@@ -182,7 +181,7 @@ try {
       packageArchives,
     };
     await checkConsumer(archive, packed, join(temporary, directory), packageDirectory, options);
-    console.log(`${packed.name}@${packed.version}: tarball and Bun consumer passed`);
+    console.log(`${packed.name}@${packed.version}: tarball and Node consumer passed`);
     await checkWithoutOptionalPeers(
       archive,
       packed,

@@ -28,7 +28,7 @@ Root `docs/` is an internal Fumadocs application and owns
 the documentation site alongside canonical reference Markdown. New libraries live under `packages/`
 and have explicit ESM exports, a README, license, independent version and tests.
 Configuration packages export their package-root files directly instead of `dist/`.
-`pack:check` installs public archives in isolated Bun consumers and
+`pack:check` installs public archives in isolated Node consumers and
 loads JavaScript/JSON exports and resolves and reads exported CSS assets. Internal
 runtime dependencies install from archives in the same verification batch;
 package behavior and public types belong in unit tests.
@@ -36,7 +36,7 @@ Optional `packages/<name>/tests/fixtures/consumer` declaration contracts are cop
 the isolated archive consumer by `pack:check`. Their own tsconfig checks public
 types against the installed tarball; they are excluded from source lint resolution.
 An optional `runtime.mjs` in the same fixture runs against the installed archive
-with Bun, including fixtures without a tsconfig. The separate Node workflow reuses
+with Node, including fixtures without a tsconfig. The separate Node workflow reuses
 the same contracts on the supported Node versions.
 Optional `without-optional-peers/runtime.mjs` and `without-optional-peers/types.ts`
 contracts use a second isolated consumer that omits optional peers and extra
@@ -78,26 +78,27 @@ Write canonical repository and package documentation in English. The documentati
 site may keep maintained translations under `docs/content/`; preserve English
 fallbacks, localized message examples, code identifiers and source links.
 Keep Markdown/MDX formatting in the root `vite.config.ts` `fmt.overrides`; use
-`bun run format` for table alignment, spacing and code-example formatting.
+`pnpm run format` for table alignment, spacing and code-example formatting.
 Write documentation table cell values as plain text, including paths and API
 names, and preserve Markdown links. Oxfmt preserves inline-code delimiters, so
 plain table values are an authoring convention rather than an automatic formatter fix.
 
 ## Toolchain
 
-Bun 1.4.4 is the development and default CI runtime. Root `packageManager` is the
-single development pin; `devEngines`, mise, CI and documentation follow it. There
-is no root Node pin. mise reads only Bun from package.json and has no `[tools]` pins.
-Run `mise trust && mise install`, activate mise or use `mise exec -- <command>`.
-`bun run doctor` checks the actual executable; `toolchain:check` rejects drift.
+Node 24.22.2 is the development and default CI runtime; pnpm 12.16.1 owns
+installation, the lockfile and archive packing. Root `engines.node` and
+`packageManager` are the pins; devEngines, CI and documentation follow them.
+mise reads Node from package.json without a `[tools]` section. Install the pinned
+pnpm independently. `pnpm run doctor` checks both actual executables;
+`toolchain:check` rejects declaration and workspace drift. Root workspace patterns,
+catalog and overrides generate `pnpm-workspace.yaml` through `workspace:sync`.
 
 VP owns the only task graph, cache, formatting, linting, tests and builds. Root
 `scripts/tasks/` composes shared Devkit task policies and supplies plain `run.tasks` through
 lightweight `vite.config.ts` files. Tasks use private `task:*` names, while package
 scripts remain terminal leaf commands. `scripts/tasks/leaf.ts` forwards arguments
 only to the selected task, and runtime/platform identity participates in commands.
-Keep native Bun typechecker source inputs explicit across dependency workspaces;
-filesystem tracing does not capture every native checker read. Cache real output
+Keep source inputs explicit across dependency workspaces. Cache real output
 files, preserve build environment values and fingerprint outcome-affecting variables.
 Start environment loading is scoped through Devkit's injected Vite adapter. Keep
 the inherited environment, CI guards, credentials and actual build inputs available;
@@ -105,40 +106,37 @@ do not introduce global environment blacklists.
 Create ignored output directories before tracing to keep enumeration stable.
 Do not introduce a second task runner.
 
-Libraries build with `bun --bun vp pack`, using the `pack` block in their
+Libraries build with `pnpm exec vp pack`, using the `pack` block in their
 `vite.config.ts`. Preserve ESM exports, declarations, sourcemaps, bundling rules
 and the public Node compatibility floor. Drizzle Kit keeps its byte-for-byte
 upstream extractor as its VP build leaf. TSConfig exports package-root JSON.
-Apps use `bun --bun vp build`; application plugins live in `vite.app.config.ts`
+Apps use `pnpm exec vp build`; application plugins live in `vite.app.config.ts`
 so loading task metadata cannot start an application or import a built library.
 Email Preview packs its plugin and builds its prebuilt interface through VP.
 Themes generates package-root styles from tokens; UI scans its published dist.
-Run local binaries with Bun (`bun --bun vp`, `bun run knip`, `bun run changeset`).
+Run local binaries through pnpm (`pnpm exec vp`, `pnpm run knip`, `pnpm run changeset`).
 
 Public packages retain Node-compatible interfaces and existing `engines.node`
-ranges; a Bun development toolchain is not permission to introduce Bun-only APIs
-into their Node/universal exports. Library targets stay at `node22.21.0`. Independent
+ranges; preserve their Node/universal runtime boundaries. Library targets stay at `node22.21.0`. Independent
 Node consumer tests run through `.github/workflows/node-compatibility.yml`, manually
 or before npm publication, against exact archives and supported peer lower bounds.
 `scripts/packages/node-version` selects that workflow's upper baseline, not a
-repository development runtime. Node-only vendor tools (Cloudflare packaging and
-npm transport) use the explicit `.github/actions/setup-node-tools` exception.
-Default CI never installs Node through the repository setup action.
+repository development runtime. The shared CI setup installs Node and pnpm;
+Cloudflare packaging and npm transport use the same development runtime.
 
-Documentation defaults to Nitro's Bun target for builds, previews and browser
+Documentation defaults to Nitro's node-server target for builds, previews and browser
 verification. `docs:build:cloudflare` and `docs:deploy` explicitly select the Worker
-target using the isolated Node vendor tools; the independent compatibility workflow
-checks that build. Keep both targets working and never deploy a Bun server entry
+target using the Node development runtime; the independent compatibility workflow
+checks that build. Keep both targets working and never deploy a Node server entry
 as a Worker. Docs and browser tests consume built public package exports.
 
 `devkit.config.ts` owns complete workspace metadata and source-entry mappings.
 Repository maintenance imports this trusted configuration explicitly; discovery
 never executes an inspected repository's configuration. Keep manifests free of
 repository-only Devkit metadata. `scripts/checks/toolchain.ts` composes generic
-Devkit declaration checks with installed dependency pairing and the narrow vendor
-workflow exception. Preserve public Devkit Node/Bun checking APIs for consumers.
+Devkit declaration checks with installed dependency pairing and workspace configuration checks. Preserve public Devkit Node/Bun checking APIs for consumers.
 
-Use `bun --check --tsconfig-override tsconfig.json` for native type checks. VP pack
+Use `tsc --noEmit --project tsconfig.json` for native type checks. VP pack
 emits declarations; installed archive consumers also run strict NodeNext TypeScript
 contracts with `skipLibCheck: false`. Keep direct third-party dependencies in their
 owning manifests and internal dependencies on `workspace:*`.
@@ -149,10 +147,10 @@ Third-party dependency declarations use version ranges. Stable dependencies and
 development dependencies use caret ranges from the latest compatible tested
 release. Peer ranges describe supported consumer versions; do not narrow them
 just to match the development install. Internal dependencies keep `workspace:*`.
-Commit `bun.lock` and use frozen installation in CI for reproducible builds.
+Commit `pnpm-lock.yaml` and use frozen installation in CI for reproducible builds.
 
 Preserve compatibility through constrained prerelease ranges and installed-version
-checks in `bun run toolchain:check`:
+checks in `pnpm run toolchain:check`:
 
 - Vite+, its Vite core alias/override and coverage providers use caret ranges.
   The installed Vite+ and core versions must match, and installed coverage
@@ -166,9 +164,9 @@ checks in `bun run toolchain:check`:
   upstream declarations become caret ranges that include the upstream version.
 - Nitro uses the tested prerelease range `~3.0.260903-beta`.
 
-The Bun runtime pin remains exact in `packageManager`. Node type declarations
-follow the independent compatibility baseline; Bun types, when declared, start
-at the Bun pin. Do not install a development Node runtime to run checks.
+The development Node and pnpm pins remain exact in the root manifest. Node type
+declarations follow the development Node major. The consumer compatibility
+baseline and published engine ranges remain separate.
 
 Range changes do not authorize upgrading copied source provenance or replacing
 bundled dependencies outside their upstream compatibility ranges. Recheck
@@ -195,7 +193,7 @@ changeset for user-visible changes after initial release preparation. Retain ful
 licenses and pinned source provenance for copied or adapted code. UI, Themes,
 Email Preview, Notifications and Security keep their own Apache license in `LICENSE`. Their READMEs contain
 generated indexes of direct runtime and peer dependencies, recording installed
-versions and license links. Maintain these indexes with `bun run licenses:update`;
+versions and license links. Maintain these indexes with `pnpm run licenses:update`;
 `licenses:check` rejects drift before source verification. Ordinary external
 dependencies carry their own full license texts; do not copy them into package
 licenses. Preserve UI's complete shadcn MIT license and source notice, and Themes'
@@ -214,22 +212,20 @@ The CLI accepts release `--stable` and string `--otp <code>` flags directly,
 after the final subcommand. Reject options before a subcommand rather than losing them.
 Prefer `--` for additional Changesets arguments; retain direct forwarding for
 existing publish invocations and preserve OTP leading zeros. Help after `--`
-belongs to Changesets. Prefer the full `raypx-kit-dev release publish` command for
-forwarding; Bun consumes a leading separator on the `release:publish` alias,
-which needs `-- -- <Changesets args>` when no wrapper options precede it.
+belongs to Changesets. Use `pnpm run release:publish -- <Changesets args>` for explicit forwarding.
 Automatic version PRs and npm publication are disabled independently in CI until
 maintainers configure `VERSION_PR_ENABLED` and `NPM_PUBLISH_ENABLED`, respectively.
 Version PRs also require the repository's Actions PR-creation permission.
 
 ## Verification
 
-Run a changed package's narrow tests first, then `bun run verify --full` before
+Run a changed package's narrow tests first, then `pnpm run verify --full` before
 delivery. Daily `verify` selects affected workspaces from Git (including local
 changes); unknown files or an unavailable base select full coverage. `--dry-run`
 prints the exact plan. `verify:quick` runs source checks and affected unit suites.
 All paths retain doctor, toolchain checks, licenses, architecture, formatting,
 lint, Knip and strict types. Full verification additionally builds libraries/docs,
-runs browser scenarios and validates archives and release preparation with Bun.
+runs browser scenarios and validates archives and release preparation with Node.
 
 CI consumes the same plan. Source/tests/builds precede independent browser and
 archive gates; those gates restore the newly saved VP build cache. PostgreSQL runs
@@ -238,7 +234,7 @@ missing or cancelled required gates and accepts skips only when unselected.
 Publication is called only after the same canary commit passes `verify`; manual
 release dispatch requires successful CI for that SHA. Node compatibility archives
 include their commit and digests; CI publication reuses the completed main source gates, copies those verified bytes and
-checks them with Bun instead of rebuilding or repacking. Shared workflow actions restore compatible VP artifacts and upload the cache only
+checks them with Node instead of rebuilding or repacking. Shared workflow actions restore compatible VP artifacts and upload the cache only
 when a new successful artifact exists. Node matrices live outside default CI.
 
 Maintenance tests are uncached because they spawn independent VP runners; nested
@@ -249,7 +245,7 @@ worker by default. Documentation content invalidates docs, not unrelated librari
 
 React workspaces own `e2e/` scenarios and installed public-export consumers; shared
 runner/configuration live in root `e2e/` and Playwright configuration. Install the
-Chromium shell with `bun run test:e2e:install --only-shell`. Browser failures remain
+Chromium shell with `pnpm run test:e2e:install --only-shell`. Browser failures remain
 in ignored `.artifacts/e2e/`. Keep HTTP traffic local and test-owned; no live service
 accounts or application credentials. Never replace a failing browser flow with a mock.
 
@@ -261,7 +257,7 @@ run only in their independent CI job with a temporary PostgreSQL 17 service and
 job establishes PostgreSQL execution evidence. Preserve test-owned schemas, cleanup
 and connection closure; do not expand the database/platform support matrix silently.
 
-`bun run knip` checks workspace source files, dependency usage and internal
+`pnpm run knip` checks workspace source files, dependency usage and internal
 exports. Keep public library entry points as API roots, including APIs with no
 workspace callers. Independent tarball consumer fixtures retain their own
 manifests and installed-dependency environments; `pack:check` validates those

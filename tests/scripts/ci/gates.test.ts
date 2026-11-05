@@ -28,7 +28,7 @@ it("checks exported configuration archives without inventing a build task", asyn
       .mocked(run)
       .mock.calls.some(
         ([, args, , env]) =>
-          args[0] === "scripts/packages/check.ts" &&
+          args.includes("scripts/packages/check.ts") &&
           env?.TOOLKIT_PACKAGES?.includes("@raypx-kit/tsconfig"),
       ),
   ).toBe(true);
@@ -53,7 +53,7 @@ it("prints the effective quick plan from the command line", () => {
   const root = fileURLToPath(new URL("../../../", import.meta.url));
   const output = execFileSync(
     process.execPath,
-    ["scripts/verify/run.ts", "--quick", "--full", "--dry-run"],
+    ["--import", "tsx", "scripts/verify/run.ts", "--quick", "--full", "--dry-run"],
     { cwd: root, encoding: "utf8" },
   );
   const plan = JSON.parse(output) as ReturnType<typeof verificationPlan>;

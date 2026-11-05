@@ -7,7 +7,7 @@ describe this release; application presets and environment loading stay with
 consumers.
 
 ```bash
-bun add @raypx-kit/env zod@^4.6.7
+pnpm add @raypx-kit/env zod@^4.6.7
 ```
 
 The package is ESM-only and supports Node 22.21+ and Bun.

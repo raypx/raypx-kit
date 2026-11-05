@@ -11,9 +11,9 @@ export interface Toolchain {
 }
 
 export interface ToolchainOptions {
-  /** Bun-only repositories forbid Node runtime pins; the default checks both runtimes. */
-  runtime?: "node-bun" | "bun";
-  /** Repository-relative documents whose `Node x.y.z` and `Bun x.y.z` mentions must match. */
+  /** Select Bun-only or Node/pnpm policy; the default checks Node and Bun. */
+  runtime?: "node-bun" | "bun" | "node-pnpm";
+  /** Repository-relative documents whose runtime and package-manager pins must match. */
   documents?: readonly string[];
   /** Files every Turbo cache key must include when `turbo.json` exists. */
   turboGlobalDependencies?: readonly string[];
@@ -248,6 +248,7 @@ export function checkToolchain(
     turboGlobalDependencies = runtime === "bun" ? ["mise.toml"] : [".nvmrc", "mise.toml"],
   }: ToolchainOptions = {},
 ): string[] {
+  if (runtime === "node-pnpm") return checkNodePnpmToolchain(root, documents);
   const bunOnly = runtime === "bun";
   let pins: { bun: string; node?: string };
   try {
@@ -341,4 +342,108 @@ export function checkToolchain(
         findings.push(`turbo.json: include ${file} in globalDependencies`);
   }
   return [...new Set(findings)];
+}
+
+/** Root manifest pins for repositories developed with Node and pnpm. */
+export function readNodePnpmPins(root: string): { node: string; pnpm: string } {
+  const manifest = manifestAt(root);
+  const node = manifest.engines?.node;
+  const pnpm = /^pnpm@(\d+\.\d+\.\d+)$/.exec(manifest.packageManager ?? "")?.[1];
+  if (!node || !exactVersion.test(node) || !pnpm)
+    throw new Error(
+      "Pin exact Node and pnpm versions in package.json engines.node and packageManager.",
+    );
+  return { node, pnpm };
+}
+
+/** Check the active executables without changing the user's runtime selection. */
+export function assertNodePnpmRuntime(root: string): { node: string; pnpm: string } {
+  const pins = readNodePnpmPins(root);
+  if (process.versions.bun || process.versions.node !== pins.node)
+    throw new Error(
+      `Expected Node ${pins.node}, got ${process.versions.bun ? "Bun" : process.versions.node}.`,
+    );
+  const actual = execFileSync("pnpm", ["--version"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: "pipe",
+  }).trim();
+  if (actual !== pins.pnpm) throw new Error(`Expected pnpm ${pins.pnpm}, got ${actual}.`);
+  return pins;
+}
+
+function checkNodePnpmToolchain(root: string, documents: readonly string[]): string[] {
+  let pins: { node: string; pnpm: string };
+  try {
+    pins = readNodePnpmPins(root);
+  } catch (error) {
+    return [error instanceof Error ? error.message : String(error)];
+  }
+  const findings: string[] = [];
+  const manifest = manifestAt(root);
+  for (const [key, name, version] of [
+    ["runtime", "node", pins.node],
+    ["packageManager", "pnpm", pins.pnpm],
+  ] as const) {
+    const engine = manifest.devEngines?.[key];
+    if (engine?.name !== name || engine.version !== version || engine.onFail !== "error")
+      findings.push(`package.json: devEngines.${key} must require ${name}@${version}`);
+  }
+  for (const file of [
+    "bun.lock",
+    "bunfig.toml",
+    ".bun-version",
+    ".nvmrc",
+    ".node-version",
+    ".tool-versions",
+  ])
+    if (existsSync(join(root, file))) findings.push(`${file}: use the root Node/pnpm pins only`);
+  try {
+    const mise = parseTOML<{
+      tools?: unknown;
+      settings?: { idiomatic_version_file_enable_tools?: string[] };
+    }>(readFileSync(join(root, "mise.toml"), "utf8"));
+    if (
+      mise.tools ||
+      JSON.stringify(mise.settings?.idiomatic_version_file_enable_tools) !== '["node"]'
+    )
+      findings.push("mise.toml: read the package.json Node pin without a tools section");
+  } catch {
+    findings.push("mise.toml: invalid runtime manager configuration");
+  }
+  for (const file of globSync(
+    [".github/workflows/*.{yml,yaml}", ".github/actions/**/action.{yml,yaml}"],
+    { cwd: root },
+  )) {
+    type Step = { uses?: string; with?: Record<string, unknown> };
+    let document: { runs?: { steps?: Step[] }; jobs?: Record<string, { steps?: Step[] }> };
+    try {
+      document = parseYAML(readFileSync(join(root, file), "utf8"));
+    } catch {
+      findings.push(`${file}: invalid YAML`);
+      continue;
+    }
+    for (const step of [
+      ...(document.runs?.steps ?? []),
+      ...Object.values(document.jobs ?? {}).flatMap((job) => job.steps ?? []),
+    ]) {
+      if (step.uses?.startsWith("oven-sh/setup-bun@"))
+        findings.push(`${file}: use the Node/pnpm toolchain`);
+      if (
+        step.uses?.startsWith("actions/setup-node@") &&
+        (step.with?.["node-version-file"] !== "package.json" || step.with?.["node-version"])
+      )
+        findings.push(`${file}: setup-node must read package.json`);
+      if (step.uses?.startsWith("pnpm/action-setup@") && step.with?.version)
+        findings.push(`${file}: pnpm setup must read packageManager`);
+    }
+  }
+  for (const file of documents) {
+    if (!existsSync(join(root, file))) continue;
+    const document = readFileSync(join(root, file), "utf8").replaceAll("**", "");
+    for (const [, tool, version] of document.matchAll(/\b(Node|pnpm) v?(\d+\.\d+\.\d+)\b/g))
+      if (version !== (tool === "Node" ? pins.node : pins.pnpm))
+        findings.push(`${file}: documented ${tool} pin differs from package.json`);
+  }
+  return findings;
 }

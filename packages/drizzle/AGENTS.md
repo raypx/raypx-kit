@@ -24,7 +24,7 @@ Tests live under `tests/`, retaining supporting `diagnostics/` and `postgres/`
 subdirectories; library builds include only `src/`. Consumer declaration fixtures
 are excluded from source checks and checked against installed tarballs instead.
 Preserve the additional consumer without optional peers: it checks `/errors` and
-`/results` through Bun, Node and strict TypeScript without installing the ORM.
+`/results` through Node and strict TypeScript without installing the ORM.
 
 ## Ownership
 
@@ -72,13 +72,13 @@ must not require or connect to a database. Keep integration files outside those
 default test selections.
 
 ```bash
-bun run build --filter=@raypx-kit/drizzle
-bun run --cwd packages/drizzle check
-bun run --cwd packages/drizzle test
-bun run --cwd packages/drizzle pack:check
+pnpm run build --filter=@raypx-kit/drizzle
+pnpm --dir packages/drizzle run check
+pnpm --dir packages/drizzle run test
+pnpm --dir packages/drizzle run pack:check
 ```
 
-CI runs `bun run --cwd packages/drizzle test:integration` in a separate job with
+CI runs `pnpm --dir packages/drizzle run test:integration` in a separate job with
 a temporary PostgreSQL 17 service. The command requires a CI environment and
 `DRIZZLE_TEST_DATABASE_URL`; missing either is an error, never a skipped suite.
 Exercise real JSONB values and decoding, UPSERT behavior, SQLSTATE error metadata

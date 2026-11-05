@@ -7,10 +7,10 @@ set -euo pipefail
 browsers="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
 find_shell() { find "$browsers" -type f -name chrome-headless-shell 2>/dev/null | head -n 1; }
 if [[ -z "$(find_shell)" ]]; then
-  bun run test:e2e:install --only-shell
+  pnpm run test:e2e:install --only-shell
 fi
 shell="$(find_shell)"
 test -n "$shell"
 if ldd "$shell" | grep -q "not found"; then
-  bun x playwright install-deps chromium
+  pnpm exec playwright install-deps chromium
 fi

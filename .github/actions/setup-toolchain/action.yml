@@ -1,26 +1,22 @@
 name: Set up repository toolchain
-description: Install the pinned Bun runtime and locked dependencies with shared downloads.
-
+description: Install pinned Node and pnpm with locked dependencies.
+inputs:
+  registry-url:
+    description: Optional npm registry for publication
+    required: false
+    default: ""
 runs:
   using: composite
   steps:
-    - uses: oven-sh/setup-bun@v2
-      id: bun
+    - uses: pnpm/action-setup@v6
+    - uses: actions/setup-node@v7
       with:
-        bun-version-file: package.json
-    - name: Configure Bun downloads
-      shell: bash
-      run: printf 'BUN_INSTALL_CACHE_DIR=%s\n' "$RUNNER_TEMP/raypx-kit-bun-cache" >> "$GITHUB_ENV"
-    - name: Cache Bun downloads
-      uses: actions/cache@v6
-      with:
-        path: ${{ runner.temp }}/raypx-kit-bun-cache
-        key: bun-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.bun.outputs.bun-version }}-${{ hashFiles('bun.lock') }}
-        restore-keys: |
-          bun-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.bun.outputs.bun-version }}-
+        node-version-file: package.json
+        registry-url: ${{ inputs.registry-url }}
+        cache: pnpm
+        cache-dependency-path: pnpm-lock.yaml
     - name: Install locked dependencies
       shell: bash
-      # CI needs no Git hooks; the root prepare script skips them with this flag.
       env:
         VP_GIT_HOOKS: "0"
-      run: bun scripts/ci/diagnostics.ts run install bun install --frozen-lockfile
+      run: node scripts/ci/diagnostics.ts run install pnpm install --frozen-lockfile

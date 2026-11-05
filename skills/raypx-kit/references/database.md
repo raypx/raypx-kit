@@ -4,8 +4,8 @@ Both target Drizzle ORM `>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z`, PostgreSQL only, w
 the postgres.js driver (`pg`/node-postgres is unsupported).
 
 ```sh
-bun add @raypx-kit/drizzle 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z' postgres@^3.4.9
-bun add -d @raypx-kit/drizzle-kit
+pnpm add @raypx-kit/drizzle 'drizzle-orm@>=1.0.0-rc.5-5935859 <1.0.0-rc.5-z' postgres@^3.4.9
+pnpm add -d @raypx-kit/drizzle-kit
 ```
 
 ## @raypx-kit/drizzle

@@ -11,9 +11,9 @@ runs:
       id: cache
       with:
         path: node_modules/.vite/task-cache
-        key: vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'bun.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+        key: vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
         restore-keys: |
-          vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'bun.lock') }}-
+          vp-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}-
           vp-v1-${{ runner.os }}-${{ runner.arch }}-
     - shell: bash
-      run: bun scripts/ci/cache.ts snapshot
+      run: node --import tsx scripts/ci/cache.ts snapshot

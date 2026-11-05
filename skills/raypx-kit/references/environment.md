@@ -1,7 +1,7 @@
 # @raypx-kit/env
 
 ```sh
-bun add @raypx-kit/env zod@^4.6.7
+pnpm add @raypx-kit/env zod@^4.6.7
 ```
 
 Zod is a required peer so your schemas and the package share one Zod runtime.

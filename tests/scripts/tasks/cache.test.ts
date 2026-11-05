@@ -14,7 +14,13 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
   const run = (args: string[], name = "@fixture/consumer#build", env: NodeJS.ProcessEnv = {}) =>
     execFileSync(
       process.execPath,
-      [fileURLToPath(new URL("../../../scripts/tasks/run.ts", import.meta.url)), name, ...args],
+      [
+        "--import",
+        "tsx",
+        fileURLToPath(new URL("../../../scripts/tasks/run.ts", import.meta.url)),
+        name,
+        ...args,
+      ],
       {
         cwd: root,
         env: {
@@ -35,11 +41,13 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
       join(root, "package.json"),
       JSON.stringify({
         name: "cache-fixture",
+        type: "module",
         private: true,
-        packageManager: "bun@1.4.4",
+        packageManager: "pnpm@12.16.1",
         workspaces: ["packages/*"],
       }),
     );
+    await writeFile(join(root, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n");
     for (const name of ["base", "consumer"]) {
       const directory = join(root, "packages", name);
       await mkdir(join(directory, "src"), { recursive: true });
@@ -49,7 +57,7 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
         JSON.stringify({
           name: `@fixture/${name}`,
           type: "module",
-          scripts: { check: "bun --version", build: "bun build.mjs" },
+          scripts: { check: "node --version", build: "node build.mjs" },
           dependencies: name === "consumer" ? { "@fixture/base": "workspace:*" } : {},
         }),
       );
@@ -65,15 +73,20 @@ it("reuses real VP artifacts, invalidates dependency edits and restores deleted 
     await mkdir(join(root, "scripts/tasks"), { recursive: true });
     await writeFile(
       join(root, "scripts/tasks/leaf.ts"),
-      `import { runTaskLeaf } from ${JSON.stringify(fileURLToPath(new URL("../../../packages/devkit/src/tasks.ts", import.meta.url)))}; process.exitCode = await runTaskLeaf({ runtime: process.execPath });`,
+      `import { runTaskLeaf } from ${JSON.stringify(fileURLToPath(new URL("../../../packages/devkit/src/tasks.ts", import.meta.url)))}; process.exitCode = await runTaskLeaf({ runtime: "pnpm" });`,
     );
-    execFileSync(process.execPath, ["install", "--ignore-scripts"], { cwd: root, stdio: "pipe" });
+    execFileSync("pnpm", ["install", "--ignore-scripts"], { cwd: root, stdio: "pipe" });
     await symlink(
       join(repository, "node_modules/vite-plus"),
       join(root, "node_modules/vite-plus"),
       "dir",
     );
+    await symlink(join(repository, "node_modules/tsx"), join(root, "node_modules/tsx"), "dir");
     await mkdir(join(root, "node_modules/.bin"), { recursive: true });
+    await symlink(
+      join(repository, "node_modules/tsx/dist/cli.mjs"),
+      join(root, "node_modules/.bin/tsx"),
+    );
     await symlink(
       join(repository, "node_modules/vite-plus/bin/vp"),
       join(root, "node_modules/.bin/vp"),

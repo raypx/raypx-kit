@@ -14,7 +14,7 @@ prebuilt API and payload bundles.
 
 ## Constraints
 
-- `bun run build` copies upstream files from the lockfile's resolved `drizzle-kit`
+- `pnpm run build` copies upstream files from the lockfile's resolved `drizzle-kit`
   devDependency into `dist/`. Never edit or rebundle them.
 - Generate `dist/package.json` with `type: commonjs` so upstream `.js` and
   `.d.ts` files retain their module semantics; `.mjs` and `.d.mts` remain ESM.
@@ -23,7 +23,7 @@ prebuilt API and payload bundles.
   dependency names and that upstream ranges remain subsets of our declarations.
   Review these declarations with each upstream upgrade.
 - esbuild also supports `^0.28.2` alongside upstream's `^0.25.10`. Keep the archive
-  consumer's real TypeScript migration-generation check under both Bun and Node
+  consumer's real TypeScript migration-generation check under Node
   when changing this dependency; loading exports or CLI help does not compile schemas.
 - Stable dependencies and coverage providers use caret ranges. Installed coverage
   providers must match Vite+'s bundled Vitest version.
@@ -41,8 +41,8 @@ prebuilt API and payload bundles.
 ## Verification
 
 ```bash
-bun run --cwd packages/drizzle-kit test
-bun run --cwd packages/drizzle-kit check
-bun run build --filter=@raypx-kit/drizzle-kit
-bun run --cwd packages/drizzle-kit pack:check
+pnpm --dir packages/drizzle-kit run test
+pnpm --dir packages/drizzle-kit run check
+pnpm run build --filter=@raypx-kit/drizzle-kit
+pnpm --dir packages/drizzle-kit run pack:check
 ```

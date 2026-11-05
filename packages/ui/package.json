@@ -71,13 +71,13 @@
     "./styles.css": "./styles.css"
   },
   "scripts": {
-    "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "bun --bun vp pack",
-    "dev": "bun --bun vp pack --watch",
-    "test": "bun --bun vp test --run",
-    "test:unit": "bun --bun vp test --run",
-    "pack:check": "bun pm pack --dry-run",
-    "test:e2e": "bun ../../e2e/run.ts --project ui"
+    "check": "tsc --noEmit --project tsconfig.json",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test --run",
+    "test:unit": "vp test --run",
+    "pack:check": "pnpm pack --dry-run",
+    "test:e2e": "tsx ../../e2e/run.ts --project ui"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

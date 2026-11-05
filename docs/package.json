@@ -8,11 +8,11 @@
   },
   "type": "module",
   "scripts": {
-    "check": "bun --check --tsconfig-override tsconfig.json",
-    "build": "bun --bun vp build --config vite.app.config.ts",
-    "dev": "bun --bun vp dev --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
-    "preview": "bun --bun vp preview --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
-    "test:e2e": "bun ../e2e/run.ts --project docs",
+    "check": "tsc --noEmit --project tsconfig.json",
+    "build": "vp build --config vite.app.config.ts",
+    "dev": "vp dev --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
+    "preview": "vp preview --host 127.0.0.1 --port 3100 --config vite.app.config.ts",
+    "test:e2e": "tsx ../e2e/run.ts --project docs",
     "build:cloudflare": "TOOLKIT_DOCS_PRESET=cloudflare_module node ../node_modules/vite-plus/bin/vp build --config vite.app.config.ts"
   },
   "dependencies": {

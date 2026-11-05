@@ -7,9 +7,9 @@ user authentication, authorization, configuration, recipients and delivery polic
 ## Install and entries
 
 ```sh
-bun add @raypx-kit/notifications
+pnpm add @raypx-kit/notifications
 # Install these peers when using the React feed:
-bun add @knocklabs/react react react-dom
+pnpm add @knocklabs/react react react-dom
 ```
 
 ESM; Node 22.21 or newer. The root entry works without React. The optional
@@ -175,10 +175,10 @@ authentication endpoint or product workflow is included.
 Run the package check and tests before the repository verification gate:
 
 ```sh
-bun run --cwd packages/notifications check
-bun run --cwd packages/notifications test
-bun run test:e2e:install
-bun run --cwd packages/notifications test:e2e
+pnpm --dir packages/notifications run check
+pnpm --dir packages/notifications run test
+pnpm run test:e2e:install
+pnpm --dir packages/notifications run test:e2e
 ```
 
 The package owns browser scenarios in `e2e/`. They exercise the real Knock React
@@ -194,7 +194,7 @@ for project selection, reports and CI behavior.
 index links to upstream license texts for the installed versions. When an npm
 archive omits its license file, the index uses a verified, pinned upstream source;
 no external license text is copied into this package's license. Run
-`bun run licenses:update` after dependency changes; `bun run licenses:check`
+`pnpm run licenses:update` after dependency changes; `pnpm run licenses:check`
 rejects drift.
 
 <!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->

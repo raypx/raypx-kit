@@ -6,7 +6,7 @@ The package has no application reset, picker, icon, Tailwind runtime, or product
 ## Install and styles
 
 ```sh
-bun add @raypx-kit/themes react
+pnpm add @raypx-kit/themes react
 ```
 
 For plain CSS, import `@raypx-kit/themes/styles.css`. It defines semantic custom
@@ -93,7 +93,7 @@ characters; arbitrary JavaScript source expressions are not accepted.
 ## Maintenance
 
 `src/tokens.ts` is the single source for both CSS artifacts. Run
-`bun run generate:theme` after token changes; `check` and `build` reject stale
+`pnpm run generate:theme` after token changes; `check` and `build` reject stale
 generated files. Node 22.21 or newer is supported. React is an optional peer for
 the pure entries and is required when importing the root React entry.
 
@@ -105,8 +105,8 @@ archive. The React peer remains an external dependency with its own license file
 
 The index below records installed direct runtime dependencies and peers, with
 links to their licenses. Their full texts are not duplicated here. Run
-`bun run licenses:update` from the repository root after dependency changes;
-`bun run licenses:check` rejects a stale index.
+`pnpm run licenses:update` from the repository root after dependency changes;
+`pnpm run licenses:check` rejects a stale index.
 
 <!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->
 
@@ -120,7 +120,7 @@ links to their licenses. Their full texts are not duplicated here. Run
 
 The first-paint script, hydration, reload persistence, real cross-tab synchronization and system preferences.
 
-Run `bun run test:e2e:install` once at the repository root, then
-`bun run --cwd packages/themes test:e2e`. The package owns its scenarios in
+Run `pnpm run test:e2e:install` once at the repository root, then
+`pnpm --dir packages/themes run test:e2e`. The package owns its scenarios in
 `e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
 for project selection, reports and CI behavior.

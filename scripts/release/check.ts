@@ -14,7 +14,7 @@ const changesets = join(root, "node_modules/@changesets/cli/bin.js");
 const config = JSON.parse(await readFile(join(root, ".changeset/config.json"), "utf8"));
 const fixtures: string[] = [];
 
-/** A disposable Bun workspace with this repository's Changesets configuration. */
+/** A disposable pnpm workspace with this repository's Changesets configuration. */
 async function fixture(versions: Readonly<Record<string, string>>, pre?: { tag: string }) {
   const directory = await mkdtemp(join(tmpdir(), "raypx-kit-release-"));
   fixtures.push(directory);
@@ -52,9 +52,8 @@ async function fixture(versions: Readonly<Record<string, string>>, pre?: { tag: 
       JSON.stringify({ name: `@raypx-kit/${name}`, version }),
     );
   }
-  // @manypkg identifies Bun workspaces by their lockfile. Generate a real one
-  // rather than using an empty placeholder or a different workspace format.
-  run(process.execPath, ["install"]);
+  await writeFile(join(directory, "pnpm-workspace.yaml"), "packages:\n  - docs\n  - packages/*\n");
+  run("pnpm", ["install", "--ignore-scripts"]);
   run("git", ["init", "-b", "canary"]);
   run("git", ["config", "user.name", "Toolkit release fixture"]);
   run("git", ["config", "user.email", "toolkit-fixture@example.invalid"]);
@@ -67,7 +66,7 @@ async function fixture(versions: Readonly<Record<string, string>>, pre?: { tag: 
         `---\n"@raypx-kit/${name}": ${bump}\n---\n\nExercise an independent release.\n`,
       ),
     commit,
-    changesets: (...args: string[]) => run(process.execPath, ["--bun", changesets, ...args]),
+    changesets: (...args: string[]) => run(process.execPath, [changesets, ...args]),
     version: async (path: string) =>
       (
         JSON.parse(await readFile(join(directory, path, "package.json"), "utf8")) as {

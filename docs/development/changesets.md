@@ -13,7 +13,7 @@ the pre-mode state below; consumer snapshots use `next`.
 The repository is in pre mode with the `alpha` tag, recorded in
 `.changeset/pre.json`. New packages start at `0.0.0-alpha.0`, with initial work
 recorded in their initial changelog. Publish that manifest version after
-verification without running `bun run version-packages` first: versioning consumes
+verification without running `pnpm run version-packages` first: versioning consumes
 changesets and advances versions.
 
 In pre mode, versioning produces the next `alpha.N` prerelease for changed
@@ -27,20 +27,20 @@ After the first stable release, prereleases use only `alpha`. Consumers pin exac
 Exiting the current pre mode graduates every package to stable `0.0.0`. Do this
 only for an explicitly approved first stable release, following the
 [stable publication procedure](publishing.md#first-stable-release).
-`bun run release:check` tests independent version bumps, private-package exclusion
+`pnpm run release:check` tests independent version bumps, private-package exclusion
 and pre-mode graduation in disposable local repositories; it does not publish or
 exercise npm's dist-tag behavior.
 
 ## Preparing subsequent versions
 
-1. For a user-visible change after initial publication, run `bun run changeset`,
+1. For a user-visible change after initial publication, run `pnpm run changeset`,
    select the affected packages, choose a SemVer bump and describe the resulting
    behavior. Commit the Markdown file with the implementation. Use
-   `bun run changeset --empty` for a no-release marker only when a release reviewer
+   `pnpm run changeset --empty` for a no-release marker only when a release reviewer
    requests one.
 2. Merge to `canary`. Prepare versions through a version PR or run
-   `bun run version-packages` locally. That command consumes changesets, updates
-   versions and changelogs, refreshes `bun.lock` and README license indexes, and
+   `pnpm run version-packages` locally. That command consumes changesets, updates
+   versions and changelogs, refreshes `pnpm-lock.yaml` and README license indexes, and
    formats the result.
 3. Review and commit the resulting versions, changelogs and lockfile. A local
    version commit pushed to `canary` is valid; a version PR is optional.
@@ -61,7 +61,7 @@ To enable them, allow **GitHub Actions to create and approve pull requests** und
 **Settings → Actions → General → Workflow permissions**, then set that variable.
 The workflow's `pull-requests: write` permission cannot override repository or
 organization policy. When enabled, `changesets/action/version` runs
-`bun run version-packages` to open or update the version PR. Otherwise the workflow
+`pnpm run version-packages` to open or update the version PR. Otherwise the workflow
 reports pending version changes and skips PR creation.
 
 Review the PR and run CI before merging. Version PRs created with the default

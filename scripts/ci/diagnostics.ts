@@ -55,7 +55,7 @@ function directories() {
 export async function runStage(name: string, command: string[]): Promise<number> {
   if (!/^[a-z][a-z0-9-]*$/.test(name) || !command.length) {
     throw new Error(
-      "Usage: bun scripts/ci/diagnostics.ts run <stage-name> <command> [arguments...]",
+      "Usage: tsx scripts/ci/diagnostics.ts run <stage-name> <command> [arguments...]",
     );
   }
   const { artifacts } = directories();
@@ -171,5 +171,5 @@ if (import.meta.main) {
   if (operation === "run" && name) process.exitCode = await runStage(name, command);
   else if (operation === "summary" && name && !command.length) writeSummary(name);
   else
-    throw new Error("Usage: bun scripts/ci/diagnostics.ts <run stage command... | summary status>");
+    throw new Error("Usage: tsx scripts/ci/diagnostics.ts <run stage command... | summary status>");
 }

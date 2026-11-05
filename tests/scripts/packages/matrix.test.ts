@@ -40,7 +40,9 @@ function index(): CompatibilityIndex {
 }
 
 describe("consumer versions", () => {
-  const lock = `"react": ["react@19.2.0", ""],\n"vite": ["@voidzero-dev/vite-plus-core@1.3.0", ""],`;
+  const lock = JSON.stringify({
+    packages: { "react@19.2.0": {}, "@voidzero-dev/vite-plus-core@1.3.0": {} },
+  });
   const core = { name: "@voidzero-dev/vite-plus-core", version: "1.3.0" };
 
   it("uses installed versions and follows npm aliases to their bundled upstream", () => {
@@ -52,9 +54,19 @@ describe("consumer versions", () => {
 
   it("rejects unlocked installs and aliases without a bundled upstream version", () => {
     expect(() => consumerVersion("react", { name: "react", version: "18.3.1" }, lock)).toThrow(
-      "react@18.3.1: not in bun.lock",
+      "react@18.3.1: not in pnpm-lock.yaml",
     );
     expect(() => consumerVersion("vite", core, lock)).toThrow("declares no bundled vite version");
+  });
+
+  it("reads workspace versions after pnpm's package-manager lock document", () => {
+    const documents = `---\npackages:\n  pnpm@12.16.1: {}\n---\n${lock}\n`;
+    expect(consumerVersion("react", { name: "react", version: "19.2.0" }, documents)).toBe(
+      "19.2.0",
+    );
+    expect(() => consumerVersion("react", { name: "react", version: "18.3.1" }, documents)).toThrow(
+      "react@18.3.1: not in pnpm-lock.yaml",
+    );
   });
 });
 

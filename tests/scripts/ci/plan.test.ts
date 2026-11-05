@@ -16,7 +16,7 @@ function model() {
     join(root, "package.json"),
     JSON.stringify({
       name: "fixture",
-      packageManager: "bun@1.4.4",
+      packageManager: "pnpm@12.16.1",
       workspaces: ["packages/*", "docs"],
     }),
   );
@@ -29,10 +29,10 @@ function model() {
         name: name === "docs" ? name : `@raypx-kit/${name}`,
         private: name === "docs" || name === "ui",
         scripts: {
-          check: "bun --version",
-          ...(name === "docs" ? {} : { test: "bun --version" }),
-          ...(name === "storage" || name === "docs" ? {} : { "test:unit": "bun --version" }),
-          build: "bun --version",
+          check: "node --version",
+          ...(name === "docs" ? {} : { test: "node --version" }),
+          ...(name === "storage" || name === "docs" ? {} : { "test:unit": "node --version" }),
+          build: "node --version",
         },
         devDependencies:
           name === "ui" || name === "docs"
@@ -132,7 +132,7 @@ it("requires PostgreSQL for Drizzle changes", () => {
 });
 
 it.each([
-  "bun.lock",
+  "pnpm-lock.yaml",
   "scripts/tasks/model.ts",
   "packages/devkit/src/workspaces.ts",
   "packages/tsconfig/base.json",

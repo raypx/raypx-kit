@@ -50,7 +50,7 @@ function dependencyRange(manifest: Manifest, name: string): string | undefined {
 export function checkDependencyCompatibility(root: string): string[] {
   const findings: string[] = [];
   const report = (message: string) => {
-    findings.push(`${message}. Update compatible dependencies together in bun.lock.`);
+    findings.push(`${message}. Update compatible dependencies together in pnpm-lock.yaml.`);
   };
   const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
   const installed = (

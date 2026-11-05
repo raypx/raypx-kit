@@ -34,12 +34,14 @@ Repository development uses the pin below.
 
 ## Quick start
 
-Use Bun **1.4.4**, pinned in root `packageManager`. With mise installed:
+Use Node **24.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
+`packageManager`. With mise installed:
 
 ```sh
 mise trust && mise install
-mise exec -- bun install --frozen-lockfile
-mise exec -- bun run verify --full
+mise exec -- npm install --global pnpm@12.16.1
+mise exec -- pnpm install --frozen-lockfile
+mise exec -- pnpm run verify --full
 ```
 
 For development, activate mise in your shell or prefix repository commands with
@@ -48,7 +50,7 @@ See the [development guide](docs/development/README.md) for setup, focused check
 and common commands.
 
 ```sh
-bun run docs:dev  # http://localhost:3100/
+pnpm run docs:dev  # http://localhost:3100/
 ```
 
 The internal Fumadocs workspace renders the canonical repository Markdown directly;

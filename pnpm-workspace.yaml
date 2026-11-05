@@ -1,0 +1,20 @@
+# Generated from package.json by pnpm run workspace:sync.
+packages:
+  - docs
+  - packages/*
+catalog:
+  "@react-email/render": ^2.2.0
+overrides:
+  "@react-email/render": "catalog:"
+  vite: npm:@voidzero-dev/vite-plus-core@^1.4.0
+strictPeerDependencies: false
+engineStrict: true
+minimumReleaseAge: 0
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
+  core-js: false
+  protobufjs: false

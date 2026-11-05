@@ -1,7 +1,7 @@
 # @raypx-kit/devkit
 
 ```sh
-bun add -d @raypx-kit/devkit
+pnpm add -d @raypx-kit/devkit
 ```
 
 Building blocks for a repository's own policy script. Each entry is independent.

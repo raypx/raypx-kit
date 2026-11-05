@@ -11,7 +11,7 @@ layout, form validation and business behavior.
 > released.
 
 ```sh
-bun add @raypx-kit/ui react react-dom tailwindcss
+pnpm add @raypx-kit/ui react react-dom tailwindcss
 ```
 
 Requires React 19, React DOM 19 and Tailwind CSS 4. Package tooling supports Node
@@ -143,8 +143,8 @@ source retains its complete MIT license in
 Direct runtime dependencies and peers are listed below with their installed
 versions and license links. They remain separate packages with their own notices;
 their license texts and transitive dependency notices are not duplicated here.
-Run `bun run licenses:update` from the repository root after dependency changes;
-`bun run licenses:check` detects a stale index.
+Run `pnpm run licenses:update` from the repository root after dependency changes;
+`pnpm run licenses:check` detects a stale index.
 
 <!-- BEGIN GENERATED DEPENDENCY LICENSE INDEX -->
 
@@ -166,7 +166,7 @@ Run `bun run licenses:update` from the repository root after dependency changes;
 
 Dialog focus and dismissal, tab keyboard navigation, forms, narrow layouts and reduced motion.
 
-Run `bun run test:e2e:install` once at the repository root, then
-`bun run --cwd packages/ui test:e2e`. The package owns its scenarios in
+Run `pnpm run test:e2e:install` once at the repository root, then
+`pnpm --dir packages/ui run test:e2e`. The package owns its scenarios in
 `e2e/`; see the [browser test guide](../../docs/development/README.md#browser-e2e-by-workspace)
 for project selection, reports and CI behavior.
