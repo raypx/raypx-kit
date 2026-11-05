@@ -85,7 +85,7 @@ plain table values are an authoring convention rather than an automatic formatte
 
 ## Toolchain
 
-Node 24.22.2 is the development and default CI runtime; pnpm 12.16.1 owns
+Node 22.22.2 is the development and default CI runtime; pnpm 12.16.1 owns
 installation, the lockfile and archive packing. Root `engines.node` and
 `packageManager` are the pins; devEngines, CI and documentation follow them.
 mise reads Node from package.json without a `[tools]` section. Install the pinned

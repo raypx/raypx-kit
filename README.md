@@ -34,7 +34,7 @@ Repository development uses the pin below.
 
 ## Quick start
 
-Use Node **24.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
+Use Node **22.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
 `packageManager`. With mise installed:
 
 ```sh

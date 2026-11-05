@@ -5,7 +5,7 @@ versions and explicit ESM exports; `docs/` is an internal documentation applicat
 
 ## Setup
 
-Use Node **24.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
+Use Node **22.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
 `packageManager`. mise reads the Node pin; install the pinned pnpm separately:
 
 ```sh
