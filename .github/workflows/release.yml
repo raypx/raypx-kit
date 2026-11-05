@@ -39,7 +39,7 @@ jobs:
           VERIFIED_SHA: ${{ inputs.verified-sha }}
         run: node --import tsx scripts/release/gate.ts
       - name: Verify toolchain
-        run: node --import tsx scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
+        run: node scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
       - uses: changesets/action/select-mode@v2.0.0
         id: mode
         env:
@@ -82,10 +82,10 @@ jobs:
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
       - name: Verify toolchain
-        run: node --import tsx scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
+        run: node scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
       - uses: changesets/action/version@v2.0.0
         with:
-          script: node --import tsx scripts/ci/diagnostics.ts run version-packages pnpm run version-packages
+          script: node scripts/ci/diagnostics.ts run version-packages pnpm run version-packages
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
       - name: Report version preparation diagnostics
@@ -132,7 +132,7 @@ jobs:
         with:
           # Publish the exact pnpm archives verified by Node consumers.
           # The action runs the script without a shell, so `&&` lives in package.json.
-          script: node --import tsx scripts/ci/diagnostics.ts run publish pnpm run release:ci
+          script: node scripts/ci/diagnostics.ts run publish pnpm run release:ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"

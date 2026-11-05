@@ -71,7 +71,8 @@ export default defineConfig({
     ...(ports.has(4175)
       ? [
           {
-            command: `${node} --import tsx docs/scripts/preview.ts --host 127.0.0.1 --port 4175`,
+            command: `${node} docs/.output/server/index.mjs`,
+            env: { HOST: "127.0.0.1", PORT: "4175" },
             url: "http://127.0.0.1:4175/docs",
             reuseExistingServer: false,
             timeout: 150_000,

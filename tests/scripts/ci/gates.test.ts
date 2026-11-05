@@ -28,8 +28,7 @@ it("checks exported configuration archives without inventing a build task", asyn
       .mocked(run)
       .mock.calls.some(
         ([, args, , env]) =>
-          args.includes("scripts/packages/check.ts") &&
-          env?.TOOLKIT_PACKAGES?.includes("@raypx-kit/tsconfig"),
+          args.includes("pack:check") && env?.TOOLKIT_PACKAGES?.includes("@raypx-kit/tsconfig"),
       ),
   ).toBe(true);
 });

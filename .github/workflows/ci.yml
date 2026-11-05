@@ -39,7 +39,7 @@ jobs:
       - uses: ./.github/actions/vp-restore
         id: cache
       - name: Verify affected sources, tests and builds
-        run: node --import tsx scripts/ci/diagnostics.ts run javascript node --import tsx scripts/ci/gate.ts javascript
+        run: node scripts/ci/diagnostics.ts run javascript node --import tsx scripts/ci/gate.ts javascript
       - name: Generated sources remain reproducible
         run: git diff --exit-code
       - uses: ./.github/actions/vp-save
@@ -71,9 +71,9 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-shell-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
       - name: Install missing browser and system libraries
-        run: node --import tsx scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
+        run: node scripts/ci/diagnostics.ts run browser-install bash scripts/ci/browser.sh
       - name: Test affected React workspaces
-        run: node --import tsx scripts/ci/diagnostics.ts run browser node --import tsx scripts/ci/gate.ts browser
+        run: node scripts/ci/diagnostics.ts run browser node --import tsx scripts/ci/gate.ts browser
       - uses: ./.github/actions/vp-save
         with:
           key: ${{ steps.cache.outputs.key }}
@@ -103,7 +103,7 @@ jobs:
       - uses: ./.github/actions/vp-restore
         id: cache
       - name: Check affected archives and Node consumers
-        run: node --import tsx scripts/ci/diagnostics.ts run artifacts node --import tsx scripts/ci/gate.ts artifacts
+        run: node scripts/ci/diagnostics.ts run artifacts node --import tsx scripts/ci/gate.ts artifacts
       - uses: ./.github/actions/vp-save
         with:
           key: ${{ steps.cache.outputs.key }}
@@ -134,7 +134,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-toolchain
       - name: Test Drizzle against isolated PostgreSQL
-        run: node --import tsx scripts/ci/diagnostics.ts run postgres pnpm --dir packages/drizzle run test:integration
+        run: node scripts/ci/diagnostics.ts run postgres pnpm --dir packages/drizzle run test:integration
         env:
           DRIZZLE_TEST_DATABASE_URL: postgresql://drizzle:drizzle@localhost:${{ job.services.postgres.ports['5432'] }}/drizzle_test
       - uses: ./.github/actions/report-diagnostics

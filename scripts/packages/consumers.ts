@@ -58,6 +58,27 @@ function binaryEntries(manifest: Manifest): [string, string][] {
   return Object.entries(manifest.bin ?? {});
 }
 
+async function installConsumer(
+  directory: string,
+  manifest: Pick<Manifest, "name" | "dependencies" | "devDependencies">,
+  packageArchives: Dependencies = {},
+): Promise<void> {
+  await mkdir(directory);
+  await writeFile(
+    join(directory, "package.json"),
+    JSON.stringify({ private: true, type: "module", ...manifest }),
+  );
+  await writeFile(
+    join(directory, "pnpm-workspace.yaml"),
+    JSON.stringify({
+      overrides: packageArchives,
+      autoInstallPeers: false,
+      strictPeerDependencies: false,
+    }),
+  );
+  run("pnpm", ["install", "--ignore-scripts", "--no-frozen-lockfile"], directory);
+}
+
 /** Installs the archive outside the workspace and loads every export with Node. */
 export async function checkConsumer(
   archive: string,
@@ -72,13 +93,10 @@ export async function checkConsumer(
   const fixtureManifest: Partial<Manifest> = existsSync(join(fixture, "package.json"))
     ? JSON.parse(await readFile(join(fixture, "package.json"), "utf8"))
     : {};
-  await mkdir(consumer);
-  await writeFile(
-    join(consumer, "package.json"),
-    JSON.stringify({
+  await installConsumer(
+    consumer,
+    {
       name: "toolkit-artifact-consumer",
-      private: true,
-      type: "module",
       dependencies: {
         ...packed.peerDependencies,
         ...fixtureManifest.dependencies,
@@ -90,17 +108,9 @@ export async function checkConsumer(
         ...fixtureManifest.devDependencies,
         ...options.fixtureDevDependencies,
       },
-    }),
+    },
+    options.packageArchives,
   );
-  await writeFile(
-    join(consumer, "pnpm-workspace.yaml"),
-    JSON.stringify({
-      overrides: options.packageArchives ?? {},
-      autoInstallPeers: false,
-      strictPeerDependencies: false,
-    }),
-  );
-  run("pnpm", ["install", "--ignore-scripts", "--no-frozen-lockfile"], consumer);
   if (options.dependencies) {
     const require = createRequire(join(consumer, "package.json"));
     for (const [name, expected] of Object.entries(options.dependencies)) {
@@ -133,7 +143,7 @@ export async function checkConsumer(
       ...imports,
     ].join("\n"),
   );
-  for (const binary of [options.nodeBinary]) run(binary, ["exports.mjs"], consumer);
+  run(options.nodeBinary, ["exports.mjs"], consumer);
   const requireSpecifiers = Object.entries(packed.exports)
     .filter(([key, target]) => !key.endsWith(".css") && hasRequireCondition(target))
     .map(([key]) => packed.name + key.slice(1));
@@ -142,7 +152,7 @@ export async function checkConsumer(
       join(consumer, "exports.cjs"),
       requireSpecifiers.map((specifier) => `require(${JSON.stringify(specifier)});`).join("\n"),
     );
-    for (const binary of [options.nodeBinary]) run(binary, ["exports.cjs"], consumer);
+    run(options.nodeBinary, ["exports.cjs"], consumer);
   }
   // Exercise installed bin links outside the workspace, without a database or config.
   for (const [name, target] of binaryEntries(packed)) {
@@ -150,28 +160,24 @@ export async function checkConsumer(
       existsSync(join(consumer, "node_modules/.bin", name)),
       `${packed.name}: missing installed binary ${name}`,
     );
-    for (const binary of [options.nodeBinary]) {
-      const help = execFileSync(
-        binary,
-        [realpathSync(join(consumer, "node_modules", packed.name, target)), "--help"],
-        {
-          cwd: consumer,
-          env: consumerEnvironment,
-          encoding: "utf8",
-          stdio: "pipe",
-          timeout: 30_000,
-        },
-      );
-      assert.ok(help.trim().length > 0, `${packed.name}: ${name} --help returned no output`);
-    }
+    const help = execFileSync(
+      options.nodeBinary,
+      [realpathSync(join(consumer, "node_modules", packed.name, target)), "--help"],
+      {
+        cwd: consumer,
+        env: consumerEnvironment,
+        encoding: "utf8",
+        stdio: "pipe",
+        timeout: 30_000,
+      },
+    );
+    assert.ok(help.trim().length > 0, `${packed.name}: ${name} --help returned no output`);
   }
   const fixtureTypes = existsSync(join(fixture, "tsconfig.json"));
   const fixtureRuntime = existsSync(join(fixture, "runtime.mjs"));
   if (fixtureTypes || fixtureRuntime)
     await cp(fixture, join(consumer, "contract"), { recursive: true });
-  if (fixtureRuntime) {
-    for (const binary of [options.nodeBinary]) run(binary, ["contract/runtime.mjs"], consumer);
-  }
+  if (fixtureRuntime) run(options.nodeBinary, ["contract/runtime.mjs"], consumer);
   if (modules.length === 0) return;
 
   // Every JavaScript export must ship declarations a NodeNext consumer resolves.
@@ -234,13 +240,10 @@ export async function checkWithoutOptionalPeers(
     `${packed.name}: without-optional-peers contracts require a declared optional peer`,
   );
 
-  await mkdir(consumer);
-  await writeFile(
-    join(consumer, "package.json"),
-    JSON.stringify({
+  await installConsumer(
+    consumer,
+    {
       name: "toolkit-without-optional-peers-consumer",
-      private: true,
-      type: "module",
       dependencies: {
         ...Object.fromEntries(
           peers
@@ -249,24 +252,12 @@ export async function checkWithoutOptionalPeers(
         ),
         [packed.name]: archive,
       },
-      devDependencies: {
-        ...options.compilerDependencies,
-      },
-    }),
+      devDependencies: options.compilerDependencies,
+    },
+    options.packageArchives,
   );
-  await writeFile(
-    join(consumer, "pnpm-workspace.yaml"),
-    JSON.stringify({
-      overrides: options.packageArchives ?? {},
-      autoInstallPeers: false,
-      strictPeerDependencies: false,
-    }),
-  );
-  run("pnpm", ["install", "--ignore-scripts", "--no-frozen-lockfile"], consumer);
   await cp(fixture, join(consumer, "contract"), { recursive: true });
-  if (runtime) {
-    for (const binary of [options.nodeBinary]) run(binary, ["contract/runtime.mjs"], consumer);
-  }
+  if (runtime) run(options.nodeBinary, ["contract/runtime.mjs"], consumer);
   if (types) {
     await writeFile(
       join(consumer, "tsconfig.json"),

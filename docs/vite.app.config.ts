@@ -51,10 +51,8 @@ export default defineConfig(({ command }) => ({
     nitro({
       preset: command === "serve" || !cloudflare ? "node-server" : "cloudflare_module",
       cloudflare: { deployConfig: false },
-      commands: {
-        // Wraps Wrangler so a slow start or failed prerender cannot orphan workerd.
-        preview: "node --import tsx scripts/preview.ts",
-      },
+      // Wrap Wrangler so a slow start or failed prerender cannot orphan workerd.
+      commands: cloudflare ? { preview: "node scripts/preview.ts" } : {},
       serverDir: false,
       serverEntry: false,
     }),

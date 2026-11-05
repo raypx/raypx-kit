@@ -1,5 +1,5 @@
 /**
- * Preview server for Nitro's Node and Cloudflare prerender steps.
+ * Wrangler preview server for Nitro's Cloudflare prerender step.
  *
  * Nitro waits only ten seconds for the preview port and never stops the child when
  * that wait fails, so a slow Wrangler start under parallel builds both fails the
@@ -54,22 +54,19 @@ const host = option("--host") ?? "127.0.0.1";
 const internalPort = await freePort();
 const parent = process.ppid;
 
-const cloudflare = process.env.TOOLKIT_DOCS_PRESET === "cloudflare_module";
-const runtime = spawn(
+const wrangler = spawn(
   process.execPath,
-  cloudflare
-    ? [
-        fileURLToPath(new URL("../../node_modules/wrangler/bin/wrangler.js", import.meta.url)),
-        "dev",
-        "--config",
-        fileURLToPath(new URL("../../wrangler.jsonc", import.meta.url)),
-        "--local",
-        "--ip",
-        "127.0.0.1",
-        "--port",
-        String(internalPort),
-      ]
-    : [fileURLToPath(new URL("../.output/server/index.mjs", import.meta.url))],
+  [
+    fileURLToPath(new URL("../../node_modules/wrangler/bin/wrangler.js", import.meta.url)),
+    "dev",
+    "--config",
+    fileURLToPath(new URL("../../wrangler.jsonc", import.meta.url)),
+    "--local",
+    "--ip",
+    "127.0.0.1",
+    "--port",
+    String(internalPort),
+  ],
   {
     stdio: "inherit",
     detached: true,
@@ -83,7 +80,7 @@ function stop(code = 0): void {
   stopping = true;
   // Wrangler starts workerd and esbuild; signal the whole process group.
   try {
-    if (runtime.pid) process.kill(-runtime.pid, "SIGTERM");
+    if (wrangler.pid) process.kill(-wrangler.pid, "SIGTERM");
   } catch {
     // Already exited.
   }
@@ -96,10 +93,10 @@ const ready = (async () => {
   const deadline = Date.now() + READY_TIMEOUT_MS;
   while (Date.now() < deadline) {
     if (await reachable(internalPort)) return;
-    if (runtime.exitCode !== null) throw new Error("Preview runtime exited before it was ready");
+    if (wrangler.exitCode !== null) throw new Error("Wrangler exited before it was ready");
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error(`Preview runtime was not ready within ${READY_TIMEOUT_MS} ms`);
+  throw new Error(`Wrangler was not ready within ${READY_TIMEOUT_MS} ms`);
 })();
 ready.catch((error: unknown) => {
   console.error(`[docs preview] ${error instanceof Error ? error.message : String(error)}`);
@@ -147,7 +144,7 @@ const servers = (host === "localhost" ? ["127.0.0.1", "::1"] : [host]).map((addr
   return server;
 });
 
-runtime.once("exit", (code) => stop(code ?? 1));
+wrangler.once("exit", (code) => stop(code ?? 1));
 for (const signal of ["SIGTERM", "SIGINT", "SIGHUP"] as const) process.once(signal, () => stop());
 // Nitro does not close the preview when prerendering fails; follow the build process.
 setInterval(() => {

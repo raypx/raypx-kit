@@ -24,27 +24,20 @@ export async function runVerification(
         builds(plan.browser.map((name) => browserProjects[name as BrowserProject].workspace)),
       );
     await run(
-      process.execPath,
-      [
-        "--import",
-        "tsx",
-        "e2e/run.ts",
-        "--skip-build",
-        ...plan.browser.flatMap((name) => ["--project", name]),
-      ],
+      "pnpm",
+      ["run", "verify:e2e", ...plan.browser.flatMap((name) => ["--project", name])],
       root,
     );
   }
   if (["artifacts", "full"].includes(phase)) {
     if (plan.packages.length) {
       if (phase === "artifacts") await execute(builds(plan.packages));
-      await run(process.execPath, ["--import", "tsx", "scripts/packages/check.ts"], root, {
+      await run("pnpm", ["run", "pack:check"], root, {
         ...process.env,
         TOOLKIT_PACKAGES: JSON.stringify(plan.packages),
       });
     }
-    if (plan.release)
-      await run(process.execPath, ["--import", "tsx", "scripts/release/check.ts"], root);
+    if (plan.release) await run("pnpm", ["run", "release:check"], root);
   }
 }
 

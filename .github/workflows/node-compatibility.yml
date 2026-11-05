@@ -53,10 +53,10 @@ jobs:
       - name: Install isolated consumer Node
         env:
           CONSUMER_NODE_VERSION: ${{ matrix.node }}
-        run: node --import tsx scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
+        run: node scripts/ci/diagnostics.ts run consumer-node bash scripts/ci/node.sh
       - name: Check exact archives on Node and supported peer bounds
         run: >-
-          node --import tsx scripts/ci/diagnostics.ts run consumers
+          node scripts/ci/diagnostics.ts run consumers
           node --import tsx scripts/packages/compatibility.ts check
           --artifacts .artifacts/compatibility
           --node "$RUNNER_TEMP/consumer-node/node-v${{ matrix.node }}-linux-x64/bin/node"

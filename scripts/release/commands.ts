@@ -47,7 +47,6 @@ const root = fileURLToPath(new URL("../../", import.meta.url));
 const packDirectory = join(root, ".changeset/pack/release");
 const planFile = join(packDirectory, "publish-plan.json");
 const releaseFile = join(packDirectory, "release.json");
-const changesets = join(root, "node_modules/@changesets/cli/bin.js");
 // npm is only the registry transport; it otherwise rejects the strict pnpm devEngines pin.
 // Keep the inherited environment intact: in CI, changesets/action passes CHANGESETS_OUTPUT,
 // where `changeset publish` records the tags the action pushes as GitHub releases.
@@ -62,17 +61,13 @@ function git(...args: string[]): string {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }
 
-function run(args: string[], env: NodeJS.ProcessEnv = process.env): void {
-  const result = spawnSync(
-    args[0] === "run" ? "pnpm" : process.execPath,
-    args[0] === "run" ? args : ["--import", "tsx", ...args],
-    { cwd: root, env, stdio: "inherit" },
-  );
+function pnpm(args: string[], env: NodeJS.ProcessEnv = process.env): void {
+  const result = spawnSync("pnpm", args, { cwd: root, env, stdio: "inherit" });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
 function changeset(args: string[]): void {
-  run([changesets, ...args], npmEnvironment);
+  pnpm(["exec", "changeset", ...args], npmEnvironment);
 }
 
 /** Pre mode selects the dist-tag; leaving it requires an explicit stable release. */
@@ -225,7 +220,7 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
     ? await verifiedArchives(resolve(root, fromCompatibility), git("rev-parse", "HEAD"))
     : undefined;
   // Imported archives are the exact bytes verified by the compatibility matrix.
-  if (!verified) run(["run", "build", "--filter=./packages/*"]);
+  if (!verified) pnpm(["run", "build", "--filter=./packages/*"]);
 
   // pnpm resolves workspace: and catalog: using the same packer verified by pack:check.
   const directories = await workspaceDirectories();
@@ -279,7 +274,7 @@ export async function pack(stable = false, fromCompatibility?: string): Promise<
   await writeFile(planFile, `${JSON.stringify(document, null, 2)}\n`);
 
   // Install and load the exact archives in isolated Node consumers; CI gates publishing on Node compatibility.
-  run(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
+  pnpm(["run", "pack:check"], { ...process.env, TOOLKIT_RELEASE_PLAN: planFile });
   // Recorded last: publication refuses archives that did not pass the consumer checks.
   await recordCommit();
   describe("Packed for publication:", planned);
@@ -336,16 +331,6 @@ async function changedPackages(): Promise<string[]> {
   return [...names].sort();
 }
 
-/** Like run(), but throws so callers can restore files in a finally block. */
-function runOrThrow(args: string[], env: NodeJS.ProcessEnv = process.env): void {
-  const result = spawnSync(
-    args[0] === "run" ? "pnpm" : process.execPath,
-    args[0] === "run" ? args : ["--import", "tsx", ...args],
-    { cwd: root, env, stdio: "inherit" },
-  );
-  if (result.status !== 0) throw new Error(`${args.join(" ")} exited with ${result.status}`);
-}
-
 export interface SnapshotOptions {
   publish?: boolean;
   otp?: string;
@@ -366,7 +351,7 @@ export async function snapshot(
   const stamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
   const version = `0.0.0-${snapshotTag}-${stamp}-${git("rev-parse", "--short=7", "HEAD")}`;
 
-  run(["run", "build", "--filter=./packages/*"]);
+  pnpm(["run", "build", "--filter=./packages/*"]);
   await rm(snapshotDirectory, { recursive: true, force: true });
   await mkdir(join(snapshotDirectory, "packages"), { recursive: true });
   const originals = new Map<string, string>();
@@ -405,7 +390,12 @@ export async function snapshot(
     const planPath = join(snapshotDirectory, "publish-plan.json");
     await writeFile(planPath, `${JSON.stringify({ version: 1, plan: [entries] }, null, 2)}\n`);
     // The same archive rules and isolated Node consumers as a real release.
-    runOrThrow(["scripts/packages/check.ts"], { ...process.env, TOOLKIT_RELEASE_PLAN: planPath });
+    // Throw on failure so the finally block restores every manifest before exiting.
+    execFileSync("pnpm", ["run", "pack:check"], {
+      cwd: root,
+      env: { ...process.env, TOOLKIT_RELEASE_PLAN: planPath },
+      stdio: "inherit",
+    });
   } finally {
     for (const [file, source] of originals) await writeFile(file, source);
   }

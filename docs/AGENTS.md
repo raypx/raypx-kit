@@ -92,6 +92,6 @@ pnpm run verify
 Use `pnpm run docs:dev` for development at `http://localhost:3100`.
 
 Browser scenarios live in `e2e/` and run through `pnpm run test:e2e`. They use
-the built Node application through the shared local preview wrapper,
+the built Node application directly,
 with Playwright Chromium and the root shared E2E runner. Keep browser cases out
 of the unit runner; root verification includes their separate post-build gate.
