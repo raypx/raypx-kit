@@ -5,7 +5,7 @@ versions and explicit ESM exports; `docs/` is an internal documentation applicat
 
 ## Setup
 
-Use Node **22.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
+Use Node **>=24.18.0 <25** and pnpm **12.16.1**, declared in root `engines.node` and
 `packageManager`. mise reads the Node pin; install the pinned pnpm separately:
 
 ```sh
@@ -94,6 +94,10 @@ its sibling `e2e/`. Shared defaults are in root `tests/config.ts`. Tests remain
 independent of application plugins, live databases, mail or service accounts.
 
 ## Repository check configuration
+
+`pnpm-workspace.yaml` owns workspace package patterns, dependency catalogs, overrides
+and pnpm installation policy. Maintain it directly; root `package.json` owns scripts,
+dependencies and the Node/pnpm requirements.
 
 `devkit.config.ts` owns complete workspace metadata, platform constraints and public
 source-entry mappings. Maintenance scripts import it explicitly; package discovery
@@ -217,13 +221,19 @@ opt-in steps and code tabs, including rendered examples of each Fumadocs plugin.
 
 ### Cloudflare deployment
 
-The explicit `docs:build:cloudflare` command uses the separate Node vendor baseline
+The explicit `docs:build:cloudflare` command uses the development Node range
 and Nitro's `cloudflare_module` target. Root `wrangler.jsonc` selects its Worker
 entry, static assets and search API routing. `docs:deploy` always builds this target
 before uploading; it never uploads a Node server entry as a Worker. The independent
 Node workflow validates this build without deployment credentials.
 
 Cloudflare Workers Builds owns automatic deployment. Recommended settings are:
+
+The root `engines.node` and `devEngines.runtime.version` allow supported Node 24
+releases, including Cloudflare's default build runtime. pnpm checks this range
+before installing dependencies. To select a specific compatible version, use the
+`NODE_VERSION` build variable under Settings > Build > Build Variables and Secrets.
+See Cloudflare's [build image documentation](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/).
 
 | Setting           | Value                          |
 | ----------------- | ------------------------------ |

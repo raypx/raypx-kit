@@ -3,6 +3,7 @@ import { existsSync, globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseTOML } from "confbox/toml";
 import { parseYAML } from "confbox/yaml";
+import { satisfies, validRange } from "semver";
 import { readWorkspaceConfiguration, workspaceManifestFiles } from "./workspace-config.js";
 
 export interface Toolchain {
@@ -336,14 +337,14 @@ export function checkToolchain(
   return [...new Set(findings)];
 }
 
-/** Root manifest pins for repositories developed with Node and pnpm. */
+/** Root Node requirement and exact pnpm pin for repositories developed with Node and pnpm. */
 export function readNodePnpmPins(root: string): { node: string; pnpm: string } {
   const manifest = manifestAt(root);
   const node = manifest.engines?.node;
   const pnpm = /^pnpm@(\d+\.\d+\.\d+)$/.exec(manifest.packageManager ?? "")?.[1];
-  if (!node || !exactVersion.test(node) || !pnpm)
+  if (!node?.trim() || !validRange(node) || !pnpm)
     throw new Error(
-      "Pin exact Node and pnpm versions in package.json engines.node and packageManager.",
+      "Declare a valid Node version or range in package.json engines.node and an exact pnpm version in packageManager.",
     );
   return { node, pnpm };
 }
@@ -351,7 +352,7 @@ export function readNodePnpmPins(root: string): { node: string; pnpm: string } {
 /** Check the active executables without changing the user's runtime selection. */
 export function assertNodePnpmRuntime(root: string): { node: string; pnpm: string } {
   const pins = readNodePnpmPins(root);
-  if (process.versions.bun || process.versions.node !== pins.node)
+  if (process.versions.bun || !satisfies(process.versions.node, pins.node))
     throw new Error(
       `Expected Node ${pins.node}, got ${process.versions.bun ? "Bun" : process.versions.node}.`,
     );
@@ -361,7 +362,7 @@ export function assertNodePnpmRuntime(root: string): { node: string; pnpm: strin
     stdio: "pipe",
   }).trim();
   if (actual !== pins.pnpm) throw new Error(`Expected pnpm ${pins.pnpm}, got ${actual}.`);
-  return pins;
+  return { node: process.versions.node, pnpm: pins.pnpm };
 }
 
 function checkNodePnpmToolchain(root: string, documents: readonly string[]): string[] {
@@ -433,8 +434,14 @@ function checkNodePnpmToolchain(root: string, documents: readonly string[]): str
   for (const file of documents) {
     if (!existsSync(join(root, file))) continue;
     const document = readFileSync(join(root, file), "utf8").replaceAll("**", "");
-    for (const [, tool, version] of document.matchAll(/\b(Node|pnpm) v?(\d+\.\d+\.\d+)\b/g))
-      if (version !== (tool === "Node" ? pins.node : pins.pnpm))
+    for (const [, tool, version] of document.matchAll(
+      /\b(Node|pnpm) v?([<>=~^]*\d+\.\d+\.\d+[\d.<>=~^|*xX -]*)/g,
+    ))
+      if (
+        tool === "Node"
+          ? validRange(version!.trim().replace(/\.$/, "")) !== validRange(pins.node)
+          : version!.trim().replace(/\.$/, "") !== pins.pnpm
+      )
         findings.push(`${file}: documented ${tool} pin differs from package.json`);
   }
   return findings;

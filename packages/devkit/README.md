@@ -168,7 +168,8 @@ const findings = checkToolchain(root, { runtime: "node-pnpm" });
 assertNodePnpmRuntime(root);
 ```
 
-This policy reads exact root `engines.node` and `packageManager` pins, validates
+This policy reads a Node version or semver range from root `engines.node` and an exact
+pnpm pin from `packageManager`, validates
 `devEngines`, mise and CI declarations, and checks both active executables. It does
 not change public package engine ranges. `nodeTestDefaults` from `/testing` provides
 plain Vitest Node defaults without Bun worker flags.

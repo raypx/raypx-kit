@@ -11,6 +11,7 @@ vi.mock("node:child_process", () => ({ execFileSync }));
 const roots: string[] = [];
 afterEach(() => {
   execFileSync.mockReset();
+  vi.unstubAllGlobals();
   roots.splice(0).forEach((root) => rmSync(root, { recursive: true, force: true }));
 });
 function repository(node = "24.22.2") {
@@ -49,6 +50,44 @@ it("reads manifest pins without requiring Bun or a second Node pin", () => {
   expect(readNodePnpmPins(root)).toEqual({ node: "24.22.2", pnpm: "12.16.1" });
   expect(checkToolchain(root, { runtime: "node-pnpm" })).toEqual([]);
   expect(nodeTestDefaults.test).not.toHaveProperty("execArgv");
+});
+it("accepts a Node range while keeping the pnpm version exact", () => {
+  const root = repository(">=24.18.0 <25");
+  writeFileSync(
+    join(root, "README.md"),
+    "Develop with Node **>=24.18.0 <25** and pnpm **12.16.1**.\n",
+  );
+  expect(readNodePnpmPins(root)).toEqual({ node: ">=24.18.0 <25", pnpm: "12.16.1" });
+  expect(checkToolchain(root, { runtime: "node-pnpm" })).toEqual([]);
+});
+
+it.each(["", "not-a-version", ">=24.invalid"])("rejects an invalid Node requirement %j", (node) => {
+  expect(() => readNodePnpmPins(repository(node))).toThrow("valid Node version or range");
+});
+
+it("reports a documented Node range that differs from the manifest", () => {
+  const root = repository(">=24.18.0 <25");
+  writeFileSync(join(root, "README.md"), "Develop with Node **>=22.22.2 <25**.\n");
+  expect(checkToolchain(root, { runtime: "node-pnpm" })).toContain(
+    "README.md: documented Node pin differs from package.json",
+  );
+});
+
+it.each(["24.18.0", "24.22.1", "24.99.0"])("accepts supported Node %s", (node) => {
+  vi.stubGlobal("process", { versions: { node } });
+  execFileSync.mockReturnValue("12.16.1\n");
+  expect(assertNodePnpmRuntime(repository(">=24.18.0 <25"))).toEqual({
+    node,
+    pnpm: "12.16.1",
+  });
+});
+
+it.each(["22.22.2", "24.17.9", "25.0.0", "25.0.0-rc.1"])("rejects unsupported Node %s", (node) => {
+  vi.stubGlobal("process", { versions: { node } });
+  expect(() => assertNodePnpmRuntime(repository(">=24.18.0 <25"))).toThrow(
+    `Expected Node >=24.18.0 <25, got ${node}`,
+  );
+  expect(execFileSync).not.toHaveBeenCalled();
 });
 it("rejects duplicate runtime pins and CI drift", () => {
   const root = repository();

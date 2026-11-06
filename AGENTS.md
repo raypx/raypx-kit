@@ -87,13 +87,13 @@ plain table values are an authoring convention rather than an automatic formatte
 
 ## Toolchain
 
-Node 22.22.2 is the development and default CI runtime; pnpm 12.16.1 owns
+Node >=24.18.0 <25 is the development and default CI runtime; pnpm 12.16.1 owns
 installation, the lockfile and archive packing. Root `engines.node` and
-`packageManager` are the pins; devEngines, CI and documentation follow them.
+`packageManager` define the Node range and exact pnpm pin; devEngines, CI and documentation follow them.
 mise reads Node from package.json without a `[tools]` section. Install the pinned
 pnpm independently. `pnpm run doctor` checks both actual executables;
-`toolchain:check` rejects declaration and workspace drift. Root workspace patterns,
-catalog and overrides generate `pnpm-workspace.yaml` through `workspace:sync`.
+`toolchain:check` rejects declaration and dependency drift. `pnpm-workspace.yaml`
+owns workspace patterns, catalogs, overrides and installation policy; edit it directly.
 
 VP owns the only task graph, cache, formatting, linting, tests and builds. Root
 `scripts/tasks/` composes shared Devkit task policies and supplies plain `run.tasks` through
@@ -166,7 +166,7 @@ checks in `pnpm run toolchain:check`:
   upstream declarations become caret ranges that include the upstream version.
 - Nitro uses the tested prerelease range `~3.0.260903-beta`.
 
-The development Node and pnpm pins remain exact in the root manifest. Node type
+The development Node range and exact pnpm pin live in the root manifest. Node type
 declarations follow the development Node major. The consumer compatibility
 baseline and published engine ranges remain separate.
 

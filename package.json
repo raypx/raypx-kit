@@ -9,15 +9,6 @@
   "bin": {
     "raypx-kit-dev": "./bin/raypx-kit-dev.mjs"
   },
-  "workspaces": {
-    "packages": [
-      "docs",
-      "packages/*"
-    ],
-    "catalog": {
-      "@react-email/render": "^2.2.0"
-    }
-  },
   "type": "module",
   "scripts": {
     "prepare": "vp config --hooks --no-agent",
@@ -59,15 +50,14 @@
     "test:e2e": "tsx e2e/run.ts",
     "test:e2e:install": "playwright install chromium",
     "verify:e2e": "tsx e2e/run.ts --skip-build",
-    "docs:build:cloudflare": "pnpm --dir docs run build:cloudflare",
-    "workspace:sync": "tsx scripts/checks/workspace.ts --write"
+    "docs:build:cloudflare": "pnpm --dir docs run build:cloudflare"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@playwright/test": "^1.64.1",
     "@raypx-kit/tsconfig": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^22.20.5",
+    "@types/node": "^24.19.2",
     "@types/semver": "^7.8.0",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.0.5",
@@ -82,10 +72,6 @@
     "vite-plus": "^1.4.0",
     "wrangler": "^4.155.0"
   },
-  "overrides": {
-    "@react-email/render": "catalog:",
-    "vite": "npm:@voidzero-dev/vite-plus-core@^1.4.0"
-  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -94,12 +80,12 @@
     },
     "runtime": {
       "name": "node",
-      "version": "22.22.2",
+      "version": ">=24.18.0 <25",
       "onFail": "error"
     }
   },
   "engines": {
-    "node": "22.22.2"
+    "node": ">=24.18.0 <25"
   },
   "packageManager": "pnpm@12.16.1"
 }

@@ -38,7 +38,7 @@ function vitePlus(root: string, version = "1.2.0") {
   );
 }
 
-function repository() {
+function repository(nativeWorkspace = false) {
   const root = mkdtempSync(join(tmpdir(), "raypx-kit-dependencies-"));
   fixtures.push(root);
   mkdirSync(join(root, "docs"));
@@ -46,10 +46,19 @@ function repository() {
   writeJson(join(root, "package.json"), {
     name: "dependency-contract",
     private: true,
-    workspaces: ["docs", "packages/*"],
+    ...(nativeWorkspace
+      ? {}
+      : {
+          workspaces: ["docs", "packages/*"],
+          overrides: { vite: "npm:@voidzero-dev/vite-plus-core@^1.2.0" },
+        }),
     devDependencies: { "vite-plus": "^1.2.0" },
-    overrides: { vite: "npm:@voidzero-dev/vite-plus-core@^1.2.0" },
   });
+  if (nativeWorkspace)
+    writeFileSync(
+      join(root, "pnpm-workspace.yaml"),
+      "packages: [docs, packages/*]\noverrides:\n  vite: npm:@voidzero-dev/vite-plus-core@^1.2.0\n",
+    );
   writeJson(join(root, "docs/package.json"), {
     name: "docs",
     private: true,
@@ -81,6 +90,37 @@ afterEach(() => {
 });
 
 describe("installed dependency compatibility", () => {
+  it("reads native pnpm workspaces without package.json workspaces", () => {
+    expect(checkDependencyCompatibility(repository(true))).toEqual([]);
+  });
+
+  it("checks dependency drift in workspaces discovered from YAML", () => {
+    const root = repository(true);
+    packageMetadata(root, "@vitest/coverage-v8", "2.4.0");
+    expect(checkDependencyCompatibility(root)).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          "packages/library/package.json: coverage-v8 is 2.4.0, expected bundled Vitest 2.3.0",
+        ),
+      ]),
+    );
+  });
+
+  it("validates the Vite override declared in pnpm-workspace.yaml", () => {
+    const root = repository(true);
+    writeFileSync(
+      join(root, "pnpm-workspace.yaml"),
+      "packages: [docs, packages/*]\noverrides:\n  vite: npm:@voidzero-dev/vite-plus-core@^9.0.0\n",
+    );
+    expect(checkDependencyCompatibility(root)).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          "pnpm-workspace.yaml overrides: installed vite@1.2.0 does not satisfy",
+        ),
+      ]),
+    );
+  });
+
   it("accepts coordinated packages resolved through their public metadata exports", () => {
     expect(checkDependencyCompatibility(repository())).toEqual([]);
   });

@@ -1,14 +1,17 @@
-import { globSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { satisfies } from "semver";
+import {
+  readWorkspaceConfiguration,
+  workspaceManifestFiles,
+} from "../../packages/devkit/src/workspace-config.js";
 
 type Dependencies = Record<string, string>;
 
 interface Manifest {
   name?: string;
   version?: string;
-  workspaces?: string[] | { packages?: string[] };
   dependencies?: Dependencies;
   devDependencies?: Dependencies;
   optionalDependencies?: Dependencies;
@@ -98,19 +101,16 @@ export function checkDependencyCompatibility(root: string): string[] {
   };
 
   let workspaces: Workspace[];
+  let overrides: Dependencies | undefined;
+  let overrideSource = "package.json overrides";
   try {
     root = resolve(root);
     const rootManifest = readManifest(join(root, "package.json"));
-    const patterns = Array.isArray(rootManifest.workspaces)
-      ? rootManifest.workspaces
-      : (rootManifest.workspaces?.packages ?? []);
-    const files = [
-      "package.json",
-      ...globSync(
-        patterns.map((pattern) => `${pattern}/package.json`),
-        { cwd: root },
-      ).sort(),
-    ];
+    if (existsSync(join(root, "pnpm-workspace.yaml"))) {
+      overrides = readWorkspaceConfiguration(root).overrides;
+      overrideSource = "pnpm-workspace.yaml overrides";
+    } else overrides = rootManifest.overrides;
+    const files = ["package.json", ...workspaceManifestFiles(root)];
     workspaces = [...new Set(files)].map((file) => ({
       file,
       manifest: readManifest(join(root, file)),
@@ -138,13 +138,8 @@ export function checkDependencyCompatibility(root: string): string[] {
 
     const fromVitePlus = createRequire(vitePlus.path);
     const core = checkCore(fromVitePlus, `${workspace.file} (vite-plus)`, version);
-    if (workspace === rootWorkspace && core && workspace.manifest.overrides?.vite)
-      checkRange(
-        "package.json overrides",
-        "vite",
-        workspace.manifest.overrides.vite,
-        core.manifest.version,
-      );
+    if (workspace === rootWorkspace && core && overrides?.vite)
+      checkRange(overrideSource, "vite", overrides.vite, core.manifest.version);
     if (dependencyRange(workspace.manifest, "vite")) {
       const directCore = checkCore(workspace.require, workspace.file, version);
       if (directCore) checkDeclaration(workspace, "vite", directCore.manifest.version);

@@ -30,11 +30,11 @@ consumers pin exact prerelease versions. Drizzle query clients, relations and
 plugins in the design documents remain planned work.
 Public packages require Node `22.21+`. Security follows Arcjet's supported range,
 `>=22.21.0 <23 || >=24.5.0`, excluding Node 23 and earlier Node 24 releases.
-Repository development uses the pin below.
+Repository development uses the Node range below.
 
 ## Quick start
 
-Use Node **22.22.2** and pnpm **12.16.1**, pinned in root `engines.node` and
+Use Node **>=24.18.0 <25** and pnpm **12.16.1**, declared in root `engines.node` and
 `packageManager`. With mise installed:
 
 ```sh

@@ -6,6 +6,7 @@ export interface WorkspaceConfiguration {
   packages?: string[];
   catalog?: Record<string, string>;
   catalogs?: Record<string, Record<string, string>>;
+  overrides?: Record<string, string>;
 }
 
 /** Read static package-manager data without loading repository code. */
