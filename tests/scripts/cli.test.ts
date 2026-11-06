@@ -47,7 +47,7 @@ function runCli(rawArgs: string[], env: NodeJS.ProcessEnv = {}) {
       preload,
       `import { registerHooks } from "node:module";
 registerHooks({ load(url, context, nextLoad) {
-  if (url.endsWith("/scripts/release/commands.ts")) return { format: "module", shortCircuit: true, source:
+  if (new URL(url).pathname.endsWith("/scripts/release/commands.ts")) return { format: "module", shortCircuit: true, source:
     ["plan", "pack", "publish", "snapshot"].map(name => "export function " + name + "(...args) { console.log(JSON.stringify({ release: '" + name + "', args })); }").join("\\n")
   };
   return nextLoad(url, context);
@@ -56,9 +56,9 @@ registerHooks({ load(url, context, nextLoad) {
     );
     return spawnSync(
       process.execPath,
-      ["--import", "tsx", "--import", preload, "scripts/cli.ts", ...rawArgs],
+      ["--import", preload, join(root, "bin/raypx-kit-dev.mjs"), ...rawArgs],
       {
-        cwd: root,
+        cwd: fixture,
         encoding: "utf8",
         timeout: 10_000,
         env: { ...process.env, NO_COLOR: "1", ...env },

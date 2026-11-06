@@ -20,6 +20,11 @@ checks, builds, browser runners and default CI use Node. Public package Node API
 and engine ranges remain compatible; their independent tests are described below.
 The shared setup action installs pinned Node and pnpm.
 
+The `raypx-kit-dev` bin and `pnpm run raypx-kit-dev` use `bin/raypx-kit-dev.mjs`.
+This JavaScript entry loads `scripts/cli.ts` with the local `tsx/esm/api`, so no
+global tsx executable or separate CLI build is required. For direct invocation, run
+`node bin/raypx-kit-dev.mjs --help`.
+
 ## Daily commands
 
 ```sh

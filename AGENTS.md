@@ -54,7 +54,9 @@ package fixtures in `tests/fixtures/`. Type checks include tests; library builds
 include only `src/`. Keep Vitest configuration at each workspace root and import
 the shared configuration from root `tests/config.ts`.
 
-Keep the internal CLI at `scripts/cli.ts`. Group maintenance modules by their
+Keep the internal CLI at `scripts/cli.ts`; `bin/raypx-kit-dev.mjs` loads its
+`main` through the local `tsx/esm/api`. Root `bin` and the `raypx-kit-dev` script
+use this JavaScript entry without a global tsx executable. Group maintenance modules by their
 responsibility under `scripts/checks/`, `scripts/packages/`, `scripts/release/`
 `scripts/tasks/`, `scripts/verify/` and `scripts/ci/`; keep helpers shared by these scripts in `scripts/shared/`.
 Use the directory for context instead of repeating that context in every filename.

@@ -12,6 +12,8 @@ and [dependency policy](../development/dependencies.md).
 
 ```files
 raypx-kit/
+├── bin/
+│   └── raypx-kit-dev.mjs
 ├── packages/
 │   ├── codemods/
 │   ├── devkit/
@@ -46,20 +48,21 @@ raypx-kit/
 
 Package responsibilities are listed below. Repository support directories own:
 
-| Path              | Responsibility                                                    |
-| ----------------- | ----------------------------------------------------------------- |
-| scripts/cli.ts    | Internal maintenance command entry                                |
-| scripts/checks/   | Source architecture, dependencies and toolchain policy            |
-| scripts/packages/ | Archives, isolated consumers and compatibility matrix             |
-| scripts/release/  | Release commands, scope checks and validation                     |
-| scripts/tasks/    | VP task definitions, argument forwarding and execution            |
-| scripts/verify/   | Verification planning and gate execution                          |
-| scripts/ci/       | CI diagnostics and consumer runtime setup                         |
-| scripts/shared/   | Internal helpers for temporary directories and atomic file writes |
-| tests/scripts/    | Maintenance tests grouped by the same responsibilities            |
-| tests/setup/      | Shared test preloads                                              |
-| e2e/              | Shared browser project inventory, runner and fixture server       |
-| docs/             | Canonical Markdown and the internal documentation application     |
+| Path                  | Responsibility                                                    |
+| --------------------- | ----------------------------------------------------------------- |
+| bin/raypx-kit-dev.mjs | JavaScript maintenance executable loading TypeScript through tsx  |
+| scripts/cli.ts        | Internal maintenance commands and main handler                    |
+| scripts/checks/       | Source architecture, dependencies and toolchain policy            |
+| scripts/packages/     | Archives, isolated consumers and compatibility matrix             |
+| scripts/release/      | Release commands, scope checks and validation                     |
+| scripts/tasks/        | VP task definitions, argument forwarding and execution            |
+| scripts/verify/       | Verification planning and gate execution                          |
+| scripts/ci/           | CI diagnostics and consumer runtime setup                         |
+| scripts/shared/       | Internal helpers for temporary directories and atomic file writes |
+| tests/scripts/        | Maintenance tests grouped by the same responsibilities            |
+| tests/setup/          | Shared test preloads                                              |
+| e2e/                  | Shared browser project inventory, runner and fixture server       |
+| docs/                 | Canonical Markdown and the internal documentation application     |
 
 Public TypeScript entries live directly under each library's `src/`. Supporting
 implementation modules may live beneath them. Unit and integration tests belong to

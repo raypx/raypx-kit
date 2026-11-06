@@ -6,6 +6,9 @@
     "name": "Zack",
     "email": "heyloyep@gmail.com"
   },
+  "bin": {
+    "raypx-kit-dev": "./bin/raypx-kit-dev.mjs"
+  },
   "workspaces": {
     "packages": [
       "docs",
@@ -18,7 +21,7 @@
   "type": "module",
   "scripts": {
     "prepare": "vp config --hooks --no-agent",
-    "raypx-kit-dev": "tsx scripts/cli.ts",
+    "raypx-kit-dev": "node bin/raypx-kit-dev.mjs",
     "doctor": "pnpm run raypx-kit-dev doctor",
     "toolchain:check": "pnpm run raypx-kit-dev toolchain check",
     "architecture:check": "pnpm run raypx-kit-dev architecture check",

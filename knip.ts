@@ -29,12 +29,14 @@ const config: KnipConfig = {
   workspaces: {
     ".": {
       entry: [
+        // The JavaScript bin loads this TypeScript entry through tsx's scoped API.
+        "scripts/cli.ts",
         "scripts/ci/{cache,gate,plan,result}.ts",
         // Shared Devkit generates the leaf command path in VP metadata.
         "scripts/tasks/leaf.ts",
       ],
-      // package.json scripts provide the CLI, pack and release entry points.
-      project: ["scripts/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],
+      // package.json bin/scripts provide the executable, pack and release entry points.
+      project: ["bin/**/*.mjs", "scripts/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],
       includeEntryExports: true,
       vite: { config: ["vite.config.ts", "e2e/vite.config.ts"] },
     },
