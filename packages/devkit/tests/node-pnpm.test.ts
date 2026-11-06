@@ -52,14 +52,40 @@ it("reads manifest pins without requiring Bun or a second Node pin", () => {
   expect(nodeTestDefaults.test).not.toHaveProperty("execArgv");
 });
 it("accepts a Node range while keeping the pnpm version exact", () => {
-  const root = repository(">=24.18.0 <25");
+  const root = repository("^22.22.2 || ^24.18.0 || >=26.0.0");
   writeFileSync(
     join(root, "README.md"),
-    "Develop with Node **>=24.18.0 <25** and pnpm **12.16.1**.\n",
+    "Develop with Node **^22.22.2 || ^24.18.0 || >=26.0.0** and pnpm **12.16.1**.\n",
   );
-  expect(readNodePnpmPins(root)).toEqual({ node: ">=24.18.0 <25", pnpm: "12.16.1" });
+  expect(readNodePnpmPins(root)).toEqual({
+    node: "^22.22.2 || ^24.18.0 || >=26.0.0",
+    pnpm: "12.16.1",
+  });
   expect(checkToolchain(root, { runtime: "node-pnpm" })).toEqual([]);
 });
+
+it.each(["22.22.2", "22.23.0", "24.18.0", "24.22.2", "26.0.0", "26.12.0", "27.0.0"])(
+  "accepts Node %s across the supported major ranges",
+  (node) => {
+    vi.stubGlobal("process", { versions: { node } });
+    execFileSync.mockReturnValue("12.16.1\n");
+    expect(assertNodePnpmRuntime(repository("^22.22.2 || ^24.18.0 || >=26.0.0"))).toEqual({
+      node,
+      pnpm: "12.16.1",
+    });
+  },
+);
+
+it.each(["20.19.0", "22.22.1", "23.0.0", "24.17.9", "25.0.0", "26.0.0-rc.1"])(
+  "rejects Node %s outside the supported major ranges",
+  (node) => {
+    vi.stubGlobal("process", { versions: { node } });
+    expect(() => assertNodePnpmRuntime(repository("^22.22.2 || ^24.18.0 || >=26.0.0"))).toThrow(
+      `Expected Node ^22.22.2 || ^24.18.0 || >=26.0.0, got ${node}`,
+    );
+    expect(execFileSync).not.toHaveBeenCalled();
+  },
+);
 
 it.each(["", "not-a-version", ">=24.invalid"])("rejects an invalid Node requirement %j", (node) => {
   expect(() => readNodePnpmPins(repository(node))).toThrow("valid Node version or range");

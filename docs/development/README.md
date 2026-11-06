@@ -5,7 +5,7 @@ versions and explicit ESM exports; `docs/` is an internal documentation applicat
 
 ## Setup
 
-Use Node **>=24.18.0 <25** and pnpm **12.16.1**, declared in root `engines.node` and
+Use Node **^22.22.2 || ^24.18.0 || >=26.0.0** and pnpm **12.16.1**, declared in root `engines.node` and
 `packageManager`. mise reads the Node pin; install the pinned pnpm separately:
 
 ```sh
@@ -229,8 +229,9 @@ Node workflow validates this build without deployment credentials.
 
 Cloudflare Workers Builds owns automatic deployment. Recommended settings are:
 
-The root `engines.node` and `devEngines.runtime.version` allow supported Node 24
-releases, including Cloudflare's default build runtime. pnpm checks this range
+The root `engines.node` and `devEngines.runtime.version` allow supported Node 22,
+24 and newer releases, including Cloudflare's default build runtime. Node 23 and
+25 are excluded to match Vite+, Vitest and jsdom requirements. pnpm checks this range
 before installing dependencies. To select a specific compatible version, use the
 `NODE_VERSION` build variable under Settings > Build > Build Variables and Secrets.
 See Cloudflare's [build image documentation](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/).

@@ -34,7 +34,7 @@ Repository development uses the Node range below.
 
 ## Quick start
 
-Use Node **>=24.18.0 <25** and pnpm **12.16.1**, declared in root `engines.node` and
+Use Node **^22.22.2 || ^24.18.0 || >=26.0.0** and pnpm **12.16.1**, declared in root `engines.node` and
 `packageManager`. With mise installed:
 
 ```sh

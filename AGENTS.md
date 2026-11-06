@@ -87,7 +87,7 @@ plain table values are an authoring convention rather than an automatic formatte
 
 ## Toolchain
 
-Node >=24.18.0 <25 is the development and default CI runtime; pnpm 12.16.1 owns
+Node ^22.22.2 || ^24.18.0 || >=26.0.0 is the development and default CI runtime range; pnpm 12.16.1 owns
 installation, the lockfile and archive packing. Root `engines.node` and
 `packageManager` define the Node range and exact pnpm pin; devEngines, CI and documentation follow them.
 mise reads Node from package.json without a `[tools]` section. Install the pinned
@@ -167,7 +167,7 @@ checks in `pnpm run toolchain:check`:
 - Nitro uses the tested prerelease range `~3.0.260903-beta`.
 
 The development Node range and exact pnpm pin live in the root manifest. Node type
-declarations follow the development Node major. The consumer compatibility
+declarations follow the lowest supported development Node major. The consumer compatibility
 baseline and published engine ranges remain separate.
 
 Range changes do not authorize upgrading copied source provenance or replacing

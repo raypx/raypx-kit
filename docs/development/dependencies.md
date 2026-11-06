@@ -35,9 +35,9 @@ Its esbuild range also accepts the tested `^0.28.2` release alongside upstream's
 `^0.25.10`; archive consumers generate migrations from TypeScript configuration
 and schemas with the installed CLI under Node.
 
-Node and pnpm development pins remain exact in root `engines.node` and `packageManager`. The separate
+The development Node range and exact pnpm pin live in root `engines.node` and `packageManager`. The separate
 Node consumer baseline lives in `scripts/packages/node-version`.
-`@types/node` follows the development Node major. Public package engine ranges describe consumer support
+`@types/node` follows the lowest supported development Node major. Public package engine ranges describe consumer support
 independently of repository development pins.
 
 The [consumer compatibility matrix](README.md#consumer-compatibility-matrix)
