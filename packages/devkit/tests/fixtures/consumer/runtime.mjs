@@ -9,6 +9,7 @@ import { checkToolchain, readBunPin } from "@raypx-kit/devkit/toolchain";
 import { discover } from "@raypx-kit/devkit/workspaces";
 import {
   createTaskModel,
+  repositoryRoot,
   taskPlan,
   taskRef,
   argumentKey,
@@ -25,7 +26,7 @@ try {
   mkdirSync(join(directory, "src"), { recursive: true });
   writeFileSync(
     join(root, "package.json"),
-    JSON.stringify({ name: "consumer-fixture", private: true, workspaces: ["packages/*"] }),
+    JSON.stringify({ name: "consumer-fixture", private: true }),
   );
   writeFileSync(
     join(directory, "package.json"),
@@ -44,6 +45,10 @@ try {
     join(root, "devkit.config.ts"),
     `import { writeFileSync } from "node:fs"; writeFileSync(${JSON.stringify(marker)}, "executed"); throw new Error("Configuration must not execute");`,
   );
+
+  writeFileSync(join(root, "pnpm-workspace.yaml"), 'packages: ["packages/*"]\n');
+
+  assert.equal(repositoryRoot(directory), await (await import("node:fs/promises")).realpath(root));
 
   const metadata = {
     "packages/library": {

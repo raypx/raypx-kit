@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import { checkArchitecture } from "../src/architecture.js";
-import { discover, type Metadata } from "../src/workspaces.js";
+import { discover, workspacePatterns, type Metadata } from "../src/workspaces.js";
 
 const roots: string[] = [];
 function fixture() {
@@ -49,6 +49,31 @@ afterEach(() => {
 });
 
 describe("workspace architecture", () => {
+  it("uses native pnpm patterns and exclusions without package.json workspaces", () => {
+    const root = fixture();
+    writeFileSync(join(root, "package.json"), "{}");
+    member(root, "included");
+    member(root, "excluded");
+    writeFileSync(
+      join(root, "pnpm-workspace.yaml"),
+      'packages:\n  - packages/*\n  - "!packages/excluded"\n',
+    );
+    const index = discover(root);
+    expect(index.workspaces.map((workspace) => workspace.manifest.name)).toEqual([
+      "@raypx/included",
+    ]);
+    expect(index.findings).toEqual([]);
+    expect(workspacePatterns(root)).toEqual(["packages/*", "!packages/excluded"]);
+  });
+
+  it("rejects malformed pnpm workspace data instead of using package.json patterns", () => {
+    const root = fixture();
+    for (const value of ["[]", "packages: wrong", "packages: [1]", 'packages: [""]']) {
+      writeFileSync(join(root, "pnpm-workspace.yaml"), value);
+      expect(() => discover(root)).toThrow("pnpm-workspace.yaml");
+    }
+  });
+
   it("discovers workspaces from manifests and reads metadata from a configured key", () => {
     const root = fixture();
     member(root, "one");

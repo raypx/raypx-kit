@@ -3,7 +3,7 @@ import { existsSync, globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseTOML } from "confbox/toml";
 import { parseYAML } from "confbox/yaml";
-import { workspacePatterns } from "./workspaces.js";
+import { readWorkspaceConfiguration, workspaceManifestFiles } from "./workspace-config.js";
 
 export interface Toolchain {
   node: string;
@@ -35,13 +35,8 @@ interface Manifest {
 const exactVersion = /^\d+\.\d+\.\d+$/;
 const manifestAt = (root: string, file = "package.json"): Manifest =>
   JSON.parse(readFileSync(join(root, file), "utf8")) as Manifest;
-const catalogsOf = (manifest: Manifest): Record<string, string>[] => {
-  const workspaces = manifest.workspaces;
-  if (!workspaces || typeof workspaces !== "object" || Array.isArray(workspaces)) return [];
-  const { catalog, catalogs } = workspaces as {
-    catalog?: Record<string, string>;
-    catalogs?: Record<string, Record<string, string>>;
-  };
+const catalogsOf = (root: string): Record<string, string>[] => {
+  const { catalog, catalogs } = readWorkspaceConfiguration(root);
   return [...(catalog ? [catalog] : []), ...Object.values(catalogs ?? {})];
 };
 
@@ -302,14 +297,11 @@ export function checkToolchain(
     const bun = version(dependencies?.["@types/bun"]);
     if (bun) expect(file, "@types/bun", bun, pins.bun);
   };
-  for (const catalog of catalogsOf(manifest)) checkTypes("package.json catalog", catalog);
-  for (const file of [
-    "package.json",
-    ...globSync(
-      workspacePatterns(manifest).map((path) => `${path}/package.json`),
-      { cwd: root },
-    ),
-  ])
+  const catalogFile = existsSync(join(root, "pnpm-workspace.yaml"))
+    ? "pnpm-workspace.yaml"
+    : "package.json";
+  for (const catalog of catalogsOf(root)) checkTypes(`${catalogFile} catalog`, catalog);
+  for (const file of ["package.json", ...workspaceManifestFiles(root)])
     checkTypes(file, manifestAt(root, file).devDependencies);
 
   for (const file of globSync("**/Dockerfile", { cwd: root, exclude: ["**/node_modules/**"] })) {

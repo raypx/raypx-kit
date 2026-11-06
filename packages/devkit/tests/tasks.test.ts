@@ -1,10 +1,11 @@
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, expect, it } from "vite-plus/test";
 import {
   createTaskModel,
+  repositoryRoot,
   taskRef,
   taskPlan,
   taskConfig,
@@ -122,4 +123,15 @@ it("tracks successful artifacts independently of cache database updates", () => 
   expect(taskCacheSnapshot(directory, before).changed).toBe(false);
   writeFileSync(join(directory, "successful.tar.zst"), "artifact");
   expect(taskCacheSnapshot(directory, before).changed).toBe(true);
+});
+
+it("finds native pnpm roots from a workspace and builds the same task graph", () => {
+  const { root, policy } = fixture();
+  writeFileSync(join(root, "package.json"), JSON.stringify({ name: "fixture" }));
+  writeFileSync(join(root, "pnpm-workspace.yaml"), 'packages: ["packages/*"]\n');
+  expect(repositoryRoot(join(root, "packages/base"))).toBe(realpathSync(root));
+  expect(createTaskModel(root, policy).members.map((member) => member.name)).toEqual([
+    "base",
+    "consumer",
+  ]);
 });

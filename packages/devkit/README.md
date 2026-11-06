@@ -105,6 +105,11 @@ dependencies still come from package manifests, and aliases come from workspace
 TypeScript configurations. Keep a repository's typed policy file in its type
 check and build-cache dependencies.
 
+`discover(root)` and `workspacePatterns(root)` read native `pnpm-workspace.yaml`
+packages and exclusions when present; otherwise they read package.json workspaces.
+Invalid pnpm configuration fails explicitly. The manifest-only
+`workspacePatterns(manifest)` form remains available for static JSON callers.
+
 `discover` also reports directories under `apps/` and `packages/` without a
 manifest; pass `containers` to change them. `checkArchitecture` statically parses
 runtime sources under `src/`, `server/`, `native/` and `app/` and walks every

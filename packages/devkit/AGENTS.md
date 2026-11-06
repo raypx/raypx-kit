@@ -25,6 +25,8 @@ Git changes and scope propagation; `./vite` owns injected Start environment load
 Callers explicitly supply trusted policies. Keep product/native/packaging decisions
 in their repositories; never discover or execute inspected configuration files.
 
+Discovery reads static pnpm-workspace.yaml patterns/exclusions when present,
+otherwise package.json workspaces. Toolchain catalogs use the same source.
 The README documents the complete shipped API.
 
 ## Constraints

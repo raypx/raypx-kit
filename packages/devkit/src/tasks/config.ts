@@ -7,7 +7,12 @@ export function repositoryRoot(directory: string): string {
   let current = realpathSync(directory);
   while (true) {
     const file = join(current, "package.json");
-    if (existsSync(file) && JSON.parse(readFileSync(file, "utf8")).workspaces) return current;
+    if (
+      existsSync(file) &&
+      (existsSync(join(current, "pnpm-workspace.yaml")) ||
+        JSON.parse(readFileSync(file, "utf8")).workspaces)
+    )
+      return current;
     const parent = dirname(current);
     if (parent === current) throw new Error("Task config needs a workspace repository");
     current = parent;

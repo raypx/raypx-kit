@@ -1,5 +1,6 @@
-import { existsSync, globSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, posix } from "node:path";
+import { readWorkspaceConfiguration, workspaceManifestFiles } from "./workspace-config.js";
 
 export const targets = ["universal", "browser", "native", "node", "bun"] as const;
 export type Target = (typeof targets)[number];
@@ -72,8 +73,9 @@ export function matches(pattern: string, value: string): boolean {
   return new RegExp(`${regex}$`).test(value);
 }
 
-/** Reads workspace patterns from the array or Bun/Yarn object form of `workspaces`. */
-export function workspacePatterns(manifest: { workspaces?: unknown }): string[] {
+/** Read native pnpm patterns by repository path, or the package.json workspace forms. */
+export function workspacePatterns(manifest: { workspaces?: unknown } | string): string[] {
+  if (typeof manifest === "string") return readWorkspaceConfiguration(manifest).packages ?? [];
   const value = manifest.workspaces;
   if (Array.isArray(value)) return value as string[];
   if (
@@ -89,13 +91,9 @@ export function discover(
   root: string,
   { metadata, metadataKey = "devkit", containers = ["apps", "packages"] }: DiscoverOptions = {},
 ): WorkspaceIndex {
-  const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const findings: string[] = [];
   const workspaces: Workspace[] = [];
-  for (const file of globSync(
-    workspacePatterns(manifest).map((p) => `${p}/package.json`),
-    { cwd: root },
-  ).sort()) {
+  for (const file of workspaceManifestFiles(root)) {
     const path = file.replaceAll("\\", "/").slice(0, -13);
     const entry = JSON.parse(readFileSync(join(root, file), "utf8")) as Manifest;
     const workspaceMetadata =
@@ -134,11 +132,13 @@ export function discover(
       if (!paths.has(path)) findings.push(`${path}: metadata supplied for unknown workspace`);
     }
   }
+  const excluded = workspacePatterns(root).filter((pattern) => pattern.startsWith("!"));
   for (const parent of containers) {
     if (!existsSync(join(root, parent))) continue;
     for (const child of readdirSync(join(root, parent), { withFileTypes: true })) {
       if (!child.isDirectory() || child.name.startsWith(".")) continue;
       const path = `${parent}/${child.name}`;
+      if (excluded.some((pattern) => matches(pattern.slice(1), path))) continue;
       if (!workspaces.some((w) => w.path === path))
         findings.push(`${path}: missing workspace manifest`);
     }
