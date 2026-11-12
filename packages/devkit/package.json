@@ -93,8 +93,8 @@
   },
   "devDependencies": {
     "@types/semver": "^7.8.0",
-    "@vitest/coverage-v8": "^5.0.5",
-    "vite-plus": "^1.4.0"
+    "@vitest/coverage-v8": "^5.1.0",
+    "vite-plus": "^1.6.0"
   },
   "engines": {
     "node": ">=22.21"

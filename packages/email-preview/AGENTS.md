@@ -26,8 +26,10 @@ projects run it with `vite dev`.
 - Keep `LICENSE` limited to the package's Apache license. Maintain the README's
   direct runtime and peer dependency index through the root `licenses:update` and
   `licenses:check` commands; ordinary external dependencies carry their own full
-  license texts. Build notices use the root Turbo `dist/` cache rule and must not
+  license texts. Build notices use the package's VP `dist/` output cache and must not
   rewrite `LICENSE`.
+- Runtime dependencies are the renderer and formatter. Keep `react-email` in
+  development dependencies for examples; consumers own their template libraries.
 - Resolve packaged assets from the package location and templates from the caller's
   working directory. Never write caches or generated files into the installed package.
 - Use the consumer's React and template dependencies when evaluating templates;

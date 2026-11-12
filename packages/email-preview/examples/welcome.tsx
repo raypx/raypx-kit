@@ -1,14 +1,4 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Img,
-  Preview,
-  Text,
-} from "@react-email/components";
+import { Body, Button, Container, Head, Heading, Html, Img, Preview, Text } from "react-email";
 import { Footer } from "./_components/footer";
 
 interface WelcomeProps {

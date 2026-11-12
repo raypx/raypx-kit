@@ -2,9 +2,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@react-email/components": "^1.0.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-email": "^6.11.11",
     "vite": "^8.0.0"
   }
 }

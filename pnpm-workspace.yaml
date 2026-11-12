@@ -3,10 +3,10 @@ packages:
   - docs
   - packages/*
 catalog:
-  "@react-email/render": ^2.2.0
+  "@react-email/render": ^2.3.1
+  react-email: ^6.11.11
 overrides:
-  "@react-email/render": "catalog:"
-  vite: npm:@voidzero-dev/vite-plus-core@^1.4.0
+  vite: npm:@voidzero-dev/vite-plus-core@^1.6.0
 strictPeerDependencies: false
 engineStrict: true
 minimumReleaseAge: 0

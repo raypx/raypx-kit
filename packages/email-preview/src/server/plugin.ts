@@ -52,7 +52,7 @@ export function emailPreview(options: EmailPreviewOptions = {}): Plugin {
             resolve: {
               dedupe: ["react", "react-dom"],
               external: true,
-              // Bundled through Vite so the renderer resolves the project's React.
+              // Evaluate the renderer through Vite so it uses the project's React.
               noExternal: ["@react-email/render"],
             },
             dev: {

@@ -4,6 +4,7 @@ import { existsSync, realpathSync } from "node:fs";
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join } from "node:path";
+import { stringifyYAML } from "confbox/yaml";
 
 export type Dependencies = Record<string, string>;
 
@@ -70,7 +71,7 @@ async function installConsumer(
   );
   await writeFile(
     join(directory, "pnpm-workspace.yaml"),
-    JSON.stringify({
+    stringifyYAML({
       overrides: packageArchives,
       autoInstallPeers: false,
       strictPeerDependencies: false,

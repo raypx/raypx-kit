@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@types/semver": "^7.8.0",
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitest/coverage-v8": "^5.1.0",
     "drizzle-kit": ">=1.0.0-rc.5-5935859 <1.0.0-rc.5-z",
     "drizzle-orm": ">=1.0.0-rc.5-5935859 <1.0.0-rc.5-z",
     "semver": "^7.8.5"

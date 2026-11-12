@@ -381,11 +381,14 @@ test("supports Chinese mobile navigation and a keyboard-operated language picker
   await page.getByRole("button", { name: "English", exact: true }).press("Enter");
   await expect(page).toHaveURL(/\/docs$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
-    ),
-  ).toBe(true);
+  // The open language picker repositions after its localized contents change.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+      ),
+    )
+    .toBe(true);
 });
 
 test("recovers in Chinese from missing pages and canonicalizes the English prefix", async ({

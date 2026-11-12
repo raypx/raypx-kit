@@ -60,10 +60,12 @@ shipped a `raypx-email dev` CLI wrapping such a server; it was removed because a
 three-line configuration gives the same result without a second interface to
 document and test.
 
-Peer dependencies become `vite` (`^8`), `react` and `react-dom` (`^19`). Runtime
-dependencies are `@react-email/render` and `prettier`. `esbuild`, `chokidar`,
-TanStack Start, Nitro and srvx are removed; TanStack Router stays bundled into
-the client interface.
+Peer dependencies are `vite` (`^8`), `react` and `react-dom` (`^19`). Runtime
+dependencies are `@react-email/render` and `prettier`. The unified `react-email`
+package is a development dependency for examples and belongs to consumer projects
+that use its components. The plugin does not install its CLI toolchain, official
+preview UI or Next.js. Vite handles template loading and watching; TanStack Router
+stays bundled into the client interface.
 
 ## Architecture
 
@@ -92,9 +94,9 @@ environment, and the application's SSR entry is never imported.
 Rendering imports the template through `environment.runner.import(path)`, reads
 its default export and `PreviewProps`, and renders it with
 `@react-email/render` imported through the same runner so that React is shared
-between the template and the renderer. The resulting HTML is formatted with
-Prettier in the plugin process; the original HTML is returned for preview,
-copy and download.
+between the template and the renderer. Template libraries resolve from the
+consumer project. The resulting HTML is formatted with Prettier in the plugin
+process; the original HTML is returned for preview, copy and download.
 
 ### Discovery, invalidation and events
 

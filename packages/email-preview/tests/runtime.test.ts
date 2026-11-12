@@ -83,13 +83,22 @@ async function fixture(timeout = 10_000, createEmails = true, installReact = tru
   return { root, emails, runtime, server };
 }
 
-async function changed(runtime: PreviewRuntime, mutate: () => Promise<void>) {
+async function changed(
+  runtime: PreviewRuntime,
+  mutate: () => Promise<void>,
+  expectedFile?: { server: ViteDevServer; path: string },
+) {
   const previous = runtime.revision;
+  let observed = expectedFile === undefined;
+  const onFileEvent = (_event: string, path: string) => {
+    if (path === expectedFile?.path) observed = true;
+  };
+  expectedFile?.server.watcher.on("all", onFileEvent);
   let unsubscribe: (() => void) | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   const event = new Promise<void>((resolve, reject) => {
     unsubscribe = runtime.subscribe((revision) => {
-      if (revision > previous) resolve();
+      if (observed && revision > previous) resolve();
     });
     timer = setTimeout(() => reject(new Error("No template change event received")), 8_000);
   });
@@ -98,6 +107,7 @@ async function changed(runtime: PreviewRuntime, mutate: () => Promise<void>) {
     await event;
   } finally {
     unsubscribe?.();
+    expectedFile?.server.watcher.off("all", onFileEvent);
     clearTimeout(timer);
   }
 }
@@ -144,7 +154,7 @@ describe("preview runtime", () => {
   });
 
   it("renders PreviewProps, consumer hooks, and tsconfig aliases with the project React", async () => {
-    const { root, emails, runtime } = await fixture();
+    const { root, emails, runtime, server } = await fixture();
     await writeFile(join(root, "shared", "label.ts"), 'export const label = "First version";');
     await writeFile(
       join(emails, "welcome.tsx"),
@@ -171,17 +181,22 @@ Welcome.PreviewProps = { name: "Ada" };`,
     expect(next.revision).toBeGreaterThan(first.revision);
     await mkdir(join(root, "replacement"));
     await writeFile(join(root, "replacement", "label.ts"), 'export const label = "Changed alias";');
-    await changed(runtime, () =>
-      writeFile(
-        join(root, "tsconfig.json"),
-        JSON.stringify({
-          compilerOptions: {
-            jsx: "react-jsx",
-            baseUrl: ".",
-            paths: { "@shared/*": ["./replacement/*"] },
-          },
-        }),
-      ),
+    const tsconfig = join(root, "tsconfig.json");
+    // A delayed notification for the shared component must not satisfy this save.
+    await changed(
+      runtime,
+      () =>
+        writeFile(
+          tsconfig,
+          JSON.stringify({
+            compilerOptions: {
+              jsx: "react-jsx",
+              baseUrl: ".",
+              paths: { "@shared/*": ["./replacement/*"] },
+            },
+          }),
+        ),
+      { server, path: tsconfig },
     );
     expect((await runtime.renderTemplate("welcome.tsx")).html).toContain("Changed alias");
   }, 20_000);

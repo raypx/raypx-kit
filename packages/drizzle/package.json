@@ -59,7 +59,7 @@
     "pack:check": "pnpm pack --dry-run"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitest/coverage-v8": "^5.1.0",
     "drizzle-orm": ">=1.0.0-rc.5-5935859 <1.0.0-rc.5-z",
     "postgres": "^3.4.9"
   },

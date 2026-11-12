@@ -61,7 +61,7 @@
     "evlog": "^2.34.0"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^5.0.5"
+    "@vitest/coverage-v8": "^5.1.0"
   },
   "engines": {
     "node": ">=22.21"

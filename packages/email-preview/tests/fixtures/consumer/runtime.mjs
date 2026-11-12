@@ -98,7 +98,7 @@ async function eventually(check, message, timeout = 20_000) {
 
 const source = `
 import { useState } from "react";
-import { Body, Html, Img, Text } from "@react-email/components";
+import { Body, Html, Img, Text } from "react-email";
 import { message } from "@shared/message";
 import { Footer } from "../_components/footer";
 export default function Welcome({ name }) {

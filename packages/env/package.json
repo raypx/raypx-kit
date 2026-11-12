@@ -46,7 +46,7 @@
     "pack:check": "pnpm pack --dry-run"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitest/coverage-v8": "^5.1.0",
     "zod": "^4.6.7"
   },
   "peerDependencies": {

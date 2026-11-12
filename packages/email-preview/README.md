@@ -11,11 +11,15 @@ Install the preview and its peers in the project that owns your templates:
 
 ```sh
 pnpm add -d @raypx-kit/email-preview@0.0.0-alpha.0 vite@^8
-pnpm add react@^19 react-dom@^19 @react-email/components
+pnpm add react@^19 react-dom@^19 react-email@^6
 ```
 
 It supports Node 22.21+ and Bun. The interface is prebuilt into the package; your
 project does not build it or configure Tailwind for it.
+
+The preview depends on `@react-email/render` for rendering and Prettier for source
+formatting. Your project owns `react-email` when templates use its components.
+The plugin does not install the React Email CLI, official preview UI or Next.js.
 
 ## Use with Vite
 
@@ -84,7 +88,7 @@ Export a React component as the default export of a `.tsx` or `.jsx` file. Attac
 sample data to that component's `PreviewProps` property:
 
 ```tsx
-import { Body, Container, Heading, Html, Text } from "@react-email/components";
+import { Body, Container, Heading, Html, Text } from "react-email";
 
 type WelcomeProps = { name: string };
 
@@ -196,11 +200,11 @@ changes; `pnpm run licenses:check` checks this index without requiring build out
 
 | Package             | Installed version | License | License text                                                            |
 | ------------------- | ----------------- | ------- | ----------------------------------------------------------------------- |
-| @react-email/render | 2.2.0             | MIT     | [license.md](https://unpkg.com/@react-email/render@2.2.0/license.md)    |
-| prettier            | 3.9.10            | MIT     | [LICENSE](https://unpkg.com/prettier@3.9.10/LICENSE)                    |
+| @react-email/render | 2.3.1             | MIT     | [license.md](https://unpkg.com/@react-email/render@2.3.1/license.md)    |
+| prettier            | 3.10.0            | MIT     | [LICENSE](https://unpkg.com/prettier@3.10.0/LICENSE)                    |
 | react               | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react@19.3.1/LICENSE)                       |
 | react-dom           | 19.3.1            | MIT     | [LICENSE](https://unpkg.com/react-dom@19.3.1/LICENSE)                   |
-| vite                | 1.4.0             | MIT     | [LICENSE](https://unpkg.com/@voidzero-dev/vite-plus-core@1.4.0/LICENSE) |
+| vite                | 1.6.0             | MIT     | [LICENSE](https://unpkg.com/@voidzero-dev/vite-plus-core@1.6.0/LICENSE) |
 
 <!-- END GENERATED DEPENDENCY LICENSE INDEX -->
 
