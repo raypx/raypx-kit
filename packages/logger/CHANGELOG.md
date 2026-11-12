@@ -1,5 +1,11 @@
 # @raypx-kit/logger
 
+## 0.0.0-alpha.5
+
+### Patch Changes
+
+- 1e5fc00: Render documentation table values as plain text instead of inline code.
+
 ## 0.0.0-alpha.4
 
 ### Patch Changes

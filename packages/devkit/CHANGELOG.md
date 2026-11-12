@@ -1,5 +1,14 @@
 # @raypx-kit/devkit
 
+## 0.0.0-alpha.7
+
+### Patch Changes
+
+- cdc618e: Discover native pnpm workspaces and exclusions from pnpm-workspace.yaml, share that configuration with toolchain catalog checks, and allow workspacePatterns to read a repository path.
+- 5813d8d: Accept semver ranges for Node in the Node/pnpm toolchain policy. Runtime checks validate the active Node version against the declared range and return the actual version, while pnpm remains pinned exactly.
+- 1e5fc00: Render documentation table values as plain text instead of inline code.
+- 487da2c: Add Node/pnpm toolchain checks, Node test defaults and configurable VP launcher arguments while preserving existing Bun consumer interfaces. Repository development, CI and archive checks now use pnpm and Node.
+
 ## 0.0.0-alpha.6
 
 ### Patch Changes

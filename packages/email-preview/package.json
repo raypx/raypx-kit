@@ -1,6 +1,6 @@
 {
   "name": "@raypx-kit/email-preview",
-  "version": "0.0.0-alpha.4",
+  "version": "0.0.0-alpha.5",
   "description": "Preview React Email templates in a Vite dev server with a prebuilt interface.",
   "homepage": "https://github.com/raypx/raypx-kit/tree/canary/packages/email-preview",
   "license": "Apache-2.0",

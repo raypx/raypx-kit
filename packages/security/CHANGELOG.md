@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.0-alpha.3
+
+### Patch Changes
+
+- 1e5fc00: Render documentation table values as plain text instead of inline code.
+
 ## 0.0.0-alpha.2
 
 ### Patch Changes
