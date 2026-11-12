@@ -1,14 +1,10 @@
 name: Release
 
 on:
-  workflow_call:
-    inputs:
-      verified-sha:
-        required: true
-        type: string
-    secrets:
-      NPM_TOKEN:
-        required: false
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [canary]
   workflow_dispatch:
 
 permissions: {}
@@ -19,6 +15,12 @@ concurrency:
 
 jobs:
   plan:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'canary' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       contains(fromJSON('["push", "workflow_dispatch"]'), github.event.workflow_run.event))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -29,6 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
           fetch-depth: 0
       - name: Set up repository toolchain
@@ -36,7 +39,8 @@ jobs:
       - name: Require verified canary commit
         env:
           GH_TOKEN: ${{ github.token }}
-          VERIFIED_SHA: ${{ inputs.verified-sha }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          RELEASE_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
         run: node --import tsx scripts/release/gate.ts
       - name: Verify toolchain
         run: node scripts/ci/diagnostics.ts run toolchain pnpm run verify:toolchain
@@ -77,8 +81,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
           fetch-depth: 0
+      - name: Attach canary to the verified commit
+        run: git switch -C canary
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
       - name: Verify toolchain
@@ -101,6 +108,8 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/node-compatibility.yml
+    with:
+      ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
   publish:
     needs: [plan, compatibility]
@@ -116,8 +125,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
           fetch-depth: 0
+      - name: Attach canary to the verified commit
+        run: git switch -C canary
       - name: Set up repository toolchain
         uses: ./.github/actions/setup-toolchain
         with:

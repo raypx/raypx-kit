@@ -233,8 +233,10 @@ CI consumes the same plan. Source/tests/builds precede independent browser and
 archive gates; those gates restore the newly saved VP build cache. PostgreSQL runs
 in parallel only for relevant changes. The final `verify` job rejects failed,
 missing or cancelled required gates and accepts skips only when unselected.
-Publication is called only after the same canary commit passes `verify`; manual
-release dispatch requires successful CI for that SHA. Node compatibility archives
+The standalone `release.yml` workflow starts only after successful canary CI through
+`workflow_run`; manual release dispatch requires successful CI for that SHA.
+Every release and compatibility checkout is pinned to that verified commit.
+Node compatibility archives
 include their commit and digests; CI publication reuses the completed main source gates, copies those verified bytes and
 checks them with Node instead of rebuilding or repacking. Shared workflow actions restore compatible VP artifacts and upload the cache only
 when a new successful artifact exists. Node matrices live outside default CI.

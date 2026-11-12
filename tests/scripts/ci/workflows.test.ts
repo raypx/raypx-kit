@@ -7,12 +7,22 @@ import { checkResults } from "../../../scripts/ci/result.js";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 interface Steps {
-  steps?: { uses?: string }[];
+  steps?: { uses?: string; with?: Record<string, string>; run?: string }[];
 }
 interface Workflow {
+  on: {
+    push?: unknown;
+    workflow_call?: unknown;
+    workflow_run?: { workflows: string[]; branches: string[]; types: string[] };
+  };
   jobs: Record<
     string,
-    Steps & { needs?: string[] | string; if?: string; permissions?: { contents?: string } }
+    Steps & {
+      needs?: string[] | string;
+      if?: string;
+      permissions?: { contents?: string };
+      with?: Record<string, string>;
+    }
   >;
 }
 const read = <T>(path: string) => parseYAML(readFileSync(join(root, path), "utf8")) as T;
@@ -47,7 +57,7 @@ it("grants read access when Release calls the reusable compatibility workflow", 
 it("runs the final required check after failures and covers every conditional gate", () => {
   const { jobs } = read<Workflow>(".github/workflows/ci.yml");
   expect(jobs.verify?.if).toBe("always()");
-  for (const name of Object.keys(jobs).filter((name) => name !== "verify" && name !== "release")) {
+  for (const name of Object.keys(jobs).filter((name) => name !== "verify")) {
     expect(jobs.verify?.needs).toContain(name);
     const needs = Object.fromEntries(
       (jobs.verify!.needs as string[]).map((name) => [
@@ -63,16 +73,44 @@ it("runs the final required check after failures and covers every conditional ga
   }
 });
 
-it("calls publication only after successful canary verification", () => {
+it("keeps release.yml as the publishing identity after successful canary CI", () => {
   const { jobs } = read<Workflow>(".github/workflows/ci.yml");
-  expect(jobs.release?.needs).toBe("verify");
-  expect(jobs.release?.if).toMatch(/^always\(\) && !cancelled\(\) && /);
-  expect(jobs.release?.if).toContain("needs.verify.result == 'success'");
-  expect(jobs.release?.if).toContain("github.event_name == 'push'");
-  expect(jobs.release?.if).toContain("refs/heads/canary");
-  const release = read<{ on: { push?: unknown; workflow_call?: unknown } }>(
-    ".github/workflows/release.yml",
-  );
+  expect(jobs.release).toBeUndefined();
+  const release = read<Workflow>(".github/workflows/release.yml");
   expect(release.on.push).toBeUndefined();
-  expect(release.on.workflow_call).toBeDefined();
+  expect(release.on.workflow_call).toBeUndefined();
+  expect(release.on).toHaveProperty("workflow_dispatch");
+  expect(release.on.workflow_run).toEqual({
+    workflows: ["CI"],
+    branches: ["canary"],
+    types: ["completed"],
+  });
+  expect(release.jobs.plan?.if).toContain("github.event.workflow_run.conclusion == 'success'");
+  expect(release.jobs.plan?.if).toContain("github.event.workflow_run.head_branch == 'canary'");
+  expect(release.jobs.plan?.if).toContain(
+    "github.event.workflow_run.head_repository.full_name == github.repository",
+  );
+  expect(release.jobs.plan?.if).toContain(
+    `contains(fromJSON('["push", "workflow_dispatch"]'), github.event.workflow_run.event)`,
+  );
+});
+
+it("pins release and compatibility checkouts to the CI commit instead of the default branch tip", () => {
+  const release = read<Workflow>(".github/workflows/release.yml");
+  const releaseRef = "${{ github.event.workflow_run.head_sha || github.sha }}";
+  for (const name of ["plan", "version", "publish"]) {
+    const checkout = release.jobs[name]?.steps?.find(({ uses }) =>
+      uses?.startsWith("actions/checkout@"),
+    );
+    expect(checkout?.with?.ref, name).toBe(releaseRef);
+  }
+  expect(release.jobs.compatibility?.with?.ref).toBe(releaseRef);
+  const compatibility = read<Workflow>(".github/workflows/node-compatibility.yml");
+  for (const job of Object.values(compatibility.jobs)) {
+    const checkout = job.steps?.find(({ uses }) => uses?.startsWith("actions/checkout@"));
+    expect(checkout?.with?.ref).toBe("${{ inputs.ref || github.sha }}");
+  }
+  for (const name of ["version", "publish"]) {
+    expect(release.jobs[name]?.steps?.some(({ run }) => run === "git switch -C canary")).toBe(true);
+  }
 });

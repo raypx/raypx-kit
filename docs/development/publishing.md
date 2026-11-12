@@ -122,22 +122,26 @@ For npm trusted publishing, first publish each new package manually, then enable
 CI publication:
 
 1. On npmjs.com, configure each package's GitHub Actions trusted publisher for
-   repository `raypx/raypx-kit`, workflow `ci.yml`, environment `npm`, with direct
-   `npm publish` allowed. Keep a separate `release.yml` identity for manual releases.
-   npm validates the calling workflow for reusable workflows; see
+   repository `raypx/raypx-kit`, workflow `release.yml`, environment `npm`, with direct
+   `npm publish` allowed. Automatic and manual releases use this same identity.
+   Release runs independently instead of being called as a reusable workflow,
+   so npm validates `release.yml`; see
    [npm's OIDC troubleshooting](https://docs.npmjs.com/trusted-publishers#troubleshooting).
-   Add the `ci.yml` identity before that package's next automatic release.
    For a registry requiring tokens, set the `NPM_TOKEN` secret instead.
 2. Set the repository variable `NPM_PUBLISH_ENABLED` to `true`.
 
-On `canary`, successful main CI calls the reusable release workflow. The release
-workflow runs Node compatibility, downloads the resulting commit-bound archives,
+On `canary`, successful main CI triggers `release.yml` through `workflow_run`.
+Only successful push or manual CI runs from this repository qualify; pull requests
+cannot trigger publication. Release checks out the triggering CI run's exact SHA
+and independently requires successful CI for that commit. Its Node compatibility
+workflow packs and tests the same SHA, then Release downloads the resulting commit-bound archives
 and runs `release:ci`, which chains the same
 `release:pack` and `release:publish` commands for versions absent from npm,
 requesting provenance. Its artifact import validates commit, versions and SHA-256
 digests, copies the exact tested tarballs and runs Node consumer checks. It never
 rebuilds or repacks that CI path. Manual workflow dispatch requires successful CI
-for the same canary SHA. The action runs its script without a shell.
+for the same canary SHA and can retry publication without rerunning main CI.
+The action runs its script without a shell.
 Pushes without new versions pass as no-ops. The separate
 [version PR setup](changesets.md#automatic-version-prs) does not enable publication.
 

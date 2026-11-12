@@ -2,6 +2,11 @@ name: Node consumer compatibility
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      ref:
+        description: Exact release commit to pack and test
+        required: true
+        type: string
 permissions:
   contents: read
 jobs:
@@ -13,6 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
       - uses: ./.github/actions/setup-toolchain
       - uses: ./.github/actions/vp-restore
@@ -44,6 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
       - uses: ./.github/actions/setup-toolchain
       - uses: actions/download-artifact@v8
